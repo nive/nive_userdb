@@ -1,0 +1,3 @@
+include *.txt *.ini *.cfg
+recursive-include nive_userdb *
+global-exclude *.pyc 
