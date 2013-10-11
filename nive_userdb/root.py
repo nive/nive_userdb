@@ -31,7 +31,7 @@ from nive.definitions import RootConf, Conf, StagUser, IUser
 from nive.definitions import Interface, implements
 from nive.security import User, AdminUser, IAdminUser, UserFound
 from nive.components.objects.base import RootBase
-from nive.i18n import _
+from nive_userdb.i18n import _
 
 
 class root(RootBase):

@@ -18,7 +18,7 @@
 
 from pyramid.renderers import get_renderer, render, render_to_response
 
-from nive.i18n import _
+from nive_userdb.i18n import _
 from nive.definitions import ViewConf, ViewModuleConf, Conf
 from nive.definitions import IApplication, IUser
 

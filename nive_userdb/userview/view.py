@@ -17,7 +17,7 @@
 __doc__ = """
 """
 
-from nive.i18n import _
+from nive_userdb.i18n import _
 from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
 
 # view module definition ------------------------------------------------------------------

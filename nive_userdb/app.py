@@ -36,7 +36,7 @@ from nive.definitions import implements, IUserDatabase, ILocalGroups
 from nive.definitions import AllMetaFlds
 from nive.security import Allow, Deny, Everyone, ALL_PERMISSIONS, remember, forget
 from nive.components.objects.base import ApplicationBase
-from nive.i18n import _
+from nive_userdb.i18n import _
 
 #@nive_module
 configuration = AppConf(

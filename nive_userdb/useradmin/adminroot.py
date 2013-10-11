@@ -21,7 +21,7 @@ Root for context to run adminview
 
 from nive.definitions import RootConf
 from nive_userdb.root import root
-from nive.i18n import _
+from nive_userdb.i18n import _
 
 class adminroot(root):
 	"""

@@ -20,7 +20,7 @@ __doc__ = """
 import hashlib
 from datetime import datetime
 
-from nive.i18n import _
+from nive_userdb.i18n import _
 from nive.definitions import implements, IUser
 
 from nive.components.objects.base import ObjectBase
