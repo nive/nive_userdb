@@ -44,7 +44,7 @@ configuration.modules = [
     # user administration
     "nive_userdb.useradmin", 
     # tools
-    "nive.components.tools.dbStructureUpdater", 
+    "nive.tools.dbStructureUpdater", 
     # administration and persistence
     "nive.adminview",
     #"nive_userdb.persistence.dbPersistenceConfiguration"

@@ -22,7 +22,7 @@ dbconf = DatabaseConf(
 def app(extmodules=None):
     appconf = AppConf("nive_userdb.app")
     appconf.modules.append("nive_userdb.userview.view")
-    appconf.modules.append("nive.components.tools.sendMail")
+    appconf.modules.append("nive.tools.sendMail")
     
     a = UserDB(appconf)
     a.dbConfiguration=dbconf
@@ -37,13 +37,13 @@ def app(extmodules=None):
         a.Query("select id from users where id=1")
         a.Query("select id from pool_files where id=1")
     except:
-        a.GetTool("nive.components.tools.dbStructureUpdater")()
+        a.GetTool("nive.tools.dbStructureUpdater")()
     return a
 
 def app_nodb():
     appconf = AppConf("nive_userdb.app")
     appconf.modules.append("nive_userdb.userview.view")
-    appconf.modules.append("nive.components.tools.sendMail")
+    appconf.modules.append("nive.tools.sendMail")
     
     a = UserDB(appconf)
     a.dbConfiguration=DatabaseConf()
@@ -66,7 +66,7 @@ def emptypool(app):
 
 def createpool(path,app):
     path.CreateDirectories()
-    app.GetTool("nive.components.tools.dbStructureUpdater")()
+    app.GetTool("nive.tools.dbStructureUpdater")()
 
 def create_user(name,email):
     type = "user"
