@@ -1,4 +1,4 @@
-<tal:block metal:use-macro="view.index_tmpl('nive_userdb.userview:main.pt').macros['main']" i18n:domain="nive">
+<tal:block metal:use-macro="view.index_tmpl('nive_userdb.userview:main.pt').macros['main']" i18n:domain="nive_userdb">
 <tal:block metal:fill-slot="tmpls">
 
 <div class="signup">
