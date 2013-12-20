@@ -30,7 +30,8 @@ configuration = AppConf(
     id = "userdb",
     title = _(u"Users"),
     context = "nive_userdb.app.UserDB",
-    loginByEmail = False
+    loginByEmail = False,
+    translations="nive_userdb:locale/"
 )
 
 # configuration.systemAdmin = (u"email", u"display name")
