@@ -3,29 +3,22 @@
 import time
 import unittest
 
-from nive.helper import *
 from nive.utils.path import DvPath
-from nive.definitions import *
-from nive.security import *
+from nive.definitions import AppConf, DatabaseConf
+from nive.security import User
 from nive.portal import Portal
 from nive_userdb.app import UserDB
 
-from nive.tests import __local
 
-dbconf = DatabaseConf(
-    dbName = __local.ROOT+"users.db",
-    fileRoot = __local.ROOT,
-    context = "Sqlite3"
-)
-
-
-def app(extmodules=None):
+def app_db(confs=None):
     appconf = AppConf("nive_userdb.app")
     appconf.modules.append("nive_userdb.userview.view")
     appconf.modules.append("nive.tools.sendMail")
-    
-    a = UserDB(appconf)
-    a.dbConfiguration=dbconf
+    a = UserDB()
+    a.Register(appconf)
+    if confs:
+        for c in confs:
+            a.Register(c)
     p = Portal()
     p.Register(a)
     a.Startup(None)

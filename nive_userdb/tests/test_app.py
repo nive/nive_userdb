@@ -4,14 +4,14 @@ import time
 import unittest
 
 from nive.security import AdminUser, UserFound
-from db_app import *
+from nive_userdb.tests.db_app import *
+from nive_userdb.tests import __local
 
 
-
-class ObjectTest(unittest.TestCase):
+class ObjectTest_db(object):
 
     def setUp(self):
-        self.app = app()
+        self._loadApp()
 
     def tearDown(self):
         self.app.Close()
@@ -59,7 +59,7 @@ class ObjectTest(unittest.TestCase):
         self.assertFalse(root.LookupUser(name="user3", id=None, activeOnly=1))
         self.assert_(root.LookupUser(name="user3", id=None, activeOnly=0))
         
-        self.assert_(len(root.GetUserInfos(["user1", "user2"], fields=["name", "email", "title"], activeOnly=True)))
+        self.assert_(len(root.GetUserInfos(["user1", "user2"], fields=["name", "email", "title"], activeOnly=True))==2)
         self.assert_(len(root.GetUsersWithGroup("group:author", fields=["name"], activeOnly=True)))
         self.assert_(len(root.GetUsersWithGroup("group:editor", fields=["name"], activeOnly=False)))
         self.assertFalse(len(root.GetUsersWithGroup("group:editor", fields=["name"], activeOnly=True)))
@@ -141,11 +141,17 @@ class ObjectTest(unittest.TestCase):
         root.DeleteUser("user1")
 
 
+class ObjectTest_db_sqlite(ObjectTest_db, __local.SqliteTestCase):
+    pass
+class ObjectTest_db_mysql(ObjectTest_db, __local.MySqlTestCase):
+    pass
 
-class AdminuserTest(unittest.TestCase):
+
+
+class AdminuserTest_db(__local.DefaultTestCase):
 
     def setUp(self):
-        self.app = app()
+        self._loadApp()
         self.app.configuration.unlock()
         self.app.configuration.admin = {"name":"admin", "password":"11111", "email":"admin@aaa.ccc", "groups":("group:admin",)}
         self.app.configuration.loginByEmail = True

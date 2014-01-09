@@ -5,9 +5,11 @@ import unittest
 
 from nive.definitions import *
 
-from nive_userdb.tests.db_app import *
 from nive_userdb.userview.view import *
 from nive.views import BaseView
+
+from nive_userdb.tests.db_app import *
+from nive_userdb.tests import __local
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid import testing 
@@ -20,20 +22,21 @@ class TestView(BaseView):
         return self.context.root().GetUserByName("testuser")
     
 
-class tViews(unittest.TestCase):
+class tViews(__local.DefaultTestCase):
 
     def setUp(self):
         request = testing.DummyRequest()
         request._LOCALE_ = "en"
         self.request = request
         self.config = testing.setUp(request=request)
-        self.app = app()
+        self._loadApp()
         self.app.Startup(self.config)
         self.root = self.app.root()
         user = User(u"test")
         user.groups.append("group:admin")
         self.root.DeleteUser("testuser")
         self.request.context = self.root
+        self.request.content_type = ""
 
     def tearDown(self):
         self.app.Close()

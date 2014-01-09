@@ -5,9 +5,10 @@ import unittest
 
 from nive.definitions import FieldConf
 from nive.portal import Portal
-from nive.i18n import _
 
 from nive_userdb.tests.db_app import *
+from nive_userdb.tests import __local
+
 from nive_userdb.useradmin import view
 from nive_userdb.useradmin import adminroot
 
@@ -17,20 +18,21 @@ from pyramid.renderers import render
 
 
 
-class tViews(unittest.TestCase):
+class tViews(__local.DefaultTestCase):
 
     def setUp(self):
         request = testing.DummyRequest()
         request._LOCALE_ = "en"
         self.request = request
         self.config = testing.setUp(request=request)
-        self.app = app()
+        self._loadApp()
         self.portal = Portal()
         self.portal.Register(self.app, "nive")
         self.app.Register(adminroot.configuration)
         self.app.Startup(self.config)
         self.root = self.app.root("usermanagement")
         self.request.context = self.root
+        self.request.content_type = ""
     
 
     def tearDown(self):

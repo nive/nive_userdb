@@ -155,24 +155,3 @@ class SessionuserTest(unittest.TestCase):
         self.assertFalse(self.user.InGroups(["ahaha", "ohno"]))
         
         
-class AppTest(unittest.TestCase):
-    
-    def setUp(self):
-        pass
-    def tearDown(self):
-        pass
-
-    def test_app(self):
-        
-        appconf = AppConf("nive_userdb.app")
-        #appconf.modules.append("nive_userdb.extensions.sessionuser")
-        
-        app = UserDB(appconf)
-        app.dbConfiguration=db_app.dbconf
-        p = Portal()
-        p.Register(app)
-        app.Startup(None)
-        
-        self.assert_(app.usercache)
-        
-        self.assert_(app.root())
