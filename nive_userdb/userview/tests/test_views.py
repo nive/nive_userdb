@@ -3,12 +3,10 @@
 import time
 import unittest
 
-from nive.definitions import *
-
-from nive_userdb.userview.view import *
+from nive_userdb.userview.view import UserForm, UserView
 from nive.views import BaseView
+from nive.security import User
 
-from nive_userdb.tests.db_app import *
 from nive_userdb.tests import __local
 
 from pyramid.httpexceptions import HTTPFound
