@@ -22,9 +22,9 @@ class ObjectTest_db(object):
         root=a.root()
         user = User("test")
         # root
-        root.DeleteUser("user1")
-        root.DeleteUser("user2")
-        root.DeleteUser("user3")
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
         
         data["name"] = "user1"
@@ -59,26 +59,28 @@ class ObjectTest_db(object):
         self.assertFalse(root.LookupUser(name="user3", id=None, activeOnly=1))
         self.assert_(root.LookupUser(name="user3", id=None, activeOnly=0))
         
-        self.assert_(len(root.GetUserInfos(["user1", "user2"], fields=["name", "email", "title"], activeOnly=True))==2)
-        self.assert_(len(root.GetUsersWithGroup("group:author", fields=["name"], activeOnly=True)))
-        self.assert_(len(root.GetUsersWithGroup("group:editor", fields=["name"], activeOnly=False)))
-        self.assertFalse(len(root.GetUsersWithGroup("group:editor", fields=["name"], activeOnly=True)))
+        self.assert_(len(root.GetUserInfos([str(root.GetUserByName("user1", activeOnly=0)), 
+                                            str(root.GetUserByName("user2", activeOnly=0))], 
+                                           fields=["name", "email", "title"], activeOnly=1))==2)
+
+        self.assert_(len(root.GetUsersWithGroup("group:author", fields=["name"], activeOnly=1)))
+        self.assert_(len(root.GetUsersWithGroup("group:editor", fields=["name"], activeOnly=0)))
+        self.assertFalse(len(root.GetUsersWithGroup("group:editor", fields=["name"], activeOnly=1)))
         self.assert_(len(root.GetUsers()))
         
-        root.DeleteUser("user1")
-        root.DeleteUser("user2")
-        root.DeleteUser("user3")
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
 
         
     def test_login(self):
         a=self.app
         root=a.root()
-        root.identityField=u"name"
         user = User("test")
         # root
-        root.DeleteUser("user1")
-        root.DeleteUser("user2")
-        root.DeleteUser("user3")
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
         
         data["name"] = "user1"
@@ -87,7 +89,7 @@ class ObjectTest_db(object):
         self.assert_(o,r)
         l,r = root.Login("user1", "11111", raiseUnauthorized = 0)
         self.assert_(l,r)
-        self.assert_(root.Logout("user1"))
+        self.assert_(root.Logout(str(root.GetUserByName("user1", activeOnly=0))))
         l,r = root.Login("user1", "aaaaa", raiseUnauthorized = 0)
         self.assertFalse(l,r)
         l,r = root.Login("user1", "", raiseUnauthorized = 0)
@@ -99,7 +101,7 @@ class ObjectTest_db(object):
         self.assert_(o,r)
         l,r = root.Login("user2", o.data.password, raiseUnauthorized = 0)
         self.assertFalse(l,r)
-        self.assert_(root.Logout("user1"))
+        root.Logout("user2")
         l,r = root.Login("user2", "11111", raiseUnauthorized = 0)
         self.assertFalse(l,r)
 
@@ -109,11 +111,11 @@ class ObjectTest_db(object):
         self.assert_(o,r)
         l,r = root.Login("user3", o.data.password, raiseUnauthorized = 0)
         self.assertFalse(l,r)
-        self.assertFalse(root.Logout("user3"))
+        root.Logout("user3")
         
-        root.DeleteUser("user1")
-        root.DeleteUser("user2")
-        root.DeleteUser("user3")
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
 
 
     def test_user(self):
@@ -121,7 +123,7 @@ class ObjectTest_db(object):
         root=a.root()
         user = User("test")
         # root
-        root.DeleteUser("user1")
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
         
         data["name"] = "user1"
@@ -138,7 +140,7 @@ class ObjectTest_db(object):
     
         self.assert_(o.ReadableName()=="surname lastname")
 
-        root.DeleteUser("user1")
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
 
 
 class ObjectTest_db_sqlite(ObjectTest_db, __local.SqliteTestCase):
