@@ -133,7 +133,7 @@ class ObjectTest_db(object):
         self.assert_(o.SecureUpdate(data, user))
         self.assert_(o.UpdateGroups(["group:author"]))
         self.assert_(o.GetGroups()==("group:author",), o.GetGroups())
-        self.assert_(o.AddGroup("group:editor", user))
+        self.assert_(o.AddGroup("group:editor"))
         self.assert_(o.GetGroups()==("group:author","group:editor"), o.GetGroups())
         self.assert_(o.InGroups("group:editor"))
         self.assert_(o.InGroups("group:author"))

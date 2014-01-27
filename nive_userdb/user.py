@@ -101,23 +101,38 @@ class user(ObjectBase):
         update groups of user
         """
         self.groups = tuple(groups)
-        self.data["groups"] = groups
+        self.data["groups"] = self.groups
         return True
 
 
-    def AddGroup(self, group, user):
+    def AddGroup(self, group, user=None):
         """
         add user to this group
         
         event: securityCahnged()
         """
+        #bw 0.9.12 removed 'user' parameter and commit
         if group in self.groups:
             return True
         g = list(self.groups)
         g.append(group)
         self.groups = tuple(g)
         self.data["groups"] = g
-        self.Commit(user)
+        return True
+
+
+    def RemoveGroup(self, group):
+        """
+        add user to this group
+        
+        event: securityCahnged()
+        """
+        if group not in self.groups:
+            return True
+        g = list(self.groups)
+        g.remove(group)
+        self.groups = tuple(g)
+        self.data["groups"] = g
         return True
 
 
@@ -139,7 +154,6 @@ class user(ObjectBase):
             if g in self.groups:
                 return True
         return False
-
 
 
 # user definition ------------------------------------------------------------------
