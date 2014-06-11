@@ -306,7 +306,7 @@ class root(RootBase):
                 param[u"email"] = email
             elif ident:
                 if not self.identityField:
-                    raise ValueError, "user identity filed not set"
+                    raise ValueError, "user identity field not set"
                 param[self.identityField] = ident
                 
             user = self.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
