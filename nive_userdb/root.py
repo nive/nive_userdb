@@ -107,12 +107,12 @@ class root(RootBase):
             else:
                 title = app.configuration.title + u" - New user"
                 body = u"""
-                User: %s<br/>
-                Mail: %s<br/>
-                Name: %s %s<br/>
-                Groups: %s<br/>
-                Active: %s<br/>
-                <br/>%s<br/>
+                User: %s<br>
+                Mail: %s<br>
+                Name: %s %s<br>
+                Groups: %s<br>
+                Active: %s<br>
+                <br>%s<br>
                 """ % (data.get("name",u""), data.get("email",u""), data.get("surname",u""), data.get("lastname",u""), 
                        data.get("groups",u""), data.get("pool_state",u""), data.get("comment",u""))
             tool = app.GetTool("sendMail")

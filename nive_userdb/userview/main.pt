@@ -3,10 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" i18n:domain="nive_userdb">
 <head>
 <title i18n:translate="">Login</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<meta name="description" content="" />
-<meta name="keywords" content="" />
-<meta name="generator" content="Nive cms" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="generator" content="nive cms">
 <style>
 body {font-family: Verdana, Arial, sans-serif; font-size:80%;}
 #container {margin: auto; height:auto;width:380px;}
@@ -32,7 +32,7 @@ a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gra
 <div id="container">
   <div id="main">
   <div id="header">
-  <img src="${view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" title="Nive cms" />
+  <img src="${view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" title="Nive cms">
   </div>
 
   <tal:block metal:define-slot="tmpls"></tal:block>

@@ -15,15 +15,15 @@
   </tal:block>
 
   <tal:block tal:condition="users">
-    <hr/>
+    <hr>
     <span i18n:translate="">Users</span>: <span class="label label-info" tal:repeat="user users">${user.GetTitle()}</span>
-    <hr/>
+    <hr>
     <form id="userlist" name="userlist" method="post"
       enctype="multipart/form-data"
       action="${view.FolderUrl(context)}delete">
-      <input name="confirm" type="hidden" value="1"/>
-      <input tal:repeat="id ids" name="ids" type="hidden" value="${id}"/>
-      <input type="submit" name="delete" value="Delete all" i18n:attributes="value" />
+      <input name="confirm" type="hidden" value="1">
+      <input tal:repeat="id ids" name="ids" type="hidden" value="${id}">
+      <input type="submit" name="delete" value="Delete all" i18n:attributes="value">
     </form>
 
   </tal:block>
