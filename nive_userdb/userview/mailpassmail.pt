@@ -1,3 +1,5 @@
+<p>
 <br/>
 <span tal:replace="password"/><br/>
 <br/>
+</p>

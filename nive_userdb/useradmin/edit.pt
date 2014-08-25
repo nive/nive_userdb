@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <tal:block metal:use-macro="view.index_tmpl().macros['main']" i18n:domain="nive_userdb">
    
 <tal:block metal:fill-slot="editmain">
@@ -12,6 +13,8 @@
        ><th>${app.GetFldName(field, context.GetTypeID())}</th><td>${view.RenderField(field)}</td></tr>
  </table>
 </div>
+</div>
+
 </tal:block>
 
 </tal:block>
