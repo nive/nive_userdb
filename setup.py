@@ -44,18 +44,4 @@ setupkw = dict(
       test_suite="nive_userdb"
 )
 
-# uses babel and lingua
-try:
-    import babel
-    babel = babel # PyFlakes
-    # if babel is installed, advertise message extractors (if we pass
-    # this to setup() unconditionally, and babel isn't installed,
-    # distutils warns pointlessly)
-    setupkw['message_extractors'] = { ".": [
-        ("**.py", "lingua_python", None ),
-        ("**.pt", "lingua_xml", None ),
-        ]}
-except ImportError:
-    pass
-
 setup(**setupkw)

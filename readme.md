@@ -15,3 +15,8 @@ The source code is hosted on github: https://github.com/nive/nive_userdb
 http://cms.nive.co/doc/html/index.html
 
 
+### Translations
+Translations can be extracted using lingua>=3.1
+
+    > pip install lingua-3.1
+    > bin/pot-create -o nive_userdb/locale/nive_userdb.pot nive_userdb
