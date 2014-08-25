@@ -61,6 +61,7 @@ configuration.acl= [
 
 configuration.groups = [ 
     GroupConf(id="group:useradmin", name="group:useradmin"),
+    GroupConf(id="group:admin", name="group:admin")
 ]
 
 
