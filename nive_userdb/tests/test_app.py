@@ -147,7 +147,8 @@ class ObjectTest_db_sqlite(ObjectTest_db, __local.SqliteTestCase):
     pass
 class ObjectTest_db_mysql(ObjectTest_db, __local.MySqlTestCase):
     pass
-
+class ObjectTest_db_postgres(ObjectTest_db, __local.PostgreSqlTestCase):
+    pass
 
 
 class AdminuserTest_db(__local.DefaultTestCase):
