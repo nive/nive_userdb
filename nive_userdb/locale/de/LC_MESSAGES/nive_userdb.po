@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nive 0.9.12\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-25 18:39+0200\n"
+"POT-Creation-Date: 2014-08-26 11:27+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -154,6 +154,10 @@ msgstr "Update fehlgeschlagen."
 msgid "Confirm delete"
 msgstr "Löschen bestätigen"
 
+#: nive_userdb/useradmin/delete.pt:41
+msgid "Delete all"
+msgstr "Alle löschen"
+
 #: nive_userdb/useradmin/delete.pt:48
 msgid "Please select a user first!"
 msgstr "Bitte erst eine/n Benutzer/in auswählen!"
@@ -189,6 +193,10 @@ msgstr "Ok. BenutzerGelöscht."
 #: nive_userdb/useradmin/adminroot.py:27
 msgid "User listing"
 msgstr "Benutzerliste"
+
+#: nive_userdb/useradmin/root.pt:30
+msgid "Delete selected"
+msgstr "Ausgewählte löschen"
 
 #: nive_userdb/userview/main.pt:5 nive_userdb/userview/main.pt:49
 #: nive_userdb/userview/view.py:56
@@ -267,12 +275,6 @@ msgstr "OK"
 #: nive_userdb/userview/view.py:215
 msgid "User not found"
 msgstr "User nicht gefunden"
-
-#~ msgid "Delete all"
-#~ msgstr "Alle löschen"
-
-#~ msgid "Delete selected"
-#~ msgstr "Ausgewählte löschen"
 
 #~ msgid "String"
 #~ msgstr "String"
