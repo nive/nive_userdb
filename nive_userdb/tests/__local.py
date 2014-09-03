@@ -41,7 +41,7 @@ MYSQL_CONF = DatabaseConf(
 
 POSTGRES_CONF = DatabaseConf(
     context = "PostgreSql",
-    dbName = "ut_nive_datastore",
+    dbName = "ut_nive_userdb",
     host = "localhost",
     user = "postgres",
     password = "postgres",
