@@ -10,7 +10,7 @@
     <span tal:replace="structure content"/>
   </tal:block>
   <div tal:condition="user" class="logout">
-    <p tal:condition="view.GetFormValue('redirect')" class="boxError">You do not have the required permissions to access the page.</p>
+    <p tal:condition="view.GetFormValue('redirect')" class="boxError" i18n:translate="">You do not have the required permissions to access the page.</p>
     <p><a href="${view.FolderUrl(context)}logout?redirect=${view.logouturl()}" i18n:translate="">Log out</a></p>
   </div>
 </div>
