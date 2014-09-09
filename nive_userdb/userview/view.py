@@ -3,6 +3,7 @@
 #
 
 from nive_userdb.i18n import _
+from nive_userdb.i18n import translator
 from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
 
 # view module definition ------------------------------------------------------------------
@@ -246,6 +247,7 @@ class UserView(BaseView):
         return {}
 
     def logout(self):
+        self.ResetFlashMessages()
         app = self.context.app
         user = self.UserName()
         a = self.context.Logout(user)
@@ -257,12 +259,8 @@ class UserView(BaseView):
             except:
                 redirect = self.context.app.portal.configuration.portalDefaultUrl
         if redirect:
-            if redirect.find(u"lo=1")==-1:
-                if redirect.find(u"?")==-1:
-                    redirect+=u"?lo=1"
-                else:
-                    redirect+=u"&lo=1"
-            self.Redirect(redirect)
+            localizer = translator(self.request)
+            self.Redirect(redirect, messages=[localizer(_(u"You have been logged out!"))])
         return {}
     
     def logouturl(self):
@@ -271,6 +269,16 @@ class UserView(BaseView):
         except:
             return self.request.url
     
+    def insertMessages(self):
+        messages = self.request.session.pop_flash("")
+        if not messages:
+            return u""
+        html = u"""<ul class="boxOK"><li>%s</li></ul>"""
+        try:
+            return html % (u"</li><li>".join(messages))
+        except:
+            return u""
+
     def _render(self):
         result, data, action = self.form.Process()
         return {u"content": data, u"result": result, u"head": self.form.HTMLHead()}
