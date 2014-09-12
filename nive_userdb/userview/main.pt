@@ -7,6 +7,7 @@
 <meta name="description" content="">
 <meta name="keywords" content="">
 <meta name="generator" content="nive cms">
+
 <style>
 body {font-family: Verdana, Arial, sans-serif; font-size:80%;}
 #container {margin: auto; height:auto;width:380px;}
@@ -22,9 +23,9 @@ ul { list-style:none; padding:0px; margin-bottom:10px; }
 li { padding:0px;margin:0px; }
 .links {width:40%;float:right;margin-top:20px;}
 a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gray;margin-right:1px;text-decoration:none;color:white;}
-/* error handling */
-.boxOK { padding:2px 8px 2px 8px; background-color:#8de4d4; }
-.boxError, .alert { padding:2px 8px 2px 8px; background-color:#FFDFDF; display:block; width:100%; margin-bottom:10px;}
+.alert { padding:2px 8px 2px 8px; display:block; width:100%; margin-bottom:10px; }
+.alert-success { background-color:#8de4d4; }
+.alert-error { background-color:#FFDFDF; }
 </style>
 </head>
 

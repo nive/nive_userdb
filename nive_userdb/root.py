@@ -25,7 +25,7 @@ class root(RootBase):
     """
     """
     
-    # field used as unique user identity in sessions and acache
+    # field used as unique user identity in sessions and cache
     identityField = u"name"
     
     # User account handling ------------------------------------------------------------------------------------------------------

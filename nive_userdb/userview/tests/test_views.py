@@ -34,6 +34,7 @@ class tViews(__local.DefaultTestCase):
         user = User(u"test")
         user.groups.append("group:admin")
         self.root.DeleteUser("testuser")
+        self.root.DeleteUser("testuser123")
         self.request.context = self.root
         self.request.content_type = ""
 
@@ -46,8 +47,6 @@ class tViews(__local.DefaultTestCase):
     def test_views(self):
         view = UserView(context=self.root, request=self.request)
         view.create()
-        view.createNotActive()
-        view.createPassword()
         view.update()
         view.mailpass()
         view.resetpass()
@@ -75,13 +74,7 @@ class tViews(__local.DefaultTestCase):
         values = view.create()
         values.update(vrender)
         render("nive_userdb.userview:signup.pt", values)
-        values = view.createNotActive()
-        values.update(vrender)
-        render("nive_userdb.userview:signup.pt", values)
-        values = view.createPassword()
-        values.update(vrender)
-        render("nive_userdb.userview:signup.pt", values)
-        
+
         values = view.update()
         values.update(vrender)
         render("nive_userdb.userview:update.pt", values)
@@ -98,16 +91,24 @@ class tViews(__local.DefaultTestCase):
     def test_form(self):
         view = TestView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
-        form.Setup(subset="create2")
-        self.request.POST = {"name": "testuser", "email": "testuser@domain.net"}
+        form.Setup(subset="create")
         self.request.GET = {}
+        self.request.POST = {"name": "testuser", "email": "testuser@domain.net"}
 
+        r,v = form.AddUser("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        self.request.POST = {"name": "", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
+        r,v = form.AddUser("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
         r,v = form.AddUser("action", redirectSuccess="")
         self.assert_(r)
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="edit")
-        self.request.POST = {"name": "testuser123", "email": "testuser@domain.net", "surname": "12345", "password": "12345", "password-confirm": "12345"}
+        self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "surname": "12345", "password": "12345", "password-confirm": "12345"}
         self.request.GET = {}
 
         r,v = form.LoadUser("action", redirectSuccess="")

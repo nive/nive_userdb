@@ -17,6 +17,7 @@ configuration = ViewModuleConf(
     context = "nive_userdb.root.root",
     view = "nive_userdb.userview.view.UserView",
     templates = "nive_userdb.userview:",
+    mainTemplate = "main.pt",
     permission = "view"
 )
 t = configuration.templates
@@ -53,40 +54,24 @@ class UserForm(ObjectForm):
             Conf(id="create",     method="AddUser",   name=_(u"Signup"),        hidden=False, options={"renderSuccess":False}),
             Conf(id="edit",       method="Update",    name=_(u"Confirm"),       hidden=False),
             Conf(id="mailpass",   method="MailPass",  name=_(u"Mail password"), hidden=False),
-            Conf(id="resetpass",  method="ResetPass", name=_(u"Reset password"), hidden=False),
+            Conf(id="resetpass",  method="ResetPass", name=_(u"Reset password"),hidden=False),
             Conf(id="login",      method="Login",     name=_(u"Login"),         hidden=False),
         ]
     
         self.subsets = {
-            "create": {"fields":  ["name", "password", "email", "surname", "lastname"], 
-                       "actions": ["create"],
-                       "defaultAction": "default"},
-            "create2":{"fields":  ["name", "email"], 
-                       "actions": ["create"],
-                       "defaultAction": "default"},
-            "edit":   {"fields":  ["email", 
-                                   FieldConf(id="password", name=_("Password"), datatype="password", required=False, settings={"update": True}),
-                                   "surname", "lastname"], 
-                       "actions": ["defaultEdit", "edit"],
-                       "defaultAction": "defaultEdit"},
+            "create": {"actions": ["create"], "defaultAction": "default"}, # loads fields based on user configuration
+            "edit":   {"actions": ["defaultEdit", "edit"], "defaultAction": "defaultEdit"}, # loads fields based on user configuration
             "login":  {"fields":  ["name", FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True})], 
-                       "actions": ["login"],
-                       "defaultAction": "default"},
-            "mailpass":{"fields": ["email"], 
-                        "actions": ["mailpass"],
-                        "defaultAction": "default"},
+                       "actions": ["login"], "defaultAction": "default"},
+            "mailpass":{"fields": ["email"],
+                        "actions": ["mailpass"], "defaultAction": "default"},
             "resetpass":{"fields": ["email"], 
-                        "actions": ["resetpass"],
-                        "defaultAction": "default"},
+                        "actions": ["resetpass"], "defaultAction": "default"},
         }
 
-        self.activate = 1
-        self.generatePW = 0
-        self.notify = True
-        self.mail = None
-        self.mailpass = None
-        self.groups = ""
         self.css_class = "smallform"
+        self.mail = None
+        self.settings = {}
 
 
     def AddUser(self, action, **kw):
@@ -97,12 +82,8 @@ class UserForm(ObjectForm):
         result,data,errors = self.Validate(self.request)
         if result:
             result, msgs = self.context.AddUser(data, 
-                                                activate=self.activate, 
-                                                generatePW=self.generatePW, 
-                                                mail=self.mail, 
-                                                groups=self.groups, 
-                                                notify=self.notify, 
-                                                currentUser=self.view.User())
+                                                currentUser=self.view.User(),
+                                                **self.settings)
 
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
         
@@ -149,7 +130,7 @@ class UserForm(ObjectForm):
         data = self.GetFormValues(self.request)
         user, msgs = self.context.Login(data.get("name"), data.get("password"), 0)
         if user:
-            self.context.app.RememberLogin(self.request, user.data.get("name"))
+            self.context.app.RememberLogin(self.request, str(user))
             if self.view and redirectSuccess:
                 self.view.Redirect(redirectSuccess)
                 return
@@ -169,7 +150,10 @@ class UserForm(ObjectForm):
         """
         #result, data, e = self.Validate(self.request)
         data = self.GetFormValues(self.request)
-        result, msgs = self.context.MailUserPass(email=data.get("email"), mailtmpl=self.mailpass, createNewPasswd=createNewPasswd, currentUser=self.view.User())
+        result, msgs = self.context.MailUserPass(email=data.get("email"),
+                                                 mailtmpl=self.settings.get("mailpass"),
+                                                 createNewPasswd=createNewPasswd,
+                                                 currentUser=self.view.User())
         if result:
             data = {}
         return self._FinishFormProcessing(result, data, msgs, None, **kw)
@@ -180,28 +164,17 @@ class UserForm(ObjectForm):
 class UserView(BaseView):
     
     def __init__(self, context, request):
-        BaseView.__init__(self, context, request)
+        super(UserView, self).__init__(context, request)
+        # the viewModule is used for template/template directory lookup
+        self.viewModuleID = "userview"
+        # form setup
         self.form = UserForm(view=self, loadFromType="user")
-        self.form.groups = ""
-        self.publicSignup = False
-
+        self.form.settings = self.context.app.configuration.settings
 
     def create(self):
-        self.form.activate=1
-        self.form.generatePW=0
+        self.form.mail = self.context.app.configuration.mailSignup
+        self.form.mailnotify = self.context.app.configuration.mailNotify
         self.form.Setup(subset="create")
-        return self._render()
-
-    def createNotActive(self):
-        self.form.activate=0
-        self.form.generatePW=0
-        self.form.Setup(subset="create")
-        return self._render()
-
-    def createPassword(self):
-        self.form.activate=1
-        self.form.generatePW=1
-        self.form.Setup(subset="create2")
         return self._render()
 
     def update(self):
@@ -217,13 +190,13 @@ class UserView(BaseView):
             
     def mailpass(self):
         self.form.startEmpty = True
-        self.form.mail = Mail(_(u"Your password"), "nive_userdb:userview/mailpassmail.pt")
+        self.form.mail = self.context.app.configuration.mailSendPass
         self.form.Setup(subset="mailpass")
         return self._render()
 
     def resetpass(self):
         self.form.startEmpty = True
-        self.form.mail = Mail(_(u"Your new password"), "nive_userdb:userview/resetpassmail.pt")
+        self.form.mail = self.context.app.configuration.mailResetPass
         self.form.Setup(subset="resetpass")
         return self._render()
 
@@ -273,7 +246,7 @@ class UserView(BaseView):
         messages = self.request.session.pop_flash("")
         if not messages:
             return u""
-        html = u"""<ul class="boxOK"><li>%s</li></ul>"""
+        html = u"""<ul class="alert alert-success"><li>%s</li></ul>"""
         try:
             return html % (u"</li><li>".join(messages))
         except:

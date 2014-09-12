@@ -189,5 +189,6 @@ configuration.data = (
 #password2 = FieldConf(id="password2", datatype="password", size= 30, default="", required=1, name="Passwort - Wiederholung", description="")
 configuration.forms = {
     "create": {"fields": ["name", "password", "email", "surname", "lastname"]},
-    "edit":   {"fields": ["password", "email", "surname", "lastname"]},
+    "edit":   {"fields": [FieldConf(id="password", name=_("Password"), datatype="password", required=False, settings={"update": True}),
+                          "email", "surname", "lastname"]},
 }

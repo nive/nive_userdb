@@ -18,19 +18,37 @@ The system admin for notification mails can be specified as `systemAdmin`.
 """
 import copy
 
-from nive.definitions import AppConf, FieldConf, GroupConf
+from nive.definitions import AppConf, FieldConf, GroupConf, Conf
 from nive.definitions import implements, IUserDatabase, ILocalGroups
 from nive.definitions import AllMetaFlds
 from nive.security import Allow, Deny, Everyone, ALL_PERMISSIONS, remember, forget
 from nive.components.objects.base import ApplicationBase
+from nive.views import Mail
+
 from nive_userdb.i18n import _
 
 #@nive_module
 configuration = AppConf(
     id = "userdb",
     title = _(u"Users"),
+
+    # signup settings
+    loginByEmail = True,
+    settings = Conf(
+        groups=(),
+        activate=1,
+        generatePW=0,
+        notify=False
+    ),
+
+    # mails
+    mailSignup=Mail(_(u"Signup confirmed"), "nive_userdb:userview/signupmail.pt"),
+    mailNotify=Mail(_(u"Signup notification"), "nive_userdb:userview/notifymail.pt"),
+    mailResetPass=Mail(_(u"Your new password"), "nive_userdb:userview/resetpassmail.pt"),
+    mailSendPass=Mail(_(u"Your password"), "nive_userdb:userview/mailpassmail.pt"),
+
+    # system
     context = "nive_userdb.app.UserDB",
-    loginByEmail = False,
     translations="nive_userdb:locale/"
 )
 
@@ -52,6 +70,7 @@ configuration.modules = [
 ]
 
 configuration.acl= [
+    (Allow, Everyone, 'signup'),
     (Allow, Everyone, 'view'),
     (Allow, Everyone, 'updateuser'),
     (Allow, "group:useradmin", 'signup'), 
