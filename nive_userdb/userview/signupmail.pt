@@ -1,0 +1,5 @@
+<p>Your new account has been created.</p>
+
+<span i18n:translate="">Name</span>: ${obj.data.surname} ${obj.data.lastname}<br>
+<span i18n:translate="">User</span>: ${obj.data.name}<br>
+<span i18n:translate="">Mail</span>: ${obj.data.email}<br>
