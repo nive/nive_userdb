@@ -17,7 +17,7 @@ configuration = ViewModuleConf(
     context = "nive_userdb.root.root",
     view = "nive_userdb.userview.view.UserView",
     templates = "nive_userdb.userview:",
-    mainTemplate = "main.pt",
+    template = "main.pt",
     permission = "view"
 )
 t = configuration.templates
@@ -166,7 +166,7 @@ class UserView(BaseView):
     def __init__(self, context, request):
         super(UserView, self).__init__(context, request)
         # the viewModule is used for template/template directory lookup
-        self.viewModuleID = "userview"
+        #self.viewModuleID = "userview"
         # form setup
         self.form = UserForm(view=self, loadFromType="user")
         self.form.settings = self.context.app.configuration.settings

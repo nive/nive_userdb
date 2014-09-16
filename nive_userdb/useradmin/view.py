@@ -13,14 +13,14 @@ from nive.definitions import IApplication, IUser
 # view module definition ------------------------------------------------------------------
 
 #@nive_module
-configuration = ViewModuleConf(
+configuration = ViewModuleConf("nive.adminview.view",
     id = "useradmin",
     name = _(u"User management"),
-    static = "",
     containment = "nive_userdb.useradmin.adminroot.adminroot",
     context = "nive_userdb.useradmin.adminroot.adminroot",
     view = "nive_userdb.useradmin.view.UsermanagementView",
     templates = "nive_userdb.useradmin:",
+    template = "index.pt",
     permission = "manage users"
 )
 t = configuration.templates
