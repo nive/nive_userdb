@@ -3,7 +3,7 @@
 import time
 import unittest
 
-from nive.definitions import FieldConf
+from nive.definitions import FieldConf, Conf
 from nive.portal import Portal
 
 from nive_userdb.tests.db_app import *
@@ -52,6 +52,7 @@ class tViews(__local.DefaultTestCase):
     def test_templates(self):
         user = User(u"test")
         v = view.UsermanagementView(context=self.root, request=self.request)
+        v.__configuration__ = lambda: Conf(template="nive.adminview:index.pt",templates="",assets=[])
         vrender = {"context":self.root, "view":v, "request": self.request}
         
         values = v.add()

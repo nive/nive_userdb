@@ -3,6 +3,7 @@
 import time
 import unittest
 
+from nive.definitions import Conf
 from nive_userdb.userview.view import UserForm, UserView
 from nive.views import BaseView
 from nive.security import User
@@ -58,6 +59,7 @@ class tViews(__local.DefaultTestCase):
         
     def test_templates(self):    
         view = UserView(context=self.root, request=self.request)
+        view.__configuration__ = lambda: Conf(template="nive_userdb.userview:main.pt",templates="",assets=[])
         vrender = {"context":self.root, "view":view, "request": self.request}
         
         values = view.login()
