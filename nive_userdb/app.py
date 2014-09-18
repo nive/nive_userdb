@@ -60,6 +60,8 @@ configuration.modules = [
     "nive_userdb.user", 
     # session user cache
     "nive_userdb.extensions.sessionuser",
+    # user actions
+    "nive_userdb.userview.view",
     # user administration
     "nive_userdb.useradmin", 
     # tools

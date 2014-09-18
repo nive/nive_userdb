@@ -437,7 +437,6 @@ configuration = RootConf(
     id = "udb",
     context = "nive_userdb.root.root",
     template = "root.pt",
-    views = ["nive_userdb.userview.view"],
     default = 1,
     subtypes = "*",
     name = _(u"User account"),
