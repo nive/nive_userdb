@@ -11,8 +11,11 @@ from nive_userdb.app import UserDB
 
 
 class testobj(object):
+    configuration = Conf()
     def Listen(self, name, fnc):
         pass
+    def GetMetaFld(self, id):
+        return True
 
 class Conftest(unittest.TestCase):
     
@@ -100,6 +103,7 @@ class ListenerTest(unittest.TestCase):
         u.app.usercache = SessionUserCache()
         u.identity = "user1"
         u.data = Conf()
+        u.meta = Conf()
         u.id = 1
         sessionuser = r.SessionUserFactory("user1", u)
         self.assert_(sessionuser)

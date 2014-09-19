@@ -1,0 +1,7 @@
+<h3 i18n:translate="">A new user jsut signed up</h3>
+
+<span i18n:translate="">User</span>: ${user.data.name}<br>
+<span i18n:translate="">Mail</span>: ${user.data.email}<br>
+<span i18n:translate="">Readble name</span>: ${user.meta.title}<br>
+<span i18n:translate="">Groups</span>: ${user.data.groups}<br>
+<span i18n:translate="">Active</span>: ${user.meta.pool_state}<br>

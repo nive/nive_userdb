@@ -17,6 +17,8 @@ The system admin for notification mails can be specified as `systemAdmin`.
 
 """
 import copy
+import hashlib
+
 
 from nive.definitions import AppConf, FieldConf, GroupConf, Conf
 from nive.definitions import implements, IUserDatabase, ILocalGroups
@@ -24,6 +26,9 @@ from nive.definitions import AllMetaFlds
 from nive.security import Allow, Deny, Everyone, ALL_PERMISSIONS, remember, forget
 from nive.components.objects.base import ApplicationBase
 from nive.views import Mail
+from nive.components.reform.schema import Invalid
+from nive.components.reform.schema import Email
+from nive.components.reform.schema import Literal, Length
 
 from nive_userdb.i18n import _
 
@@ -42,10 +47,14 @@ configuration = AppConf(
     ),
 
     # mails
-    mailSignup=Mail(_(u"Signup confirmed"), "nive_userdb:userview/signupmail.pt"),
-    mailNotify=Mail(_(u"Signup notification"), "nive_userdb:userview/notifymail.pt"),
-    mailResetPass=Mail(_(u"Your new password"), "nive_userdb:userview/resetpassmail.pt"),
-    mailSendPass=Mail(_(u"Your password"), "nive_userdb:userview/mailpassmail.pt"),
+    mailSignup=Mail(_(u"Signup confirmed"), "nive_userdb:userview/mails/signup.pt"),
+    mailNotify=Mail(_(u"Signup notification"), "nive_userdb:userview/mails/notify.pt"),
+    mailVerifyMail=Mail(_(u"Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
+    mailResetPass=Mail(_(u"Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
+    mailSendPass=Mail(_(u"Your password"), "nive_userdb:userview/mails/mailpass.pt"),
+
+    # sessionuser field cache
+    sessionuser = ("name", "email", "surname", "lastname", "groups", "notify", "lastlogin"),
 
     # system
     context = "nive_userdb.app.UserDB",
@@ -157,4 +166,74 @@ class UserDB(ApplicationBase):
     def AuthenticatedUserName(self, request):
         # bw 0.9.6. removed in next version.
         return authenticated_userid(request)    
+
+
+
+def IsReservedUserName(name):
+    """
+    Check if name can be used for users
+    """
+    if not name:
+        return True
+    name = name.strip()
+    if not name:
+        return True
+    name = name.lower()
+    if name.startswith(u"group:"):
+        return True
+    return False
+
+
+def UsernameValidator(node, value):
+    """
+    Validator which succeeds if the username does not exist.
+    Can be used for the name input field in a sign up form.
+    """
+    Literal()(node, value)
+    Length(min=5,max=30)(node, value)
+    if IsReservedUserName(value):
+        err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
+        raise Invalid(node, err)
+    # lookup name in database
+    r = node.widget.form.context.root()
+    u = r.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+    if not u:
+        u = r.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+    if u:
+        # check if its the current user
+        ctx = node.widget.form.context
+        if len(u)==1 and ctx.id == u[0][0]:
+            return
+        err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
+        raise Invalid(node, err)
+
+def EmailValidator(node, value):
+    """
+    Validator which succeeds if the email does not exist.
+    Can be used for the email input field in a sign up form.
+    """
+    # validate email format
+    Email()(node, value)
+    if IsReservedUserName(value):
+        err = _(u"Email '${name}' already in use. Please use the sign in form if you already have a account.", mapping={'name':value})
+        raise Invalid(node, err)
+    # lookup email in database
+    r = node.widget.form.context.root()
+    u = r.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+    if not u:
+        u = r.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+    if u:
+        # check if its the current user
+        ctx = node.widget.form.context
+        if len(u)==1 and ctx.id == u[0][0]:
+            return
+        err = _(u"Email '${name}' already in use. Please use the sign in form if you already have a account.", mapping={'name':value})
+        raise Invalid(node, err)
+
+
+def Sha(password):
+    return hashlib.sha224(password).hexdigest()
+
+def Md5(password):
+    return hashlib.md5(password).hexdigest()
 

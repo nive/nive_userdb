@@ -145,18 +145,19 @@ class RootListener(object):
         self.app.usercache.Add(sessionuser, user.identity)
         
     def SessionUserFactory(self, ident, user):
-        fields = ("name", "email", "surname", "lastname", "groups", "notify", "lastlogin")
+        default = ("id", "title", "pool_state", "name", "email", "surname", "lastname", "groups", "notify", "lastlogin")
+        fields = self.app.configuration.get("sessionuser") or default
         data = Conf()
-        for f in fields:
-            data[f] = user.data.get(f)
-        data.lock()
-        fields = ("id", "title", "pool_state")
         meta = Conf()
+        app = self.app
         for f in fields:
-            meta[f] = user.data.get(f)
+            if app.GetMetaFld(f):
+                meta[f] = user.meta.get(f)
+            else:
+                data[f] = user.data.get(f)
+        data.lock()
         meta.lock()
-        su = SessionUser(ident, user.id, data, meta)
-        return su
+        return SessionUser(ident, user.id, data, meta)
 
 
         

@@ -3,15 +3,27 @@
 import time
 import unittest
 
+from pyramid import testing
+
+from nive.definitions import Conf, ConfigurationError
 from nive.security import AdminUser, UserFound
 from nive_userdb.tests.db_app import *
 from nive_userdb.tests import __local
+
+from nive_userdb.app import UsernameValidator, EmailValidator, IsReservedUserName, Invalid
+from nive_userdb.app import Sha
 
 
 class ObjectTest_db(object):
 
     def setUp(self):
+        request = testing.DummyRequest()
+        request._LOCALE_ = "en"
+        self.request = request
+        self.config = testing.setUp(request=request)
+        self.config.include('pyramid_chameleon')
         self._loadApp()
+        self.app.Startup(self.config)
 
     def tearDown(self):
         self.app.Close()
@@ -47,10 +59,19 @@ class ObjectTest_db(object):
         self.assert_(o.data.password != "11111")
         self.assertFalse(o.meta.pool_state)
         
-        root.MailUserPass(email = "user1", mailtmpl = None)
-        root.MailUserPass(email = "user2@aaa.ccc", mailtmpl = None, createNewPasswd=False)
-        root.MailUserPass(email = "user3@aaa.ccc", mailtmpl = None)
-        
+        try:
+            root.MailUserPass(email = "user1")
+        except ConfigurationError:
+            pass
+        try:
+            root.MailUserPass(email = "user2@aaa.ccc", newPasswd="111111")
+        except ConfigurationError:
+            pass
+        try:
+            root.MailUserPass(email = "user3@aaa.ccc")
+        except ConfigurationError:
+            pass
+
         self.assert_(root.GetUserByName("user2", activeOnly=1))
         self.assert_(root.GetUserByID(o.id, activeOnly=0))
         self.assert_(root.GetUserByMail("user2@aaa.ccc", activeOnly=1))
@@ -143,6 +164,208 @@ class ObjectTest_db(object):
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
 
 
+    def test_user2(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+
+        o.HashPassword()
+        o.data["password"] = "12345"
+        o.HashPassword()
+        self.assert_(o.data["password"] == Sha("12345"))
+
+        o.data["surname"] = ""
+        o.data["lastname"] = ""
+        self.assert_(o.ReadableName()==o.data.name)
+        o.data["surname"] = "surname"
+        o.data["lastname"] = "lastname"
+        self.assert_(o.ReadableName()=="surname lastname")
+
+        self.assert_(o.Activate(currentUser=user))
+
+        o.UpdatePassword("22222", user=user, resetActivation=True)
+        self.assert_(o.data["password"] == Sha("22222"))
+        o.UpdatePassword("33333", user=user, resetActivation=False)
+        self.assert_(o.data["password"] == Sha("33333"))
+
+
+    def test_reserved(self):
+        self.assert_(IsReservedUserName(""))
+        self.assert_(IsReservedUserName(None))
+        self.assert_(IsReservedUserName("group:admin"))
+        self.assert_(IsReservedUserName("group:aaaaaaaaaa"))
+        self.assertFalse(IsReservedUserName("aaaaaaaaaaaa"))
+
+
+    def test_usernamevalidator(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+
+        class tf(object):
+            context = root
+        class tw(object):
+            form = tf()
+        class tn(object):
+            widget = tw()
+        node = tn()
+
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        UsernameValidator(node, "user1")
+
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+        self.assertRaises(Invalid, UsernameValidator, node, "user1")
+        self.assertRaises(Invalid, UsernameValidator, node, "user1@aaa.ccc")
+
+        self.assertRaises(Invalid, UsernameValidator, node, "ua")
+        self.assertRaises(Invalid, UsernameValidator, node, "#+§$%")
+        self.assertRaises(Invalid, UsernameValidator, node, "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
+        self.assertRaises(Invalid, UsernameValidator, node, "group:")
+        self.assertRaises(Invalid, UsernameValidator, node, "group:test")
+
+
+    def test_emailvalidator(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+
+        class tf(object):
+            context = root
+        class tw(object):
+            form = tf()
+        class tn(object):
+            widget = tw()
+        node = tn()
+
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        EmailValidator(node, "user1@aaa.ccc")
+
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+        self.assertRaises(Invalid, EmailValidator, node, "user1@aaa.ccc")
+        self.assertRaises(Invalid, EmailValidator, node, "user1")
+
+        self.assertRaises(Invalid, EmailValidator, node, "ua")
+        self.assertRaises(Invalid, EmailValidator, node, "#+§$%")
+
+
+
+    def test_activate(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+        # root
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
+
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+
+        self.assertFalse(root.GetUserForToken("no id"))
+
+        self.assertFalse(root.GetUserForToken("12345", active=True))
+        u = root.GetUserForToken("12345", active=False)
+        self.assert_(u)
+        self.assert_(u.Activate(currentUser=user))
+
+        self.assertFalse(root.GetUserForToken("12345", active=False))
+
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+
+
+    def test_mail_pass(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+        # root
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname"}
+
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+
+        try:
+            root.MailResetPass("user1@aaa.ccc", currentUser=user, url=u"")
+        except ConfigurationError:
+            pass
+        self.assert_(root.GetUser("user1").data.token)
+
+        o,r = root.MailResetPass("no mail", currentUser=user, url=u"")
+        self.assertFalse(o,r)
+
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+
+
+    def test_reset_pass(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+        # root
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+
+        self.assert_(root.GetUserForToken("12345", active=False))
+
+        self.assertFalse(root.GetUserForToken("", active=False))
+
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+
+
+    def test_groups(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+        # root
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        self.assert_(o,r)
+
+        o.UpdateGroups(["g1","g2","g3"])
+        self.assert_(o.GetGroups()==("g1","g2","g3"))
+        self.assert_(o.InGroups(("g1","g2","g3")))
+        self.assert_(o.InGroups("g1"))
+        self.assertFalse(o.InGroups(("zz","yy","xx")))
+        self.assertFalse(o.InGroups("xx"))
+        o.AddGroup("g4")
+        self.assert_(o.InGroups("g4"))
+        self.assert_(o.InGroups(("g1","g2","g3")))
+        o.RemoveGroup("g4")
+        self.assertFalse(o.InGroups("g4"))
+        self.assert_(o.InGroups(("g1","g2","g3")))
+
+
+
+
+
+
+
 class ObjectTest_db_sqlite(ObjectTest_db, __local.SqliteTestCase):
     pass
 class ObjectTest_db_mysql(ObjectTest_db, __local.MySqlTestCase):
@@ -190,4 +413,3 @@ class AdminuserTest_db(__local.DefaultTestCase):
         l,r = root.Login("admin", "", raiseUnauthorized = 0)
         self.assertFalse(l,r)
 
-        

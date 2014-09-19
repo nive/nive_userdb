@@ -1,6 +1,6 @@
 <p i18n:domain="nive_userdb">
 <br>
-<span i18n:translate="">Your new password: </span><span tal:replace="password"/><br>
+<span i18n:translate="">Your new password: </span>${password}<br>
 <br>
 <span i18n:translate="">Please login and change it.</span>
 </p>

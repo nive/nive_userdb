@@ -38,6 +38,27 @@ class user(ObjectBase):
         return Sha(password) == self.data["password"]
 
     
+    def Activate(self, currentUser):
+        """
+        Activate user and remove activation id
+        calls workflow commit, if possible
+
+        signals event: activate
+        """
+        wf = self.GetWf()
+        if wf:
+            result = wf.Action("commit", self, user=currentUser)
+        else:
+            self.meta.set("pool_state", 1)
+            self.data.set("token", "")
+            self.data.set("tempcache", "firstrun")
+            result = True
+        if result:
+            self.Signal("activate")
+            self.Commit(currentUser)
+        return result
+
+
     def Login(self):
         """
         events: login(lastlogin)
@@ -82,16 +103,26 @@ class user(ObjectBase):
         Update existing user data.
         name, groups, pool_state cannot be changed
         """
-        if data.has_key("name"):
-            del data["name"]
-        if data.has_key("groups"):
-            del data["groups"]
-        if data.has_key("pool_state"):
-            del data["pool_state"]
+        readonly = ("name","email","groups","pool_state","pool_wfa","token")
+        for f in readonly:
+            if f in data:
+                del data[f]
 
         if not self.Update(data, user):
             return False, [_(u"Update failed.")]
         
+        self.Commit(user)
+        return True, []
+
+
+    def UpdatePassword(self, password, user, resetActivation=True):
+        """
+        Update existing user data.
+        name, groups, pool_state cannot be changed
+        """
+        self.data["password"] = password
+        if resetActivation:
+            self.data["token"] = u""
         self.Commit(user)
         return True, []
 
@@ -158,6 +189,8 @@ class user(ObjectBase):
 
 # user definition ------------------------------------------------------------------
 from nive.definitions import StagUser, ObjectConf, FieldConf
+from nive_userdb.app import UsernameValidator, EmailValidator
+
 #@nive_module
 configuration = ObjectConf(
     id = "user",
@@ -171,9 +204,11 @@ configuration = ObjectConf(
 )
 
 configuration.data = (
-    FieldConf(id="name",     datatype="string",      size= 30, default=u"", required=1, name=_(u"User ID"), description=u""),
-    FieldConf(id="password", datatype="password",    size=100, default=u"", required=1, name=_(u"Password"), description=u""),
-    FieldConf(id="email",    datatype="email",       size=255, default=u"", required=1, name=_(u"Email"), description=u""),
+    FieldConf(id="name",     datatype="string",      size= 30, default=u"", required=1, name=_(u"User ID"), description=u"",
+              settings={"validator": UsernameValidator}),
+    FieldConf(id="email",    datatype="email",       size=255, default=u"", required=1, name=_(u"Email"), description=u"",
+              settings={"validator": EmailValidator}),
+    FieldConf(id="password", datatype="password",    size=100, default=u"", required=1, name=_(u"Password"), description=u"",),
     FieldConf(id="groups",   datatype="mcheckboxes", size=255, default=u"", name=_(u"Groups"), settings={"codelist":"groups"}, description=u""),
     
     FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_(u"Activate email notifications"), description=u""),
@@ -182,13 +217,14 @@ configuration.data = (
     FieldConf(id="lastname", datatype="string",      size=100, default=u"", name=_(u"Lastname"), description=u""),
     FieldConf(id="organisation", datatype="string",  size=255, default=u"", name=_(u"Organisation"), description=u""),
     
-    FieldConf(id="lastlogin", datatype="datetime", size=0, readonly=True, default=u"", name=_(u"Last login"), description=u""),
-    
+    FieldConf(id="lastlogin",datatype="datetime",    size=0,   default=u"", name=_(u"Last login"), description=u""),
+    FieldConf(id="token",    datatype="string",      size=30,  default=u"", name=_(u"Token for activation or password reset")),
+    FieldConf(id="tempcache",datatype="string",      size=255, default=u"", name=_(u"Temp cache for additional verification data")),
 )
 
 #password2 = FieldConf(id="password2", datatype="password", size= 30, default="", required=1, name="Passwort - Wiederholung", description="")
 configuration.forms = {
     "create": {"fields": ["name", "password", "email", "surname", "lastname"]},
     "edit":   {"fields": [FieldConf(id="password", name=_("Password"), datatype="password", required=False, settings={"update": True}),
-                          "email", "surname", "lastname"]},
+                          "surname", "lastname"]},
 }

@@ -36,7 +36,7 @@ a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gra
   <img src="${view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" title="Nive cms">
   </div>
 
-  <tal:block metal:define-slot="tmpls"></tal:block>
+  <tal:block metal:define-slot="content"></tal:block>
   
   <div tal:define="user view.User()" class="links">
   <a tal:condition="not user and request.view_name!='login'"

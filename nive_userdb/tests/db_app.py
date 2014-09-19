@@ -28,6 +28,7 @@ def app_db(confs=None):
     try:
         a.Query("select id from pool_meta where id=1")
         a.Query("select id from users where id=1")
+        a.Query("select id from users where token='1'")
         a.Query("select id from pool_files where id=1")
     except:
         a.GetTool("nive.tools.dbStructureUpdater")()

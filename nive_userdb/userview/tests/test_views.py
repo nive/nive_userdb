@@ -3,7 +3,7 @@
 import time
 import unittest
 
-from nive.definitions import Conf
+from nive.definitions import Conf, ConfigurationError
 from nive_userdb.userview.view import UserForm, UserView
 from nive.views import BaseView
 from nive.security import User
@@ -85,14 +85,19 @@ class tViews(__local.DefaultTestCase):
     
     def test_mails(self):
         user = User(u"test")
-        values = {"user": user, "password": "12345"}
-        render("nive_userdb.userview:mailpassmail.pt", values)
-        render("nive_userdb.userview:resetpassmail.pt", values)
+        user.data["token"] = "123"
+        values = {"user": user, "url":"uuu", "password": "12345"}
+        render("nive_userdb.userview:mails/notify.pt", values)
+        render("nive_userdb.userview:mails/signup.pt", values)
+        render("nive_userdb.userview:mails/verifymail.pt", values)
+        render("nive_userdb.userview:mails/mailpass.pt", values)
+        render("nive_userdb.userview:mails/resetpass.pt", values)
     
     
     def test_form(self):
         view = TestView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.settings["mail"] = None
         form.Setup(subset="create")
         self.request.GET = {}
         self.request.POST = {"name": "testuser", "email": "testuser@domain.net"}
@@ -110,13 +115,13 @@ class tViews(__local.DefaultTestCase):
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="edit")
-        self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "surname": "12345", "password": "12345", "password-confirm": "12345"}
+        self.request.POST = {"surname": "12345", "password": "12345", "password-confirm": "12345"}
         self.request.GET = {}
 
         r,v = form.LoadUser("action", redirectSuccess="")
         self.assert_(r)
         r,v = form.Update("action", redirectSuccess="")
-        self.assert_(r)
+        self.assert_(r,v)
         self.request.POST = {"name": "testuser123", "email": "testuser@domain.net", "surname": "12345", "password": "12345"}
         r,v = form.Update("action", redirectSuccess="")
         self.assertFalse(r)
@@ -135,7 +140,9 @@ class tViews(__local.DefaultTestCase):
         self.request.POST = {"email": "testuser@domain.net"}
         self.request.GET = {}
 
-        r,v = form.MailPass("action", redirectSuccess="")
-        self.assert_(v.find("The email could not be sent"))
-        
+        try:
+            form.MailPass("action", redirectSuccess="")
+        except ConfigurationError:
+            pass
+
 

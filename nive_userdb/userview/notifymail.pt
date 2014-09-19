@@ -1,6 +1,0 @@
-
-<span i18n:translate="">User</span>: ${obj.data.name}<br>
-<span i18n:translate="">Mail</span>: ${obj.data.email}<br>
-<span i18n:translate="">Name</span>: ${obj.data.surname} ${obj.data.lastname}<br>
-<span i18n:translate="">Groups</span>: ${obj.data.groups}<br>
-<span i18n:translate="">Active</span>: ${obj.meta.pool_state}<br>

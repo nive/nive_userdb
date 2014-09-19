@@ -30,7 +30,7 @@ class root(RootBase):
     
     # User account handling ------------------------------------------------------------------------------------------------------
 
-    def AddUser(self, data, activate=1, generatePW=0, mail=None, notify=False, notifyMail=None, groups="", currentUser=None, **kw):
+    def AddUser(self, data, activate=1, generatePW=0, mail="default", notifyMail="default", groups="", currentUser=None, **kw):
         """
         Create a new user with groups for login with name/password ::
 
@@ -38,7 +38,6 @@ class root(RootBase):
             activate: directly activate the user for login (pool_state=1)
             generatePW: generate a random password to be send by mail
             mail: mail object template for confirmation mail
-            notify: notify user admin on new registrations by mail
             notifyMail: mail object template for notify mail
             groups: initially assign groups to the user
             currentUser: the currently logged in user for pool_createdby and workflow
@@ -84,98 +83,33 @@ class root(RootBase):
         #obj.Commit(currentUser)
         
         app = self.app
+        if mail=="default":
+            mail = self.app.configuration.mailSignup
         if mail:
             title = mail.title
             body = mail(user=obj, **kw)
             tool = app.GetTool("sendMail")
-            try:
-                result, value = tool(body=body, title=title, recvids=[str(obj)], force=1)
-                if not result:
-                    report.append(_(u"The email could not be sent."))
-                    return None, report
-            except Exception, e:
+            if not tool:
+                raise ConfigurationError, "Mail tool 'sendMail' not found"
+            result, value = tool(body=body, title=title, recvids=[str(obj)], force=1)
+            if not result:
                 report.append(_(u"The email could not be sent."))
-                report.append(str(e))
-                #report.append(_("Send Mail Error: ")+str(e))
                 return None, report
 
         sysadmin = app.configuration.get("systemAdmin")
-        if notify and sysadmin:
+        if sysadmin:
+            if notifyMail=="default":
+                notifyMail = self.app.configuration.mailNotify
             if notifyMail:
                 title = notifyMail.title
                 body = notifyMail(user=obj)
-            else:
-                title = app.configuration.title + u" - New user"
-                body = u"""
-                User: %s<br>
-                Mail: %s<br>
-                Name: %s %s<br>
-                Groups: %s<br>
-                Active: %s<br>
-                <br>%s<br>
-                """ % (data.get("name",u""), data.get("email",u""), data.get("surname",u""), data.get("lastname",u""), 
-                       data.get("groups",u""), data.get("pool_state",u""), data.get("comment",u""))
-            tool = app.GetTool("sendMail")
-            try:
+                tool = app.GetTool("sendMail")
+                if not tool:
+                    raise ConfigurationError, "Mail tool 'sendMail' not found"
                 result, value = tool(body=body, title=title, recvmails=[sysadmin], force=1)
-            except Exception, e:
-                pass
 
         report.append(_(u"Account created."))
         return obj, report
-
-
-    def MailUserPass(self, email=None, mailtmpl=None, createNewPasswd=True, currentUser=None):
-        """
-        Mails a new password or the current password in plain text.
-        
-        returns status and report list
-        """
-        report=[]
-
-        if not email:
-            report.append(_(u"Please enter your email address or username."))
-            return False, report
-
-        obj = self.GetUserByMail(email)
-        if not obj:
-            obj = self.GetUserByName(email)
-            if not obj:
-                report.append(_(u"No matching account found. Please try again."))
-                return False, report
-
-        email = obj.data.get("email")
-        title = obj.meta.get("title")
-        name = obj.data.get("name")
-        if email == "":
-            report.append(_("No email address found."))
-            return False, report
-        recv = [(email, title)]
-
-        if createNewPasswd:
-            pwd = self.GenerateID(5)
-            obj.data["password"] = pwd
-            obj.Commit(user=currentUser)
-        else:
-            pwd = obj.data.get("password")
-        if mailtmpl:
-            title = mailtmpl.title
-            body = mailtmpl(user=obj, password=pwd)
-        else:
-            title = _("Password")
-            body = pwd
-        tool = self.app.GetTool("sendMail")
-        try:
-            result, value = tool(body=body, title=title, recvmails=recv, force=1)
-            if not result:
-                report.append(_(u"The email could not be sent."))
-                return False, report
-        except Exception, e:
-            report.append(_(u"The email could not be sent."))
-            #report.append("Send Mail Error: "+str(e))
-            return False, report
-        report.append(_(u"The new password has been sent to your email address. Please sign in and change it."))
-        return True, report
 
 
     # Login/logout and user sessions ------------------------------------------------------------------------------------------------------
@@ -220,7 +154,140 @@ class root(RootBase):
         return True
 
 
-    # Password, activationID ------------------------------------------------------------------------------------------------------
+    # changing credentials --------------------------------------------------------------------
+
+    def MailVerifyNewEmail(self, ident, newemail, mail="default", currentUser=None, **kw):
+        """
+        returns status and report list
+        """
+        report=[]
+
+        if not newemail:
+            report.append(_(u"Please enter your new email address."))
+            return False, report
+
+        obj = self.GetUser(ident)
+        if not obj:
+            report.append(_(u"No matching account found."))
+            return False, report
+
+        recv = [(newemail, obj.meta.get("title"))]
+
+        token = self.GenerateID(20)
+        obj.data["token"] = token
+        obj.data["tempcache"] = newmail
+        obj.Commit(user=currentUser)
+
+        app = self.app
+        if mail=="default":
+            mail = self.app.configuration.mailVerifyMail
+        title = mail.title
+        body = mail(user=obj, **kw)
+        tool = app.GetTool("sendMail")
+        if not tool:
+            raise ConfigurationError, "Mail tool 'sendMail' not found"
+        result, value = tool(body=body, title=title, recvmails=recv, force=1)
+        if not result:
+            report.append(_(u"The email could not be sent."))
+            return None, report
+
+        report.append(_(u"The link to verify your new email has been sent by mail."))
+        return obj, report
+
+
+    def MailUserPass(self, email=None, mail="default", newPassword=None, currentUser=None, **kw):
+        """
+        Mails a new password or the current password in plain text.
+
+        returns status and report list
+        """
+        report=[]
+
+        if not email:
+            report.append(_(u"Please enter your email address or username."))
+            return False, report
+
+        obj = self.GetUserByMail(email)
+        if not obj:
+            obj = self.GetUserByName(email)
+            if not obj:
+                report.append(_(u"No matching account found. Please try again."))
+                return False, report
+
+        email = obj.data.get("email")
+        title = obj.meta.get("title")
+        name = obj.data.get("name")
+        if email == "":
+            report.append(_("No email address found."))
+            return False, report
+        recv = [(email, title)]
+
+        if not newPassword:
+            pwd = self.GenerateID(5)
+        else:
+            pwd = newPassword
+        obj.data["password"] = pwd
+        obj.Commit(user=currentUser)
+
+        if mail=="default":
+            mail = self.app.configuration.mailSendPass
+        title = mail.title
+        body = mail(user=obj, password=pwd, **kw)
+        tool = self.app.GetTool("sendMail")
+        if not tool:
+            raise ConfigurationError, "Mail tool 'sendMail' not found"
+        result, value = tool(body=body, title=title, recvmails=recv, force=1)
+        if not result:
+            report.append(_(u"The email could not be sent."))
+            return False, report
+
+        report.append(_(u"The new password has been sent to your email address. Please sign in and change it."))
+        return True, report
+
+
+    def MailResetPass(self, email, mail="default", currentUser=None, **kw):
+        """
+        returns status and report list
+        """
+        report=[]
+
+        if not email:
+            report.append(_(u"Please enter your sign in name or email address."))
+            return False, report
+
+        obj = self.GetUserByMail(email)
+        if not obj:
+            report.append(_(u"No matching account found."))
+            return False, report
+
+        email = obj.data.get("email")
+        if not email:
+            report.append(_("No email address found."))
+            return False, report
+        recv = [(email, u"")]
+
+        token = self.GenerateID(25)
+        obj.data["token"] = token
+        obj.Commit(user=currentUser)
+
+        app = self.app
+        if mail=="default":
+            mail = self.app.configuration.mailResetPass
+        title = mail.title
+        body = mail(user=obj, **kw)
+        tool = app.GetTool("sendMail")
+        if not tool:
+            raise ConfigurationError, "Mail tool 'sendMail' not found"
+        result, value = tool(body=body, title=title, recvmails=recv, force=1)
+        if not result:
+            report.append(_(u"The email could not be sent."))
+            return None, report
+
+        report.append(_(u"The link to reset your password has been sent to your email address."))
+        return obj, report
+
+
+    # Password, token ------------------------------------------------------------------------------------------------------
 
     def GenerateID(self, length=20, repl="-"):
         # generates a id
@@ -334,6 +401,29 @@ class root(RootBase):
         return user
      
 
+    def GetUserForToken(self, token, active=True):
+        """
+        Looks up the user for the token
+        requires fld token in user record
+        returns tuple: the user object or None
+        """
+        if not token or token == "":
+            return None
+
+        p = {"token": token}
+        if active:
+            p["pool_state"] = 1
+        users = self.Select(pool_type=u"user",
+                            parameter=p,
+                            fields=[u"id",u"name",u"email"],
+                            max=2)
+        if len(users) != 1:
+            return None
+        id = users[0][0]
+        obj = self.GetObj(id)
+        return obj
+
+
     def GetUsers(self, **kw):
         """
         """
@@ -442,42 +532,4 @@ configuration = RootConf(
     name = _(u"User account"),
     description = __doc__
 )
-
-
-from nive.components.reform.schema import Invalid
-from nive.components.reform.schema import Email
-
-def UsernameValidator(node, value):
-    """ 
-    Validator which succeeds if the username does not exist.
-    Can be used for the name input field in a sign up form.
-    """
-    # lookup name in database
-    r = node.widget.form.context.dataroot
-    u = r.LookupUser(name=value, activeOnly=0)
-    if u:
-        # check if its the current user
-        ctx = node.widget.form.context
-        if len(u)==1 and ctx.id == u[0][0]:
-            return
-        err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
-        raise Invalid(node, err)
-
-def EmailValidator(node, value):
-    """ 
-    Validator which succeeds if the email does not exist.
-    Can be used for the email input field in a sign up form.
-    """
-    # validate email format
-    Email()(node, value)
-    # lookup email in database
-    r = node.widget.form.context.dataroot
-    u = r.LookupUser(email=value, activeOnly=0)
-    if u:
-        # check if its the current user
-        ctx = node.widget.form.context
-        if len(u)==1 and ctx.id == u[0][0]:
-            return
-        err = _(u"Email '${name}' already in use. Please use the login form if you already have a account.", mapping={'name':value})
-        raise Invalid(node, err)
 

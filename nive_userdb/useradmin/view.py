@@ -40,7 +40,7 @@ configuration.views = [
 
 from nive.views import BaseView, Unauthorized, Mail
 from nive.forms import ObjectForm, ValidationError
-from nive_userdb.root import UsernameValidator
+from nive_userdb.app import UsernameValidator, EmailValidator
 
 from nive.adminview.view import AdminBasics
     

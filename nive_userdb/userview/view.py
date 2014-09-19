@@ -70,7 +70,6 @@ class UserForm(ObjectForm):
         }
 
         self.css_class = "smallform"
-        self.mail = None
         self.settings = {}
 
 
@@ -151,7 +150,6 @@ class UserForm(ObjectForm):
         #result, data, e = self.Validate(self.request)
         data = self.GetFormValues(self.request)
         result, msgs = self.context.MailUserPass(email=data.get("email"),
-                                                 mailtmpl=self.settings.get("mailpass"),
                                                  createNewPasswd=createNewPasswd,
                                                  currentUser=self.view.User())
         if result:
@@ -171,9 +169,11 @@ class UserView(BaseView):
         self.form = UserForm(view=self, loadFromType="user")
         self.form.settings = self.context.app.configuration.settings
 
+        #            report.append(_(u"The token is empty. Please copy the whole url."))
+
+
+
     def create(self):
-        self.form.mail = self.context.app.configuration.mailSignup
-        self.form.mailnotify = self.context.app.configuration.mailNotify
         self.form.Setup(subset="create")
         return self._render()
 
@@ -190,13 +190,11 @@ class UserView(BaseView):
             
     def mailpass(self):
         self.form.startEmpty = True
-        self.form.mail = self.context.app.configuration.mailSendPass
         self.form.Setup(subset="mailpass")
         return self._render()
 
     def resetpass(self):
         self.form.startEmpty = True
-        self.form.mail = self.context.app.configuration.mailResetPass
         self.form.Setup(subset="resetpass")
         return self._render()
 
