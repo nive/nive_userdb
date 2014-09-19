@@ -47,7 +47,7 @@ class user(ObjectBase):
         """
         wf = self.GetWf()
         if wf:
-            result = wf.Action("commit", self, user=currentUser)
+            result = wf.Action("activate", self, user=currentUser)
         else:
             self.meta.set("pool_state", 1)
             self.data.set("token", "")

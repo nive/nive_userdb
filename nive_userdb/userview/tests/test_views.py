@@ -145,6 +145,27 @@ class tViews(__local.DefaultTestCase):
         r,v = form.Login("action", redirectSuccess="")
         self.assert_(r)
 
+        # activate -----------------------------------------------------------------------------------------------------
+        u = self.root.LookupUser(name="testuser", reloadFromDB=1)
+        u.meta["pool_state"] = 0
+        u.data["token"] = "1111111111"
+        u.Commit(user=u)
+
+        view = BaseView(context=self.root, request=self.request)
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="activate")
+        self.request.POST = {}
+        self.request.GET = {"token": "aaaa"}
+        r,v = form.Activate("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        self.request.GET = {"token": "1111111111"}
+        r,v = form.Activate("action", redirectSuccess="")
+        self.assert_(r)
+        u = self.root.LookupUser(name="testuser", reloadFromDB=1)
+        self.assert_(u.meta["pool_state"])
+        self.assertFalse(u.data["token"])
+
 
     def test_form2(self):
         view = TestView(context=self.root, request=self.request)
@@ -213,15 +234,13 @@ class tViews(__local.DefaultTestCase):
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail1")
-        self.request.POST = {"token": "000"}
-        self.request.GET = {}
+        self.request.GET = {"token": "000"}
         r, v = form.UpdateMailToken("action", redirectSuccess="")
         self.assertFalse(r)
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail2")
-        self.request.POST = {"token": self.root.LookupUser(name="testuser", reloadFromDB=1).data.token}
-        self.request.GET = {}
+        self.request.GET = {"token": self.root.LookupUser(name="testuser", reloadFromDB=1).data.token}
         try:
             form.UpdateMailToken("action", redirectSuccess="")
         except ConfigurationError:

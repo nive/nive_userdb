@@ -66,7 +66,7 @@ class UsermanagementView(AdminBasics):
         name.settings["validator"] = UsernameValidator
         form = ObjectForm(loadFromType="user", view=self)
         form.subsets = {
-            "create": {"fields":  [name, "password", "email", "groups", "surname", "lastname"], 
+            "create": {"fields":  [name, "password", "email", "groups", "surname", "lastname"],
                        "actions": ["create"],
                        "defaultAction": "default"}
         }
@@ -87,7 +87,7 @@ class UsermanagementView(AdminBasics):
                 pass
         form.ListenEvent("loadDataObj", removepasswd)
         form.subsets = {
-            "edit":   {"fields":  [pwd, "email", "groups", "surname", "lastname"], 
+            "edit":   {"fields":  [pwd, "email", "groups", "surname", "lastname", "token", "tempcache"],
                        "actions": ["edit"],
                        "defaultAction": "defaultEdit"},
         }        

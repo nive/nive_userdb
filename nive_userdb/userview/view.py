@@ -31,10 +31,11 @@ configuration.views = [
     # User Views
     ViewConf(name="login",          attr="login",     renderer=t+"loginpage.pt"),
     ViewConf(name="signup",         attr="create",    renderer=t+"signup.pt",    permission="signup"),
+    ViewConf(name="activate",       attr="activate",  renderer=t+"form.pt"),
     ViewConf(name="update",         attr="update",    renderer=t+"update.pt",    permission="updateuser"),
     ViewConf(name="updatepass",     attr="updatepass",renderer=t+"form.pt",      permission="updateuser"),
-    ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",      permission="updateuser"),
-    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt", permission="updateuser"),
+    ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",     permission="updateuser"),
+    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt",     permission="updateuser"),
     ViewConf(name="resetpass",      attr="resetpass",  renderer=t+"form.pt"),
     ViewConf(name="logout",         attr="logout"),
 ]
@@ -80,6 +81,11 @@ class UserForm(ObjectForm):
                 "defaultAction": "default"
             },
 
+            "activate": {
+                "fields": [FieldConf(id="token", datatype="string", size="500", name="Activation token", required=True, hidden=False)],
+                "actions": [Conf(id="activate", method="Activate", name=_(u"Activate"), hidden=False)],
+                "defaultAction": "activate"
+            },
             "updatepass":{
                 "fields": [
                     FieldConf(id="oldpassword",
@@ -108,7 +114,7 @@ class UserForm(ObjectForm):
                 "defaultAction": "default"
             },
             "updatemail2": {
-                "fields": [FieldConf(id="token", datatype="string", name="reset token", required=True, hidden=True)],
+                "fields": [FieldConf(id="token", datatype="string", size="500", name="reset token", required=True, hidden=True)],
                 "actions": [Conf(id="updatemail_token", method="UpdateMailToken", name=_(u"Verify email"), hidden=False)],
                 "defaultAction": "default"
             },
@@ -131,9 +137,12 @@ class UserForm(ObjectForm):
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
+            opts = {}
+            opts.update(kw)
+            opts.update(self.settings)
             result, msgs = self.context.AddUser(data, 
                                                 currentUser=self.view.User(),
-                                                **self.settings)
+                                                **opts)
             if result and self.context.app.configuration.get("welcomeMessage"):
                 msgs = [self.context.app.configuration.get("welcomeMessage")]
 
@@ -189,6 +198,26 @@ class UserForm(ObjectForm):
         return user, self.Render(data, msgs=msgs, errors=errors)
         
 
+    def Activate(self, action, **kw):
+        """
+        Form action: activate the mail in tempcache if token matches
+        """
+        msgs = []
+        self.method = "GET"
+        result,data,errors = self.Validate(self.request)
+        if result:
+            token = data.get("token")
+            user = self.context.GetUserForToken(token, active=False)
+            if user:
+                result = True
+                user.Activate(currentUser=user)
+                msgs = [_(u"OK. Your account has been activated.")]
+            else:
+                result = False
+                msgs = [_(u"The token is invalid. Please make sure it is complete.")]
+        return self._FinishFormProcessing(result, data, msgs, errors, **kw)
+
+
     def UpdatePass(self, action, **kw):
         """
         Form action: update password if current password matches
@@ -233,6 +262,7 @@ class UserForm(ObjectForm):
         Form action: activate the mail in tempcache if token matches
         """
         msgs = []
+        self.method = "GET"
         result,data,errors = self.Validate(self.request)
         if result:
             token = data.get("token")
@@ -280,7 +310,7 @@ class UserView(BaseView):
 
     def create(self):
         self.form.Setup(subset="create")
-        return self._render()
+        return self._render(url=self.Url()+"activate")
 
     def update(self):
         user=self.User()
@@ -293,6 +323,11 @@ class UserView(BaseView):
         except Unauthorized:
             return {u"content": _(u"User not found"), u"result": False, u"head": self.form.HTMLHead()}
             
+    def activate(self):
+        self.form.startEmpty = True
+        self.form.Setup(subset="activate")
+        return self._render(renderSuccess=False)
+
     def resetpass(self):
         self.form.startEmpty = True
         self.form.Setup(subset="resetpass")
@@ -306,12 +341,12 @@ class UserView(BaseView):
     def updatemail1(self):
         self.form.startEmpty = True
         self.form.Setup(subset="updatemail1")
-        return self._render()
+        return self._render(url=self.Url()+"updatemail2")
 
     def updatemail2(self):
         self.form.startEmpty = True
         self.form.Setup(subset="updatemail2")
-        return self._render()
+        return self._render(renderSuccess=False)
 
     def login(self):
         self.form.Setup(subset="login")
@@ -365,7 +400,7 @@ class UserView(BaseView):
         except:
             return u""
 
-    def _render(self):
-        result, data, action = self.form.Process()
+    def _render(self,**kw):
+        result, data, action = self.form.Process(**kw)
         return {u"content": data, u"result": result, u"head": self.form.HTMLHead()}
     

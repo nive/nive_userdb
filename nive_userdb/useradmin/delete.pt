@@ -4,7 +4,7 @@
 <tal:block metal:fill-slot="editmain">
 
 <div class="row">
-<div class="span4 offset4">
+<div class="span4 offset2">
 <div class="alert">
   <h2 i18n:translate="">Confirm delete</h2>
   <tal:block tal:condition="not result and len(msgs)">

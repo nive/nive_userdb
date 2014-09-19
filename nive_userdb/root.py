@@ -70,6 +70,10 @@ class root(RootBase):
         if groups:
             data["groups"] = groups
 
+        if not "token" in data:
+            token = self.GenerateID(30)
+            data["token"] = token
+
         data["pool_type"] = u"user"
         data["pool_state"] = int(activate)
         data["pool_stag"] = StagUser

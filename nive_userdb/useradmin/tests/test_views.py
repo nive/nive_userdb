@@ -5,6 +5,7 @@ import unittest
 
 from nive.definitions import FieldConf, Conf
 from nive.portal import Portal
+from nive.views import ExceptionalResponse
 
 from nive_userdb.tests.db_app import *
 from nive_userdb.tests import __local
