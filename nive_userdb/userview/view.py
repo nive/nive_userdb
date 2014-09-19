@@ -2,9 +2,15 @@
 # Released under GPL3. See license.txt
 #
 
+from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
+
+from nive.views import BaseView, Unauthorized, Mail
+from nive.forms import ObjectForm
+
 from nive_userdb.i18n import _
 from nive_userdb.i18n import translator
-from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
+from nive_userdb.app import EmailValidator, UsernameValidator
+
 
 # view module definition ------------------------------------------------------------------
 
@@ -23,22 +29,19 @@ configuration = ViewModuleConf(
 t = configuration.templates
 configuration.views = [
     # User Views
-    ViewConf(name="login",    attr="login",    renderer=t+"loginpage.pt"),
-    ViewConf(name="signup",   attr="create",   renderer=t+"signup.pt", permission="signup"),
-    ViewConf(name="update",   attr="update",   renderer=t+"update.pt", permission="updateuser"),
-    ViewConf(name="resetpass",attr="resetpass",renderer=t+"resetpass.pt"),
-    ViewConf(name="logout",   attr="logout"),
-    # disabled
-    #ViewConf(name="mailpass", attr="mailpass", renderer=t+"mailpass.pt"),
+    ViewConf(name="login",          attr="login",     renderer=t+"loginpage.pt"),
+    ViewConf(name="signup",         attr="create",    renderer=t+"signup.pt",    permission="signup"),
+    ViewConf(name="update",         attr="update",    renderer=t+"update.pt",    permission="updateuser"),
+    ViewConf(name="updatepass",     attr="updatepass",renderer=t+"form.pt",      permission="updateuser"),
+    ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",      permission="updateuser"),
+    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt", permission="updateuser"),
+    ViewConf(name="resetpass",      attr="resetpass",  renderer=t+"form.pt"),
+    ViewConf(name="logout",         attr="logout"),
 ]
 
 
 
 # view and form implementation ------------------------------------------------------------------
-
-from nive.views import BaseView, Unauthorized, Mail
-from nive.forms import ObjectForm
-
 
 class UserForm(ObjectForm):
     """
@@ -53,20 +56,68 @@ class UserForm(ObjectForm):
             Conf(id="defaultEdit",method="LoadUser",  name=_(u"Initialize"),    hidden=True),
             Conf(id="create",     method="AddUser",   name=_(u"Signup"),        hidden=False, options={"renderSuccess":False}),
             Conf(id="edit",       method="Update",    name=_(u"Confirm"),       hidden=False),
-            Conf(id="mailpass",   method="MailPass",  name=_(u"Mail password"), hidden=False),
-            Conf(id="resetpass",  method="ResetPass", name=_(u"Reset password"),hidden=False),
             Conf(id="login",      method="Login",     name=_(u"Login"),         hidden=False),
         ]
-    
+
         self.subsets = {
-            "create": {"actions": ["create"], "defaultAction": "default"}, # loads fields based on user configuration
-            "edit":   {"actions": ["defaultEdit", "edit"], "defaultAction": "defaultEdit"}, # loads fields based on user configuration
-            "login":  {"fields":  ["name", FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True})], 
-                       "actions": ["login"], "defaultAction": "default"},
-            "mailpass":{"fields": ["email"],
-                        "actions": ["mailpass"], "defaultAction": "default"},
-            "resetpass":{"fields": ["email"], 
-                        "actions": ["resetpass"], "defaultAction": "default"},
+            "create": {
+                # loads fields from user configuration
+                "actions": ["create"],
+                "defaultAction": "default"
+            },
+            "edit":   {
+                # loads fields from user configuration
+                "actions": ["defaultEdit", "edit"],
+                "defaultAction": "defaultEdit"
+            },
+
+            "login":  {
+                "fields":  [
+                    FieldConf(id="name", name=_("Name"), datatype="string"),
+                    FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True})
+                ],
+                "actions": ["login"],
+                "defaultAction": "default"
+            },
+
+            "updatepass":{
+                "fields": [
+                    FieldConf(id="oldpassword",
+                              datatype="password",
+                              size=100,
+                              default=u"",
+                              required=1,
+                              name=_(u"Old password"),
+                              settings={"single":True}),
+                    "password"
+                ],
+                "actions": [Conf(id="updatepass", method="UpdatePass", name=_(u"Reset password"), hidden=False)],
+                "defaultAction": "default"
+            },
+
+            "updatemail1": {
+                "fields": [FieldConf(id="newmail",
+                           datatype="email",
+                           size=255,
+                           default=u"",
+                           required=1,
+                           name=_(u"New email"),
+                           settings={"validator":EmailValidator})
+                ],
+                "actions": [Conf(id="updatemail", method="UpdateMail", name=_(u"Update email"), hidden=False)],
+                "defaultAction": "default"
+            },
+            "updatemail2": {
+                "fields": [FieldConf(id="token", datatype="string", name="reset token", required=True, hidden=True)],
+                "actions": [Conf(id="updatemail_token", method="UpdateMailToken", name=_(u"Verify email"), hidden=False)],
+                "defaultAction": "default"
+            },
+
+            "resetpass": {
+                "fields": ["name"],
+                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"),hidden=False)],
+                "defaultAction": "default"
+            },
         }
 
         self.css_class = "smallform"
@@ -83,6 +134,8 @@ class UserForm(ObjectForm):
             result, msgs = self.context.AddUser(data, 
                                                 currentUser=self.view.User(),
                                                 **self.settings)
+            if result and self.context.app.configuration.get("welcomeMessage"):
+                msgs = [self.context.app.configuration.get("welcomeMessage")]
 
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
         
@@ -107,14 +160,13 @@ class UserForm(ObjectForm):
         """
         Form action: safely update a user 
         """
-        user = self.view.User()
+        user = self.view.User(sessionuser=False)
         if not user:
             raise Unauthorized, "User not found."
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
-            uobj = self.context.LookupUser(id=user.id)
-            result = uobj.SecureUpdate(data, user)
+            result = user.SecureUpdate(data, user)
             if result:
                 msgs.append(_(u"OK"))
 
@@ -137,20 +189,73 @@ class UserForm(ObjectForm):
         return user, self.Render(data, msgs=msgs, errors=errors)
         
 
-    def MailPass(self, action, **kw):
+    def UpdatePass(self, action, **kw):
         """
+        Form action: update password if current password matches
         """
+        user = self.view.User(sessionuser=False)
+        if user is None:
+            raise Unauthorized, "User not found."
+        msgs = []
         redirectSuccess = kw.get("redirectSuccess")
-        return self.ResetPass(action, createNewPasswd=False, **kw)
+        result,data,errors = self.Validate(self.request)
+        # check old password
+        if data["oldpassword"] and not user.Authenticate(data["oldpassword"]):
+            msgs = [_(u"The old password does not match.")]
+            result = False
+        if not result:
+            return result, self.Render(data, msgs=msgs, errors=errors)
+
+        result = user.UpdatePassword(data["password"], user)
+        if result:
+            msgs.append(_(u"OK. Password changed."))
+            return result, self.Render(data, msgs=msgs, errors=None, messagesOnly=True)
+        return result, self.Render(data)
 
 
-    def ResetPass(self, action, createNewPasswd=True, **kw):
+    def UpdateMail(self, action, **kw):
         """
+        Form action: trigger a mail to verify another mail address
         """
-        #result, data, e = self.Validate(self.request)
+        user = self.view.User()
+        if not user:
+            raise Unauthorized, "User not found."
+        msgs = []
+        result,data,errors = self.Validate(self.request)
+        if result:
+            newmail = data["newmail"]
+            result, msgs = self.context.MailVerifyNewEmail(user, newmail, currentUser=user, **kw)
+        return self._FinishFormProcessing(result, data, msgs, errors, **kw)
+
+
+    def UpdateMailToken(self, action, **kw):
+        """
+        Form action: activate the mail in tempcache if token matches
+        """
+        msgs = []
+        result,data,errors = self.Validate(self.request)
+        if result:
+            token = data.get("token")
+            user = self.context.GetUserForToken(token)
+            if user:
+                mail = user.data.tempcache
+                user.data["email"] = mail
+                user.data["tempcache"] = u""
+                user.data["token"] = u""
+                user.Commit(user=user)
+                msgs = [_(u"OK. The new email address has been activated.")]
+            else:
+                result = False
+                msgs = [_(u"The token is empty. Please copy the whole url.")]
+        return self._FinishFormProcessing(result, data, msgs, errors, **kw)
+
+
+    def ResetPass(self, action, **kw):
+        """
+        Form action: generate a new password and mail to the user
+        """
         data = self.GetFormValues(self.request)
         result, msgs = self.context.MailUserPass(email=data.get("email"),
-                                                 createNewPasswd=createNewPasswd,
                                                  currentUser=self.view.User())
         if result:
             data = {}
@@ -188,14 +293,24 @@ class UserView(BaseView):
         except Unauthorized:
             return {u"content": _(u"User not found"), u"result": False, u"head": self.form.HTMLHead()}
             
-    def mailpass(self):
-        self.form.startEmpty = True
-        self.form.Setup(subset="mailpass")
-        return self._render()
-
     def resetpass(self):
         self.form.startEmpty = True
         self.form.Setup(subset="resetpass")
+        return self._render()
+
+    def updatepass(self):
+        self.form.startEmpty = True
+        self.form.Setup(subset="updatepass")
+        return self._render()
+
+    def updatemail1(self):
+        self.form.startEmpty = True
+        self.form.Setup(subset="updatemail1")
+        return self._render()
+
+    def updatemail2(self):
+        self.form.startEmpty = True
+        self.form.Setup(subset="updatemail2")
         return self._render()
 
     def login(self):

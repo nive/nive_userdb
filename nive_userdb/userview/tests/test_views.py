@@ -49,8 +49,10 @@ class tViews(__local.DefaultTestCase):
         view = UserView(context=self.root, request=self.request)
         view.create()
         view.update()
-        view.mailpass()
+        view.updatepass()
         view.resetpass()
+        view.updatemail1()
+        view.updatemail2()
         view.login()
         view.logoutlink()
         self.assertRaises(HTTPFound, view.logout)
@@ -66,12 +68,21 @@ class tViews(__local.DefaultTestCase):
         values.update(vrender)
         render("nive_userdb.userview:loginpage.pt", values)
         
-        values = view.mailpass()
+        values = view.updatepass()
         values.update(vrender)
-        render("nive_userdb.userview:mailpass.pt", values)
+        render("nive_userdb.userview:form.pt", values)
+
+        values = view.updatemail1()
+        values.update(vrender)
+        render("nive_userdb.userview:form.pt", values)
+
+        values = view.updatemail2()
+        values.update(vrender)
+        render("nive_userdb.userview:form.pt", values)
+
         values = view.resetpass()
         values.update(vrender)
-        render("nive_userdb.userview:resetpass.pt", values)
+        render("nive_userdb.userview:form.pt", values)
         
         values = view.create()
         values.update(vrender)
@@ -131,18 +142,109 @@ class tViews(__local.DefaultTestCase):
         form.Setup(subset="login")
         self.request.POST = {"name": "testuser", "password": "12345"}
         self.request.GET = {}
-
         r,v = form.Login("action", redirectSuccess="")
         self.assert_(r)
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
-        form.Setup(subset="mailpass")
-        self.request.POST = {"email": "testuser@domain.net"}
-        self.request.GET = {}
 
+    def test_form2(self):
+        view = TestView(context=self.root, request=self.request)
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.settings["mail"] = None
+        form.Setup(subset="create")
+        self.request.GET = {}
+        self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
+        r,v = form.AddUser("action", redirectSuccess="")
+        self.assert_(r)
+
+        # UpdatePass -----------------------------------------------------------------------------------------------------
+
+        view = TestView(context=self.root, request=self.request)
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatepass")
+        self.request.POST = {"oldpassword": "12345", "password": "11111", "password-confirm": "22222"}
+        self.request.GET = {}
+        r, v = form.UpdatePass("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatepass")
+        self.request.POST = {"oldpassword": "12345", "password": "11111", "password-confirm": "11111"}
+        self.request.GET = {}
+        r, v = form.UpdatePass("action", redirectSuccess="")
+        self.assert_(r)
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatepass")
+        self.request.POST = {"oldpassword": "11111", "password": "12345", "password-confirm": "12345"}
+        self.request.GET = {}
+        r, v = form.UpdatePass("action", redirectSuccess="")
+        self.assert_(r)
+
+
+        # UpdateMail -----------------------------------------------------------------------------------------------------
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatemail1")
+        self.request.POST = {"newmail": "testuser"}
+        self.request.GET = {}
+        r, v = form.UpdateMail("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatemail1")
+        self.request.POST = {"newmail": "testuser@domain.net"}
+        self.request.GET = {}
+        r, v = form.UpdateMail("action", redirectSuccess="", url="")
+        self.assertFalse(r)
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatemail1")
+        self.request.POST = {"newmail": "newuser@domain.net"}
+        self.request.GET = {}
         try:
-            form.MailPass("action", redirectSuccess="")
+            form.UpdateMail("action", redirectSuccess="", url="")
         except ConfigurationError:
             pass
+        m = self.root.LookupUser(name="testuser", reloadFromDB=1).data.tempcache
+        self.assert_(m=="newuser@domain.net", m)
 
+
+        # UpdateMailToken -----------------------------------------------------------------------------------------------------
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatemail1")
+        self.request.POST = {"token": "000"}
+        self.request.GET = {}
+        r, v = form.UpdateMailToken("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatemail2")
+        self.request.POST = {"token": self.root.LookupUser(name="testuser", reloadFromDB=1).data.token}
+        self.request.GET = {}
+        try:
+            form.UpdateMailToken("action", redirectSuccess="")
+        except ConfigurationError:
+            pass
+        self.assert_(self.root.GetUser("testuser").data.email=="newuser@domain.net")
+
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="updatemail2")
+        self.request.POST = {"token": self.root.LookupUser(name="testuser", reloadFromDB=1).data.token}
+        self.request.GET = {}
+        r, v = form.UpdateMailToken("action", redirectSuccess="")
+        self.assertFalse(r)
+
+
+        # ResetPass -----------------------------------------------------------------------------------------------------
+
+        view = BaseView(context=self.root, request=self.request)
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="resetpass")
+        self.request.POST = {"email": "testuser@domain.net"}
+        self.request.GET = {}
+        try:
+            form.ResetPass("action", redirectSuccess="")
+        except ConfigurationError:
+            pass
 

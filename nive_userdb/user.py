@@ -222,9 +222,8 @@ configuration.data = (
     FieldConf(id="tempcache",datatype="string",      size=255, default=u"", name=_(u"Temp cache for additional verification data")),
 )
 
-#password2 = FieldConf(id="password2", datatype="password", size= 30, default="", required=1, name="Passwort - Wiederholung", description="")
 configuration.forms = {
-    "create": {"fields": ["name", "password", "email", "surname", "lastname"]},
+    "create": {"fields": ["name", "email", "password", "surname", "lastname"]},
     "edit":   {"fields": [FieldConf(id="password", name=_("Password"), datatype="password", required=False, settings={"update": True}),
                           "surname", "lastname"]},
 }

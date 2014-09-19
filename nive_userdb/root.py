@@ -84,7 +84,7 @@ class root(RootBase):
         
         app = self.app
         if mail=="default":
-            mail = self.app.configuration.mailSignup
+            mail = app.configuration.mailSignup
         if mail:
             title = mail.title
             body = mail(user=obj, **kw)
@@ -96,7 +96,7 @@ class root(RootBase):
                 report.append(_(u"The email could not be sent."))
                 return None, report
 
-        sysadmin = app.configuration.get("systemAdmin")
+        sysadmin = app.configuration.get("userAdmin")
         if sysadmin:
             if notifyMail=="default":
                 notifyMail = self.app.configuration.mailNotify
@@ -156,13 +156,13 @@ class root(RootBase):
 
     # changing credentials --------------------------------------------------------------------
 
-    def MailVerifyNewEmail(self, ident, newemail, mail="default", currentUser=None, **kw):
+    def MailVerifyNewEmail(self, ident, newmail, mail="default", currentUser=None, **kw):
         """
         returns status and report list
         """
         report=[]
 
-        if not newemail:
+        if not newmail:
             report.append(_(u"Please enter your new email address."))
             return False, report
 
@@ -171,7 +171,7 @@ class root(RootBase):
             report.append(_(u"No matching account found."))
             return False, report
 
-        recv = [(newemail, obj.meta.get("title"))]
+        recv = [(newmail, obj.meta.get("title"))]
 
         token = self.GenerateID(20)
         obj.data["token"] = token

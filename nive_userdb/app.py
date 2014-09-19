@@ -42,16 +42,20 @@ configuration = AppConf(
     settings = Conf(
         groups=(),
         activate=1,
-        generatePW=0,
-        notify=False
+        generatePW=0
     ),
+    #userAdmin = (u"admin@mymail.com", u"Admin"),  # contact system information
+    #admin = {"name": "adminusername", "password": "adminpass", "email": "u"admin@mymail.com""}, # admin login
 
     # mails
-    mailSignup=Mail(_(u"Signup confirmed"), "nive_userdb:userview/mails/signup.pt"),
-    mailNotify=Mail(_(u"Signup notification"), "nive_userdb:userview/mails/notify.pt"),
-    mailVerifyMail=Mail(_(u"Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
-    mailResetPass=Mail(_(u"Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
-    mailSendPass=Mail(_(u"Your password"), "nive_userdb:userview/mails/mailpass.pt"),
+    mailSignup = Mail(_(u"Signup confirmed"), "nive_userdb:userview/mails/signup.pt"),
+    mailNotify = Mail(_(u"Signup notification"), "nive_userdb:userview/mails/notify.pt"),
+    mailVerifyMail = Mail(_(u"Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
+    mailResetPass = Mail(_(u"Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
+    mailSendPass = Mail(_(u"Your password"), "nive_userdb:userview/mails/mailpass.pt"),
+
+    # messages customizations
+    #welcomeMessage = u"",
 
     # sessionuser field cache
     sessionuser = ("name", "email", "surname", "lastname", "groups", "notify", "lastlogin"),
