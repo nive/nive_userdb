@@ -9,14 +9,13 @@ Provides functionality to safely add users with several activation and
 mailing options.
 """
 
-import types, base64, random, string
-from time import time
+import base64, random
 import uuid
 import json
 
 from nive.definitions import RootConf, Conf, StagUser, IUser
-from nive.definitions import Interface, implements
-from nive.security import User, AdminUser, IAdminUser, UserFound
+from nive.definitions import ConfigurationError
+from nive.security import User, AdminUser, IAdminUser, UserFound, Unauthorized
 from nive.components.objects.base import RootBase
 from nive_userdb.i18n import _
 
@@ -160,7 +159,7 @@ class root(RootBase):
 
     # changing credentials --------------------------------------------------------------------
 
-    def MailVerifyNewEmail(self, ident, newmail, mail="default", currentUser=None, **kw):
+    def MailVerifyNewEmail(self, name, newmail, mail="default", currentUser=None, **kw):
         """
         returns status and report list
         """
@@ -170,7 +169,7 @@ class root(RootBase):
             report.append(_(u"Please enter your new email address."))
             return False, report
 
-        obj = self.GetUser(ident)
+        obj = self.GetUserByName(name)
         if not obj:
             report.append(_(u"No matching account found."))
             return False, report
@@ -199,7 +198,7 @@ class root(RootBase):
         return obj, report
 
 
-    def MailUserPass(self, email=None, mail="default", newPassword=None, currentUser=None, **kw):
+    def MailUserPass(self, name=None, mail="default", newPassword=None, currentUser=None, **kw):
         """
         Mails a new password or the current password in plain text.
 
@@ -207,16 +206,14 @@ class root(RootBase):
         """
         report=[]
 
-        if not email:
+        if not name:
             report.append(_(u"Please enter your email address or username."))
             return False, report
 
-        obj = self.GetUserByMail(email)
+        obj = self.GetUserByName(name)
         if not obj:
-            obj = self.GetUserByName(email)
-            if not obj:
-                report.append(_(u"No matching account found. Please try again."))
-                return False, report
+            report.append(_(u"No matching account found. Please try again."))
+            return False, report
 
         email = obj.data.get("email")
         title = obj.meta.get("title")
@@ -234,7 +231,10 @@ class root(RootBase):
         obj.Commit(user=currentUser)
 
         if mail=="default":
-            mail = self.app.configuration.mailSendPass
+            try:
+                mail = self.app.configuration.mailSendPass
+            except AttributeError, e:
+                raise ConfigurationError, str(e)
         title = mail.title
         body = mail(user=obj, password=pwd, **kw)
         tool = self.app.GetTool("sendMail")
@@ -249,26 +249,26 @@ class root(RootBase):
         return True, report
 
 
-    def MailResetPass(self, email, mail="default", currentUser=None, **kw):
+    def MailResetPass(self, name, mail="default", currentUser=None, **kw):
         """
         returns status and report list
         """
         report=[]
 
-        if not email:
+        if not name:
             report.append(_(u"Please enter your sign in name or email address."))
-            return False, report
+            return None, report
 
-        obj = self.GetUserByMail(email)
+        obj = self.GetUserByName(name)
         if not obj:
             report.append(_(u"No matching account found."))
-            return False, report
+            return None, report
 
         email = obj.data.get("email")
         if not email:
             report.append(_("No email address found."))
-            return False, report
-        recv = [(email, u"")]
+            return None, report
+        recv = [(email, obj.meta.title)]
 
         token = self.GenerateID(25)
         obj.data["token"] = token
@@ -276,7 +276,12 @@ class root(RootBase):
 
         app = self.app
         if mail=="default":
-            mail = self.app.configuration.mailResetPass
+            try:
+                mail = self.app.configuration.mailResetPass
+            except AttributeError, e:
+                raise ConfigurationError, str(e)
+        if not mail:
+            raise ConfigurationError("Required  mailtemplate is required")
         title = mail.title
         body = mail(user=obj, **kw)
         tool = app.GetTool("sendMail")
@@ -357,7 +362,7 @@ class root(RootBase):
         reloadFromDB deprecated. will be removed in the future
         """
         if not id:
-            loginByEmail = self.app.configuration.get("loginByEmail")
+            loginByEmail = self.app.configuration.get("loginByEmail", True)
             # lookup adminuser
             admin = self.app.configuration.get("admin")
             if admin:

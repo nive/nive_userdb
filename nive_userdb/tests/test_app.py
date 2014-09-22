@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time
-import unittest
-
 from pyramid import testing
 
-from nive.definitions import Conf, ConfigurationError
-from nive.security import AdminUser, UserFound
 from nive_userdb.tests.db_app import *
 from nive_userdb.tests import __local
 
@@ -41,36 +36,27 @@ class ObjectTest_db(object):
         
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assertFalse(o,r)
 
         data["name"] = "user2"
         data["email"] = "user2@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, notify=False, groups="group:author", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, groups="group:author", currentUser=user)
         self.assert_(o,r)
 
         data["name"] = "user3"
         data["email"] = "user3@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, notify=False, groups="group:editor", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, groups="group:editor", currentUser=user)
         self.assert_(o,r)
         self.assert_("group:editor" in o.data.groups, o.data.groups)
         self.assert_(o.data.password != "11111")
         self.assertFalse(o.meta.pool_state)
         
-        try:
-            root.MailUserPass(email = "user1")
-        except ConfigurationError:
-            pass
-        try:
-            root.MailUserPass(email = "user2@aaa.ccc", newPasswd="111111")
-        except ConfigurationError:
-            pass
-        try:
-            root.MailUserPass(email = "user3@aaa.ccc")
-        except ConfigurationError:
-            pass
+        root.MailUserPass(email = "user1")
+        root.MailUserPass(email = "user2@aaa.ccc", newPasswd="111111")
+        root.MailUserPass(email = "user3@aaa.ccc")
 
         self.assert_(root.GetUserByName("user2", activeOnly=1))
         self.assert_(root.GetUserByID(o.id, activeOnly=0))
@@ -106,7 +92,7 @@ class ObjectTest_db(object):
         
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
         l,r = root.Login("user1", "11111", raiseUnauthorized = 0)
         self.assert_(l,r)
@@ -118,7 +104,7 @@ class ObjectTest_db(object):
 
         data["name"] = "user2"
         data["email"] = "user2@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
         l,r = root.Login("user2", o.data.password, raiseUnauthorized = 0)
         self.assertFalse(l,r)
@@ -128,7 +114,7 @@ class ObjectTest_db(object):
 
         data["name"] = "user3"
         data["email"] = "user3@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, notify=False, groups="group:author", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, groups="group:author", currentUser=user)
         self.assert_(o,r)
         l,r = root.Login("user3", o.data.password, raiseUnauthorized = 0)
         self.assertFalse(l,r)
@@ -149,7 +135,7 @@ class ObjectTest_db(object):
         
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
 
         self.assert_(o.SecureUpdate(data, user))
         self.assert_(o.UpdateGroups(["group:author"]))
@@ -173,7 +159,7 @@ class ObjectTest_db(object):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
 
         o.HashPassword()
@@ -223,7 +209,7 @@ class ObjectTest_db(object):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
         self.assertRaises(Invalid, UsernameValidator, node, "user1")
         self.assertRaises(Invalid, UsernameValidator, node, "user1@aaa.ccc")
@@ -254,7 +240,7 @@ class ObjectTest_db(object):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
         self.assertRaises(Invalid, EmailValidator, node, "user1@aaa.ccc")
         self.assertRaises(Invalid, EmailValidator, node, "user1")
@@ -274,7 +260,7 @@ class ObjectTest_db(object):
 
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
 
         self.assertFalse(root.GetUserForToken("no id"))
@@ -299,15 +285,11 @@ class ObjectTest_db(object):
 
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"uuu")
         self.assert_(o,r)
 
-        try:
-            root.MailResetPass("user1@aaa.ccc", currentUser=user, url=u"")
-        except ConfigurationError:
-            pass
-        self.assert_(root.GetUser("user1").data.token)
-
+        root.MailResetPass("user1@aaa.ccc", currentUser=user, url=u"")
+        self.assert_(root.GetUserByName("user1").data.token)
         o,r = root.MailResetPass("no mail", currentUser=user, url=u"")
         self.assertFalse(o,r)
 
@@ -324,7 +306,7 @@ class ObjectTest_db(object):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
 
         self.assert_(root.GetUserForToken("12345", active=False))
@@ -344,7 +326,7 @@ class ObjectTest_db(object):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
 
         o.UpdateGroups(["g1","g2","g3"])
@@ -398,11 +380,11 @@ class AdminuserTest_db(__local.DefaultTestCase):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
         data["name"] = "admin"
         data["email"] = "admin@aaa.cccXXXXX"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assertFalse(o,r)
         data["name"] = "adminXXXXX"
         data["email"] = "admin@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, notify=False, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assertFalse(o,r)
 
         l,r = root.Login("admin", "11111", raiseUnauthorized = 0)

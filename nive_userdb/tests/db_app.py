@@ -13,7 +13,7 @@ from nive_userdb.app import UserDB
 def app_db(confs=None):
     appconf = AppConf("nive_userdb.app")
     appconf.modules.append("nive_userdb.userview.view")
-    appconf.modules.append("nive.tools.sendMail")
+    appconf.modules.append("nive.tools.sendMailTester")
     a = UserDB()
     a.Register(appconf)
     if confs:

@@ -75,7 +75,7 @@ class user(ObjectBase):
         events: logout()
         """
         self.Signal("logout")
-        self.Commit(self)
+        #self.Commit(self)
 
 
     def OnCommit(self):

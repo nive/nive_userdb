@@ -3,7 +3,7 @@
 import time
 import unittest
 
-from nive.definitions import Conf, ConfigurationError
+from nive.definitions import Conf
 from nive_userdb.userview.view import UserForm, UserView
 from nive.views import BaseView
 from nive.security import User
@@ -222,10 +222,7 @@ class tViews(__local.DefaultTestCase):
         form.Setup(subset="updatemail1")
         self.request.POST = {"newmail": "newuser@domain.net"}
         self.request.GET = {}
-        try:
-            form.UpdateMail("action", redirectSuccess="", url="")
-        except ConfigurationError:
-            pass
+        form.UpdateMail("action", redirectSuccess="", url="")
         m = self.root.LookupUser(name="testuser", reloadFromDB=1).data.tempcache
         self.assert_(m=="newuser@domain.net", m)
 
@@ -241,10 +238,7 @@ class tViews(__local.DefaultTestCase):
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail2")
         self.request.GET = {"token": self.root.LookupUser(name="testuser", reloadFromDB=1).data.token}
-        try:
-            form.UpdateMailToken("action", redirectSuccess="")
-        except ConfigurationError:
-            pass
+        form.UpdateMailToken("action", redirectSuccess="")
         self.assert_(self.root.GetUser("testuser").data.email=="newuser@domain.net")
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
@@ -262,8 +256,5 @@ class tViews(__local.DefaultTestCase):
         form.Setup(subset="resetpass")
         self.request.POST = {"email": "testuser@domain.net"}
         self.request.GET = {}
-        try:
-            form.ResetPass("action", redirectSuccess="")
-        except ConfigurationError:
-            pass
+        form.ResetPass("action", redirectSuccess="")
 

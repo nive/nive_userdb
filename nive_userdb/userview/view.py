@@ -50,7 +50,7 @@ class UserForm(ObjectForm):
     """
 
     def __init__(self, view=None, loadFromType=None, context=None, request=None, app=None, **kw):
-        ObjectForm.__init__(self, view=view, loadFromType=loadFromType)
+        ObjectForm.__init__(self, view=view, loadFromType=loadFromType, context=context, request=request, app=app, **kw)
         
         self.actions = [
             Conf(id="default",    method="StartForm", name=_(u"Initialize"),    hidden=True),
@@ -242,6 +242,7 @@ class UserForm(ObjectForm):
         return result, self.Render(data)
 
 
+
     def UpdateMail(self, action, **kw):
         """
         Form action: trigger a mail to verify another mail address
@@ -285,8 +286,9 @@ class UserForm(ObjectForm):
         Form action: generate a new password and mail to the user
         """
         data = self.GetFormValues(self.request)
-        result, msgs = self.context.MailUserPass(email=data.get("email"),
-                                                 currentUser=self.view.User())
+        result, msgs = self.context.MailUserPass(data.get("email"),
+                                                 currentUser=self.view.User(),
+                                                 **kw)
         if result:
             data = {}
         return self._FinishFormProcessing(result, data, msgs, None, **kw)
