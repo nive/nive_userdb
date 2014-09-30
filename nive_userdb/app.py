@@ -81,7 +81,7 @@ configuration.modules = [
     "nive.tools.dbStructureUpdater", 
     # administration and persistence
     "nive.adminview",
-    #"nive_userdb.persistence.dbPersistenceConfiguration"
+    "nive_userdb.persistence.dbPersistenceConfiguration"
 ]
 
 configuration.acl= [
