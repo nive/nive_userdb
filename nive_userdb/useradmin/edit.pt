@@ -4,16 +4,13 @@
 <tal:block metal:fill-slot="editmain">
 
  <h2>${context.data.name}</h2>
+ <div class="alert alert-success">
+     <strong i18n:translate="" i18n:domain="nive">State</strong> ${view.RenderField({'id':'pool_state','datatype':'bool'},context.meta.pool_state)},
+     <strong i18n:translate="">Last login</strong> ${view.RenderField('lastlogin')},
+     <strong i18n:translate="" i18n:domain="nive">Changed</strong> ${view.RenderField('pool_change')} - ${view.RenderField('pool_changedby')},
+     <strong i18n:translate="" i18n:domain="nive">Created</strong> ${view.RenderField('pool_create')} - ${view.RenderField('pool_createdby')}
+ </div>
  <span tal:replace="structure content"/>
-
-<div class="row">
-<div class="span4 offset6">
- <table tal:define="app context.app">
-   <tr class="row" tal:repeat="field ('lastlogin','pool_state','pool_create','pool_createdby','pool_change','pool_changedby')"
-       ><th>${app.GetFldName(field, context.GetTypeID())}</th><td>${view.RenderField(field)}</td></tr>
- </table>
-</div>
-</div>
 
 </tal:block>
 
