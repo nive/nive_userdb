@@ -5,7 +5,7 @@
 
  <h2>${context.data.name}</h2>
  <div class="alert alert-success">
-     <strong i18n:translate="" i18n:domain="nive">State</strong> ${view.RenderField({'id':'pool_state','datatype':'bool'},context.meta.pool_state)},
+     <strong i18n:translate="">Active</strong> ${view.RenderField({'id':'pool_state','datatype':'bool'},context.meta.pool_state)},
      <strong i18n:translate="">Last login</strong> ${view.RenderField('lastlogin')},
      <strong i18n:translate="" i18n:domain="nive">Changed</strong> ${view.RenderField('pool_change')} - ${view.RenderField('pool_changedby')},
      <strong i18n:translate="" i18n:domain="nive">Created</strong> ${view.RenderField('pool_create')} - ${view.RenderField('pool_createdby')}
