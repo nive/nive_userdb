@@ -24,7 +24,7 @@ class root(RootBase):
     """
     """
     
-    # field used as unique user identity in sessions and cache
+    # field used as unique user identity internally in sessions and cache
     identityField = u"name"
     
     # User account handling ------------------------------------------------------------------------------------------------------
@@ -296,6 +296,38 @@ class root(RootBase):
         return obj, report
 
 
+    def DeleteUser(self, ident, currentUser=None):
+        """
+        returns status and report list
+        """
+        report = []
+        if not ident:
+            report.append(_(u"Invalid user."))
+            return False, report
+        elif isinstance(ident, basestring):
+            if not ident:
+                report.append(_(u"Invalid user."))
+                return False, report
+
+            user = self.LookupUser(ident=ident, activeOnly=0)
+            if not user:
+                report.append(_(u"Invalid username."))
+                return False, report
+        else:
+            user = ident
+
+        if IAdminUser.providedBy(user):
+            report.append(_(u"You cannot delete the admin user."))
+            return False, report
+
+        if not self.Delete(user.id, obj=user, user=currentUser):
+            report.append(_(u"Sorry. An error occurred."))
+            return False, report
+
+        report.append(_(u"User deleted."))
+        return True, report
+
+
     # Password, token ------------------------------------------------------------------------------------------------------
 
     def GenerateID(self, length=20, repl="-"):
@@ -322,11 +354,13 @@ class root(RootBase):
         return password
 
 
-    # User ------------------------------------------------------------------------------------------------------
+    # user lookup ------------------------------------------------------------------------------------------------------
 
     def GetUser(self, ident, activeOnly=1):
         """
-        Lookup user by *user identity* as used in session cookies for example
+        Lookup user by *user identity* as used in session cookies for example.
+        Returns the cached session user if available, not the 'real' user object.
+        Use `LookupUser()` to make sure the user is actually looked in the database.
         
         events: 
         - getuser(ident, activeOnly)
@@ -370,7 +404,7 @@ class root(RootBase):
                     return AdminUser(admin, admin[self.identityField])
                 elif name and name == admin["name"]:
                     return AdminUser(admin, admin.get(self.identityField))
-                elif loginByEmail and email and email == admin["email"]: 
+                elif loginByEmail and email and email == admin["email"]:
                     return AdminUser(admin, admin.get(self.identityField))
             # lookup id for name, email or ident
             param = {}
@@ -384,7 +418,7 @@ class root(RootBase):
                 if not self.identityField:
                     raise ValueError, "user identity field not set"
                 param[self.identityField] = ident
-                
+
             user = self.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
             
             # check multiple identity fields
@@ -399,7 +433,7 @@ class root(RootBase):
                     user = self.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
                 else:
                     return None
-            
+
             if len(user)!=1:
                 return None
             id = user[0][0]
@@ -408,7 +442,7 @@ class root(RootBase):
         if not user or (activeOnly and not user.meta.get("pool_state")==1):
             return None
         return user
-     
+    
 
     def GetUserForToken(self, token, active=True):
         """
@@ -424,7 +458,7 @@ class root(RootBase):
             p["pool_state"] = 1
         users = self.Select(pool_type=u"user",
                             parameter=p,
-                            fields=[u"id",u"name",u"email"],
+                            fields=[u"id"],
                             max=2)
         if len(users) != 1:
             return None
@@ -433,10 +467,15 @@ class root(RootBase):
         return obj
 
 
+    # user infos -----------------------------------------------------------------------
+
     def GetUsers(self, **kw):
         """
         """
-        return self.SearchType(u"user", {u"pool_state":1}, [u"id",u"title",u"name",u"groups",u"lastlogin"])
+        fields = [u"id", u"name", u"email", u"title", u"groups", u"lastlogin"]
+        if not self.identityField in fields:
+            fields.append(self.identityField)
+        return self.SearchType(u"user", {u"pool_state":1}, fields)
 
 
     def GetUserInfos(self, userids, fields=None, activeOnly=True):
@@ -446,9 +485,13 @@ class root(RootBase):
         if activeOnly:
             param[u"pool_state"] = 1
         if not fields:
-            fields = [u"id", u"name", u"email", u"title", u"groups", self.identityField]
-        return self.SelectDict(pool_type=u"user", parameter=param, fields=fields, operators={self.identityField:u"IN"})
-    
+            fields = [u"id", u"name", u"email", u"title", u"groups", u"lastlogin"]
+        if not self.identityField in fields:
+            fields = list(fields)
+            fields.append(self.identityField)
+        return self.SelectDict(pool_type=u"user", 
+                               parameter=param, fields=fields, operators={self.identityField:u"IN"})
+
     
     def GetUsersWithGroup(self, group, fields=None, activeOnly=True):
         """
@@ -468,40 +511,11 @@ class root(RootBase):
         for u in users:
             try:
                 g = json.loads(u["groups"])
-            except:
+            except ValueError:
                 continue
             if group in g:
                 verified.append(u)
         return verified
-
-
-    def DeleteUser(self, ident, currentUser=None):
-        """
-        returns status and report list
-        """
-        report = []
-        if isinstance(ident, basestring):
-            if not ident:
-                report.append(_(u"Invalid user."))
-                return False, report
-    
-            user = self.LookupUser(ident=ident, activeOnly=0)
-            if not user:
-                report.append(_(u"Invalid username."))
-                return False, report
-        else:
-            user = ident
-
-        if IAdminUser.providedBy(user):
-            report.append(_(u"You cannot delete the admin user."))
-            return False, report
-            
-        if not self.Delete(user.id, obj=user, user=currentUser):
-            report.append(_(u"Sorry. An error occured."))
-            return False, report
-
-        report.append(_(u"User deleted."))
-        return True, report
 
 
     # to be removed ------------------------------------------------------
@@ -512,7 +526,6 @@ class root(RootBase):
         if not user:
             return None
         return user.data.groups
-
 
     def Encrypt(self, string):
         try:

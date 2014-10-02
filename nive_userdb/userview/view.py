@@ -306,9 +306,6 @@ class UserView(BaseView):
         self.form = UserForm(view=self, loadFromType="user")
         self.form.settings = self.context.app.configuration.settings
 
-        #            report.append(_(u"The token is empty. Please copy the whole url."))
-
-
 
     def create(self):
         self.form.Setup(subset="create")

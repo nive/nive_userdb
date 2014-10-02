@@ -30,12 +30,24 @@ class user(ObjectBase):
         return str(self.identity)
     
     def Init(self):
+        self.previousLogin = None
         self.groups = tuple(self.data.get("groups",()))
         self.ListenEvent("commit", "OnCommit")
 
 
+    def OnCommit(self):
+        self.HashPassword()
+        t = self.ReadableName()
+        if t != self.meta["title"]:
+            self.meta["title"] = t
+
+
+    def _EncryptPW(self, password):
+        return Sha(password)
+
+
     def Authenticate(self, password):
-        return Sha(password) == self.data["password"]
+        return self._EncryptPW(password) == self.data["password"]
 
     
     def Activate(self, currentUser):
@@ -51,10 +63,29 @@ class user(ObjectBase):
         else:
             self.meta.set("pool_state", 1)
             self.data.set("token", "")
-            self.data.set("tempcache", "firstrun")
+            self.data.set("tempcache", u"firstrun")
             result = True
         if result:
             self.Signal("activate")
+            self.Commit(currentUser)
+        return result
+
+
+    def DeActivate(self, currentUser):
+        """
+        DeActivate user
+        calls workflow commit, if possible
+
+        signals event: activate
+        """
+        wf = self.GetWf()
+        if wf:
+            result = wf.Action("deactivate", self, user=currentUser)
+        else:
+            self.meta.set("pool_state", 0)
+            result = True
+        if result:
+            self.Signal("deactivate")
             self.Commit(currentUser)
         return result
 
@@ -63,11 +94,11 @@ class user(ObjectBase):
         """
         events: login(lastlogin)
         """
-        lastlogin = self.data.get("lastlogin")
+        self.previousLogin = self.data.get("lastlogin")
         date = datetime.now()
         self.data.set("lastlogin", date)
         self.Commit(self)
-        self.Signal("login", lastlogin=lastlogin)
+        self.Signal("login", lastlogin=self.previousLogin)
 
 
     def Logout(self):
@@ -78,17 +109,10 @@ class user(ObjectBase):
         #self.Commit(self)
 
 
-    def OnCommit(self):
-        self.HashPassword()
-        t = self.ReadableName()
-        if t != self.meta["title"]:
-            self.meta["title"] = t
-
-
     def HashPassword(self):
         if not self.data.HasTempKey("password"):
             return
-        pw = Sha(self.data.password)
+        pw = self._EncryptPW(self.data.password)
         self.data["password"] = pw
 
 
@@ -103,7 +127,7 @@ class user(ObjectBase):
         Update existing user data.
         name, groups, pool_state cannot be changed
         """
-        readonly = ("name","email","groups","pool_state","pool_wfa","token")
+        readonly = ("name","email","groups","pool_state","pool_wfa","token","password",self.parent.identityField)
         for f in readonly:
             if f in data:
                 del data[f]
@@ -112,19 +136,31 @@ class user(ObjectBase):
             return False, [_(u"Update failed.")]
         
         self.Commit(user)
-        return True, []
+        return True
 
 
     def UpdatePassword(self, password, user, resetActivation=True):
         """
         Update existing user data.
-        name, groups, pool_state cannot be changed
+        changes the password and resets the token
         """
         self.data["password"] = password
         if resetActivation:
             self.data["token"] = u""
         self.Commit(user)
-        return True, []
+        return True
+
+
+    def UpdateEmail(self, email, user, resetActivation=True):
+        """
+        Update existing user data.
+        changes the email and resets the token
+        """
+        self.data["email"] = email
+        if resetActivation:
+            self.data["token"] = u""
+        self.Commit(user)
+        return True
 
 
     def UpdateGroups(self, groups):
