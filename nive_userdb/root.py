@@ -444,7 +444,7 @@ class root(RootBase):
         return user
     
 
-    def GetUserForToken(self, token, active=True):
+    def GetUserForToken(self, token, activeOnly=True):
         """
         Looks up the user for the token
         requires fld token in user record
@@ -454,7 +454,7 @@ class root(RootBase):
             return None
 
         p = {"token": token}
-        if active:
+        if activeOnly:
             p["pool_state"] = 1
         users = self.Select(pool_type=u"user",
                             parameter=p,

@@ -207,7 +207,7 @@ class UserForm(ObjectForm):
         result,data,errors = self.Validate(self.request)
         if result:
             token = data.get("token")
-            user = self.context.GetUserForToken(token, active=False)
+            user = self.context.GetUserForToken(token, activeOnly=False)
             if user:
                 result = True
                 user.Activate(currentUser=user)

@@ -265,12 +265,12 @@ class ObjectTest_db(object):
 
         self.assertFalse(root.GetUserForToken("no id"))
 
-        self.assertFalse(root.GetUserForToken("12345", active=True))
-        u = root.GetUserForToken("12345", active=False)
+        self.assertFalse(root.GetUserForToken("12345", activeOnly=True))
+        u = root.GetUserForToken("12345", activeOnly=False)
         self.assert_(u)
         self.assert_(u.Activate(currentUser=user))
 
-        self.assertFalse(root.GetUserForToken("12345", active=False))
+        self.assertFalse(root.GetUserForToken("12345", activeOnly=False))
 
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
 
@@ -309,9 +309,9 @@ class ObjectTest_db(object):
         o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
         self.assert_(o,r)
 
-        self.assert_(root.GetUserForToken("12345", active=False))
+        self.assert_(root.GetUserForToken("12345", activeOnly=False))
 
-        self.assertFalse(root.GetUserForToken("", active=False))
+        self.assertFalse(root.GetUserForToken("", activeOnly=False))
 
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
 
