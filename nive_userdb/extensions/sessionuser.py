@@ -127,9 +127,8 @@ class SessionUserCache(object):
         return "__c__" + str(hash(str(id)))
 
 
-
 class RootListener(object):
-    
+
     def Init(self):
         self.ListenEvent("getuser", self.LookupCache)
         self.ListenEvent("loaduser", self.AddToCache)

@@ -54,9 +54,9 @@ class ObjectTest_db(object):
         self.assert_(o.data.password != "11111")
         self.assertFalse(o.meta.pool_state)
         
-        root.MailUserPass(email = "user1")
-        root.MailUserPass(email = "user2@aaa.ccc", newPasswd="111111")
-        root.MailUserPass(email = "user3@aaa.ccc")
+        root.MailUserPass(name = "user1")
+        root.MailUserPass(name = "user2@aaa.ccc", newPasswd="111111")
+        root.MailUserPass(name = "user3@aaa.ccc")
 
         self.assert_(root.GetUserByName("user2", activeOnly=1))
         self.assert_(root.GetUserByID(o.id, activeOnly=0))

@@ -29,7 +29,7 @@ class root(RootBase):
     
     # User account handling ------------------------------------------------------------------------------------------------------
 
-    def AddUser(self, data, activate=1, generatePW=0, mail="default", notifyMail="default", groups="", currentUser=None, **kw):
+    def AddUser(self, data, activate=None, generatePW=None, mail="default", notifyMail="default", groups=None, currentUser=None, **kw):
         """
         Create a new user with groups for login with name/password ::
 
@@ -62,6 +62,13 @@ class root(RootBase):
                 report.append(_(u"Email '${name}' already in use. ", mapping={'name':email}))
                 return None, report
         
+        if generatePW is None:
+            generatePW = self.app.configuration.settings.generatePW
+        if groups is None:
+            groups = self.app.configuration.settings.groups
+        if activate is None:
+            activate = self.app.configuration.settings.activate
+
         if generatePW:
             pw = self.GeneratePassword()
             data["password"] = pw
@@ -169,16 +176,19 @@ class root(RootBase):
             report.append(_(u"Please enter your new email address."))
             return False, report
 
-        obj = self.GetUserByName(name)
-        if not obj:
-            report.append(_(u"No matching account found."))
-            return False, report
+        if isinstance(name, basestring):
+            obj = self.GetUserByName(name)
+            if not obj:
+                report.append(_(u"No matching account found."))
+                return False, report
+        else:
+            obj = name
 
         recv = [(newmail, obj.meta.get("title"))]
 
         token = self.GenerateID(20)
         obj.data["token"] = token
-        obj.data["tempcache"] = newmail
+        obj.data["tempcache"] = "verifymail:"+newmail
         obj.Commit(user=currentUser)
 
         app = self.app
@@ -198,7 +208,7 @@ class root(RootBase):
         return obj, report
 
 
-    def MailUserPass(self, name=None, mail="default", newPassword=None, currentUser=None, **kw):
+    def MailUserPass(self, name, mail="default", newPassword=None, currentUser=None, **kw):
         """
         Mails a new password or the current password in plain text.
 
@@ -210,10 +220,13 @@ class root(RootBase):
             report.append(_(u"Please enter your email address or username."))
             return False, report
 
-        obj = self.GetUserByName(name)
-        if not obj:
-            report.append(_(u"No matching account found. Please try again."))
-            return False, report
+        if isinstance(name, basestring):
+            obj = self.GetUserByName(name)
+            if not obj:
+                report.append(_(u"No matching account found. Please try again."))
+                return False, report
+        else:
+            obj = name
 
         email = obj.data.get("email")
         title = obj.meta.get("title")
@@ -259,10 +272,13 @@ class root(RootBase):
             report.append(_(u"Please enter your sign in name or email address."))
             return None, report
 
-        obj = self.GetUserByName(name)
-        if not obj:
-            report.append(_(u"No matching account found."))
-            return None, report
+        if isinstance(name, basestring):
+            obj = self.GetUserByName(name)
+            if not obj:
+                report.append(_(u"No matching account found."))
+                return None, report
+        else:
+            obj = name
 
         email = obj.data.get("email")
         if not email:

@@ -154,6 +154,7 @@ class tViews(__local.DefaultTestCase):
         view = BaseView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="activate")
+        form.method = u"GET"
         self.request.POST = {}
         self.request.GET = {"token": "aaaa"}
         r,v = form.Activate("action", redirectSuccess="")
@@ -224,7 +225,7 @@ class tViews(__local.DefaultTestCase):
         self.request.GET = {}
         form.UpdateMail("action", redirectSuccess="", url="")
         m = self.root.LookupUser(name="testuser", reloadFromDB=1).data.tempcache
-        self.assert_(m=="newuser@domain.net", m)
+        self.assert_(m=="verifymail:newuser@domain.net", m)
 
 
         # UpdateMailToken -----------------------------------------------------------------------------------------------------

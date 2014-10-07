@@ -203,15 +203,14 @@ class UserForm(ObjectForm):
         Form action: activate the mail in tempcache if token matches
         """
         msgs = []
-        self.method = "GET"
         result,data,errors = self.Validate(self.request)
         if result:
             token = data.get("token")
             user = self.context.GetUserForToken(token, activeOnly=False)
-            if user:
+            if user is not None:
                 result = True
                 user.Activate(currentUser=user)
-                msgs = [_(u"OK. Your account has been activated.")]
+                msgs = [_(u"OK.")]
             else:
                 result = False
                 msgs = [_(u"The token is invalid. Please make sure it is complete.")]
@@ -242,12 +241,11 @@ class UserForm(ObjectForm):
         return result, self.Render(data)
 
 
-
     def UpdateMail(self, action, **kw):
         """
         Form action: trigger a mail to verify another mail address
         """
-        user = self.view.User()
+        user = self.view.User(sessionuser=False)
         if not user:
             raise Unauthorized, "User not found."
         msgs = []
@@ -270,11 +268,13 @@ class UserForm(ObjectForm):
             user = self.context.GetUserForToken(token)
             if user:
                 mail = user.data.tempcache
-                user.data["email"] = mail
-                user.data["tempcache"] = u""
-                user.data["token"] = u""
-                user.Commit(user=user)
-                msgs = [_(u"OK. The new email address has been activated.")]
+                if mail.startswith(u"verifymail:"):
+                    mail = mail.replace(u"verifymail:",u"")
+                    user.data["email"] = mail
+                    user.data["tempcache"] = u""
+                    user.data["token"] = u""
+                    user.Commit(user=user)
+                    msgs = [_(u"OK. The new email address has been activated.")]
             else:
                 result = False
                 msgs = [_(u"The token is empty. Please copy the whole url.")]
@@ -349,10 +349,10 @@ class UserView(BaseView):
 
     def login(self):
         self.form.Setup(subset="login")
+        self.form.widget.item_template = "field_onecolumn"
         user = self.UserName()
         if not user:
             self.form.startEmpty = True
-            #self.form.renderOneColumn = True
             redirect = self.GetFormValue(u"redirect")
             if not redirect:
                 try:
