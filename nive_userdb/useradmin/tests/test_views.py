@@ -14,7 +14,7 @@ from nive_userdb.useradmin import view
 from nive_userdb.useradmin import adminroot
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid import testing 
+from pyramid import testing
 from pyramid.renderers import render
 
 

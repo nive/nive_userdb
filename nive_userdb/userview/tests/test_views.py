@@ -11,7 +11,7 @@ from nive.security import User
 from nive_userdb.tests import __local
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid import testing 
+from pyramid import testing
 from pyramid.renderers import render
 
 

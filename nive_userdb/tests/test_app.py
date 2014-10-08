@@ -36,27 +36,27 @@ class ObjectTest_db(object):
         
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"")
         self.assert_(o,r)
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"")
         self.assertFalse(o,r)
 
         data["name"] = "user2"
         data["email"] = "user2@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, groups="group:author", currentUser=user)
+        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, groups="group:author", currentUser=user, url=u"")
         self.assert_(o,r)
 
         data["name"] = "user3"
         data["email"] = "user3@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, groups="group:editor", currentUser=user)
+        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, groups="group:editor", currentUser=user, url=u"")
         self.assert_(o,r)
         self.assert_("group:editor" in o.data.groups, o.data.groups)
         self.assert_(o.data.password != "11111")
         self.assertFalse(o.meta.pool_state)
         
-        root.MailUserPass(name = "user1")
-        root.MailUserPass(name = "user2@aaa.ccc", newPasswd="111111")
-        root.MailUserPass(name = "user3@aaa.ccc")
+        root.MailUserPass(name = "user1", url=u"")
+        root.MailUserPass(name = "user2@aaa.ccc", newPasswd="111111", url=u"")
+        root.MailUserPass(name = "user3@aaa.ccc", url=u"")
 
         self.assert_(root.GetUserByName("user2", activeOnly=1))
         self.assert_(root.GetUserByID(o.id, activeOnly=0))
