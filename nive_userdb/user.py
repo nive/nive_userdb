@@ -47,6 +47,8 @@ class user(ObjectBase):
 
 
     def Authenticate(self, password):
+        if not password:
+            return False
         return self._EncryptPW(password) == self.data["password"]
 
     
