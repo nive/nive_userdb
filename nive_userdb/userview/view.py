@@ -24,18 +24,20 @@ configuration = ViewModuleConf(
     view = "nive_userdb.userview.view.UserView",
     templates = "nive_userdb.userview:",
     template = "main.pt",
-    permission = "view"
+    permission = "view",
+    # form settings: additional slot to configure the forms used in the views
+    form = {}
 )
 t = configuration.templates
 configuration.views = [
     # User Views
-    ViewConf(name="login",          attr="login",     renderer=t+"loginpage.pt"),
-    ViewConf(name="signup",         attr="create",    renderer=t+"signup.pt",    permission="signup"),
-    ViewConf(name="activate",       attr="activate",  renderer=t+"form.pt"),
-    ViewConf(name="update",         attr="update",    renderer=t+"update.pt",    permission="updateuser"),
-    ViewConf(name="updatepass",     attr="updatepass",renderer=t+"form.pt",      permission="updateuser"),
-    ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",     permission="updateuser"),
-    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt",     permission="updateuser"),
+    ViewConf(name="login",          attr="login",      renderer=t+"loginpage.pt"),
+    ViewConf(name="signup",         attr="create",     renderer=t+"signup.pt",    permission="signup"),
+    ViewConf(name="activate",       attr="activate",   renderer=t+"form.pt"),
+    ViewConf(name="update",         attr="update",     renderer=t+"update.pt",    permission="updateuser"),
+    ViewConf(name="updatepass",     attr="updatepass", renderer=t+"form.pt",      permission="updateuser"),
+    ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",      permission="updateuser"),
+    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt",      permission="updateuser"),
     ViewConf(name="resetpass",      attr="resetpass",  renderer=t+"form.pt"),
     ViewConf(name="logout",         attr="logout"),
 ]
@@ -300,12 +302,19 @@ class UserView(BaseView):
     
     def __init__(self, context, request):
         super(UserView, self).__init__(context, request)
-        # the viewModule is used for template/template directory lookup
-        #self.viewModuleID = "userview"
         # form setup
         self.form = UserForm(view=self, loadFromType="user")
+        # sign up settings defined in user db configuration user in AddUser()
         self.form.settings = self.context.app.configuration.settings
-
+        # form rendering settings
+        formsettings = self.viewModule.get("form")
+        if formsettings:
+            self.form.widget.settings = formsettings
+            # map item and action templates to form
+            if "item_template" in formsettings:
+                self.form.widget.item_template = formsettings["item_template"]
+            if "action_template" in formsettings:
+                self.form.widget.action_template = formsettings["action_template"]
 
     def create(self):
         self.form.Setup(subset="create")
@@ -393,11 +402,8 @@ class UserView(BaseView):
         messages = self.request.session.pop_flash("")
         if not messages:
             return u""
-        html = u"""<ul class="alert alert-success"><li>%s</li></ul>"""
-        try:
-            return html % (u"</li><li>".join(messages))
-        except:
-            return u""
+        html = u"""<div class="alert alert-success">%s</div>"""
+        return html % (u"</li><li>".join(messages))
 
     def _render(self,**kw):
         result, data, action = self.form.Process(**kw)
