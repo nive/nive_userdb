@@ -307,14 +307,11 @@ class UserView(BaseView):
         # sign up settings defined in user db configuration user in AddUser()
         self.form.settings = self.context.app.configuration.settings
         # form rendering settings
-        formsettings = self.viewModule.get("form")
-        if formsettings:
-            self.form.widget.settings = formsettings
-            # map item and action templates to form
-            if "item_template" in formsettings:
-                self.form.widget.item_template = formsettings["item_template"]
-            if "action_template" in formsettings:
-                self.form.widget.action_template = formsettings["action_template"]
+        vm = self.viewModule
+        if vm:
+            formsettings = vm.get("form")
+            if formsettings:
+                self.form.ApplyOptions(formsettings)
 
     def create(self):
         self.form.Setup(subset="create")
