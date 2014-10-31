@@ -16,13 +16,11 @@ The system admin for notification mails can be specified as `systemAdmin`.
     configuration.systemAdmin = (u"email", u"display name")
 
 """
-import copy
 import hashlib
 
 
-from nive.definitions import AppConf, FieldConf, GroupConf, Conf
+from nive.definitions import AppConf, GroupConf, Conf
 from nive.definitions import implements, IUserDatabase, ILocalGroups
-from nive.definitions import AllMetaFlds
 from nive.security import Allow, Deny, Everyone, ALL_PERMISSIONS, remember, forget
 from nive.components.objects.base import ApplicationBase
 from nive.views import Mail
@@ -158,18 +156,6 @@ class UserDB(ApplicationBase):
         headers = forget(request)
         request.response.headerlist += list(headers)
         #request.authenticate
-
-
-
-
-    def AuthenticatedUser(self, request):
-        # bw 0.9.6. removed in next version.
-        name = self.UserName(request)
-        return self.GetRoot().GetUserByName(name)
-
-    def AuthenticatedUserName(self, request):
-        # bw 0.9.6. removed in next version.
-        return authenticated_userid(request)    
 
 
 

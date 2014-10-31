@@ -2,7 +2,6 @@
 # Released under GPL3. See license.txt
 #
 
-import hashlib
 import thread
 import time
 
@@ -47,6 +46,7 @@ class SessionUserCache(object):
     def Add(self, obj, id):
         """
         """
+        lock = None
         try:
             lock = thread.allocate_lock()
             lock.acquire(1)
@@ -61,6 +61,7 @@ class SessionUserCache(object):
         """
         """
         n = self._Cachename(id)
+        lock = None
         try:
             lock = thread.allocate_lock()
             lock.acquire(1)
@@ -78,6 +79,7 @@ class SessionUserCache(object):
         """
         """
         objs = []
+        lock = None
         try:
             lock = thread.allocate_lock()
             lock.acquire(1)
@@ -94,6 +96,7 @@ class SessionUserCache(object):
     def Invalidate(self, id):
         """
         """
+        lock = None
         try:
             lock = thread.allocate_lock()
             lock.acquire(1)
@@ -110,6 +113,7 @@ class SessionUserCache(object):
     def Purge(self):
         """
         """
+        lock = None
         try:
             lock = thread.allocate_lock()
             lock.acquire(1)
