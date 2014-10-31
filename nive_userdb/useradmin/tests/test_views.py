@@ -25,6 +25,7 @@ class tViews(__local.DefaultTestCase):
         request = testing.DummyRequest()
         request._LOCALE_ = "en"
         self.request = request
+        self.request.method = "POST"
         self.config = testing.setUp(request=request)
         self.config.include('pyramid_chameleon')
         self._loadApp()
@@ -160,6 +161,7 @@ class tViews(__local.DefaultTestCase):
 
         ids = (user.id,)
         self.request.POST = {"ids":ids}
+
         r = v.delete()
         self.assert_(r["result"])
         self.assertFalse(r["confirm"])
