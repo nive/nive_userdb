@@ -247,7 +247,7 @@ configuration.data = (
     FieldConf(id="email",    datatype="email",       size=255, default=u"", required=1, name=_(u"Email"), description=u"",
               settings={"validator": EmailValidator}),
     FieldConf(id="password", datatype="password",    size=100, default=u"", required=1, name=_(u"Password"), description=u"",),
-    FieldConf(id="groups",   datatype="mcheckboxes", size=255, default=u"", name=_(u"Groups"), settings={"codelist":"groups"}, description=u""),
+    FieldConf(id="groups",   datatype="checkbox", size=255, default=u"", name=_(u"Groups"), settings={"codelist":"groups"}, description=u""),
     
     FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_(u"Activate email notifications"), description=u""),
     
