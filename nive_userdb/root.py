@@ -29,13 +29,14 @@ class root(RootBase):
     
     # User account handling ------------------------------------------------------------------------------------------------------
 
-    def AddUser(self, data, activate=None, generatePW=None, mail="default", notifyMail="default", groups=None, currentUser=None, **kw):
+    def AddUser(self, data, activate=None, generatePW=None, generateName=None, mail="default", notifyMail="default", groups=None, currentUser=None, **kw):
         """
         Create a new user with groups for login with name/password ::
 
             data: user data as dictionary. groups and pool_state are removed. 
             activate: directly activate the user for login (pool_state=1)
             generatePW: generate a random password to be send by mail
+            generateName: generate a unique id to be used as username
             mail: mail object template for confirmation mail
             notifyMail: mail object template for notify mail
             groups: initially assign groups to the user
@@ -44,7 +45,19 @@ class root(RootBase):
         returns tuple: the user object if succeeds and report list
         """
         report = []
-        name = data.get("name")
+
+        if generateName is None:
+            generateName = self.app.configuration.settings.generateName
+        if generateName:
+            # generate a short uuid name
+            name = self.GenerateID(15)
+            exists = self.GetUserByName(name, activeOnly=0)
+            while exists:
+                name = self.GenerateID(15)
+                exists = self.GetUserByName(name, activeOnly=0)
+            data["name"] = name
+        else:
+            name = data.get("name")
         
         if not name or name == "":
             report.append(_(u"Please enter your username"))

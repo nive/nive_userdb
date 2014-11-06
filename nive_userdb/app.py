@@ -21,7 +21,7 @@ import hashlib
 
 from nive.definitions import AppConf, GroupConf, Conf
 from nive.definitions import implements, IUserDatabase, ILocalGroups
-from nive.security import Allow, Deny, Everyone, ALL_PERMISSIONS, remember, forget
+from nive.security import Allow, Deny, Everyone, Authenticated, ALL_PERMISSIONS, remember, forget
 from nive.components.objects.base import ApplicationBase
 from nive.views import Mail
 from nive.components.reform.schema import Invalid
@@ -40,7 +40,8 @@ configuration = AppConf(
     settings = Conf(
         groups=(),
         activate=1,
-        generatePW=0
+        generatePW=0,
+        generateName=False
     ),
     #userAdmin = (u"admin@mymail.com", u"Admin"),  # contact system information
     #admin = {"name": "adminusername", "password": "adminpass", "email": "u"admin@mymail.com""}, # admin login
@@ -83,9 +84,9 @@ configuration.modules = [
 ]
 
 configuration.acl= [
-    (Allow, Everyone, 'signup'),
+    #(Allow, Everyone, 'signup'), # disabled by default
     (Allow, Everyone, 'view'),
-    (Allow, Everyone, 'updateuser'),
+    (Allow, Authenticated, 'updateuser'),
     (Allow, "group:useradmin", 'signup'), 
     (Allow, "group:useradmin", 'manage users'),
     (Allow, "group:admin", ALL_PERMISSIONS),
@@ -218,6 +219,26 @@ def EmailValidator(node, value):
         if len(u)==1 and ctx.id == u[0][0]:
             return
         err = _(u"Email '${name}' already in use. Please use the sign in form if you already have a account.", mapping={'name':value})
+        raise Invalid(node, err)
+
+def PasswordValidator(node, value):
+    """
+    Validator which succeeds if the username does not exist.
+    Can be used for the name input field in a sign up form.
+    """
+    Length(min=5,max=30)(node, value)
+    chars = ''.join(set(value))
+    if len(chars)<5:
+        err = _(u"Password is too simple. It should have at least 5 different characters.")
+        raise Invalid(node, err)
+
+def OldPwValidator(node, value):
+    """
+    Validator which succeeds if the current password matches.
+    """
+    user = node.widget.form.view.User(sessionuser=False)
+    if not user.Authenticate(value):
+        err = _(u"The old password does not match.")
         raise Invalid(node, err)
 
 

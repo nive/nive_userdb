@@ -15,7 +15,7 @@ from pyramid import testing
 from pyramid.renderers import render
 
 
-class TestView(BaseView):
+class TestView(UserView):
     
     def User(self, sessionuser=None):
         return self.context.root().GetUserByName("testuser")
@@ -27,6 +27,8 @@ class tViews(__local.DefaultTestCase):
         request = testing.DummyRequest()
         request._LOCALE_ = "en"
         self.request = request
+        self.request.content_type = ""
+        self.request.method = "POST"
         self.config = testing.setUp(request=request)
         self.config.include('pyramid_chameleon')
         self._loadApp()
@@ -61,7 +63,7 @@ class tViews(__local.DefaultTestCase):
         
     def test_templates(self):    
         view = UserView(context=self.root, request=self.request)
-        view.__configuration__ = lambda: Conf(template="nive_userdb.userview:main.pt",templates="",assets=[])
+        view.__configuration__ = lambda: Conf(template="nive_userdb.userview:main.pt",templates="",assets=[],views=[])
         vrender = {"context":self.root, "view":view, "request": self.request}
         
         values = view.login()
@@ -183,21 +185,21 @@ class tViews(__local.DefaultTestCase):
         view = TestView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
-        self.request.POST = {"oldpassword": "12345", "password": "11111", "password-confirm": "22222"}
+        self.request.POST = {"oldpassword": "12345", "password": "34567", "password-confirm": "67890"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
         self.assertFalse(r)
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
-        self.request.POST = {"oldpassword": "12345", "password": "11111", "password-confirm": "11111"}
+        self.request.POST = {"oldpassword": "12345", "password": "67890", "password-confirm": "67890"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
         self.assert_(r)
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
-        self.request.POST = {"oldpassword": "11111", "password": "12345", "password-confirm": "12345"}
+        self.request.POST = {"oldpassword": "67890", "password": "12345", "password-confirm": "12345"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
         self.assert_(r)

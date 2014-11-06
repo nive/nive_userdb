@@ -2,12 +2,13 @@
 <tal:block metal:use-macro="view.index_tmpl().macros['main']"  i18n:domain="nive_userdb">
 <tal:block metal:fill-slot="content">
 
-<div tal:define="user view.UserName()"
+<div tal:define="user view.User()"
      class="widget">
   <span tal:replace="structure view.insertMessages()"/>
   <tal:block tal:condition="not user">
 	<ul tal:condition="view.GetFormValue('redirect') and not view.GetFormValue('name')" class="boxOK"><li i18n:translate="">Please log in!</li></ul>
     <span tal:replace="structure content"/>
+    <p tal:condition="showPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
   </tal:block>
   <div tal:condition="user" class="logout">
     <p tal:condition="view.GetFormValue('redirect')" class="boxError" i18n:translate="">You do not have the required permissions to access the page.</p>

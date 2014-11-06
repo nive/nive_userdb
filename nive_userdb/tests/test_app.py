@@ -79,7 +79,29 @@ class ObjectTest_db(object):
         root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
         root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
 
-        
+
+    def test_add_name(self):
+        a=self.app
+        root=a.root()
+        user = User("test")
+        # root
+        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
+        data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
+
+        data["name"] = "user1"
+        data["email"] = "user1@aaa.ccc"
+        o,r = root.AddUser(data, activate=1, generatePW=0, generateName=True, mail=None, groups="", currentUser=user, url=u"")
+        self.assert_(o,r)
+        self.assert_(o.data.name)
+        self.assert_(o.data.name!="user1")
+
+        self.assert_(root.LookupUser(name=str(o), id=None, activeOnly=1))
+
+        root.DeleteUser(str(o))
+
+
     def test_login(self):
         a=self.app
         root=a.root()

@@ -227,7 +227,7 @@ class user(ObjectBase):
 
 # user definition ------------------------------------------------------------------
 from nive.definitions import StagUser, ObjectConf, FieldConf
-from nive_userdb.app import UsernameValidator, EmailValidator
+from nive_userdb.app import UsernameValidator, EmailValidator, PasswordValidator
 
 #@nive_module
 configuration = ObjectConf(
@@ -241,24 +241,27 @@ configuration = ObjectConf(
     description = __doc__
 )
 
-configuration.data = (
+# split the fields up in system and extended data. Makes customizing easier.
+system = [
     FieldConf(id="name",     datatype="string",      size= 30, default=u"", required=1, name=_(u"User ID"), description=u"",
-              settings={"validator": UsernameValidator}),
+              validator=UsernameValidator),
     FieldConf(id="email",    datatype="email",       size=255, default=u"", required=1, name=_(u"Email"), description=u"",
-              settings={"validator": EmailValidator}),
-    FieldConf(id="password", datatype="password",    size=100, default=u"", required=1, name=_(u"Password"), description=u"",),
-    FieldConf(id="groups",   datatype="checkbox", size=255, default=u"", name=_(u"Groups"), settings={"codelist":"groups"}, description=u""),
-    
+              validator=EmailValidator),
+    FieldConf(id="password", datatype="password",    size=100, default=u"", required=1, name=_(u"Password"), description=u"",
+              validator=PasswordValidator),
+
+    FieldConf(id="groups",   datatype="checkbox",    size=255, default=u"", name=_(u"Groups"), settings={"codelist":"groups"}, description=u""),
     FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_(u"Activate email notifications"), description=u""),
-    
-    FieldConf(id="surname",  datatype="string",      size=100, default=u"", name=_(u"Surname"), description=u""),
-    FieldConf(id="lastname", datatype="string",      size=100, default=u"", name=_(u"Lastname"), description=u""),
-    FieldConf(id="organisation", datatype="string",  size=255, default=u"", name=_(u"Organisation"), description=u""),
-    
     FieldConf(id="lastlogin",datatype="datetime",    size=0,   default=u"", name=_(u"Last login"), description=u""),
     FieldConf(id="token",    datatype="string",      size=30,  default=u"", name=_(u"Token for activation or password reset")),
     FieldConf(id="tempcache",datatype="string",      size=255, default=u"", name=_(u"Temp cache for additional verification data")),
-)
+]
+extended = [
+    FieldConf(id="surname",  datatype="string",      size=100, default=u"", name=_(u"Surname"), description=u""),
+    FieldConf(id="lastname", datatype="string",      size=100, default=u"", name=_(u"Lastname"), description=u""),
+    FieldConf(id="organisation", datatype="string",  size=255, default=u"", name=_(u"Organisation"), description=u""),
+]
+configuration.data = tuple(system+extended)
 
 configuration.forms = {
     "create": {"fields": ["name", "email", "password", "surname", "lastname"]},
