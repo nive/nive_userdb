@@ -55,12 +55,15 @@ class tViews(__local.DefaultTestCase):
         view.resetpass()
         view.updatemail1()
         view.updatemail2()
+        view.contact()
         view.login()
         view.logoutlink()
         self.assertRaises(HTTPFound, view.logout)
         view.logouturl()
-        
-        
+        view.closefirstrun()
+        view.remove()
+
+
     def test_templates(self):    
         view = UserView(context=self.root, request=self.request)
         view.__configuration__ = lambda: Conf(template="nive_userdb.userview:main.pt",templates="",assets=[],views=[])
@@ -93,6 +96,15 @@ class tViews(__local.DefaultTestCase):
         values = view.update()
         values.update(vrender)
         render("nive_userdb.userview:update.pt", values)
+
+        values = view.contact()
+        values.update(vrender)
+        render("nive_userdb.userview:form.pt", values)
+
+        values = view.remove()
+        values.update(vrender)
+        render("nive_userdb.userview:remove.pt", values)
+
         render("nive_userdb.userview:main.pt", values)
     
     
@@ -260,4 +272,13 @@ class tViews(__local.DefaultTestCase):
         self.request.POST = {"email": "testuser@domain.net"}
         self.request.GET = {}
         form.ResetPass("action", redirectSuccess="")
+
+        # Contact -----------------------------------------------------------------------------------------------------
+
+        view = BaseView(context=self.root, request=self.request)
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="contact")
+        self.request.POST = {"receiver": str(self.root.LookupUser(name="testuser", reloadFromDB=1))}
+        self.request.GET = {}
+        form.Contact("action", redirectSuccess="")
 

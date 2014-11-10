@@ -40,6 +40,9 @@ configuration.views = [
     ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt",      permission="updateuser"),
     ViewConf(name="resetpass",      attr="resetpass",  renderer=t+"form.pt"),
     ViewConf(name="logout",         attr="logout"),
+    ViewConf(name="contact",        attr="contact",    renderer=t+"form.pt",      permission="contactuser"),
+    ViewConf(name="closefirstrun",  attr="closefirstrun",renderer="json",         permission="updateuser"),
+    ViewConf(name="remove",         attr="remove",     renderer=t+"remove.pt",    permission="removeuser"),
 ]
 
 
@@ -141,6 +144,12 @@ class UserForm(ObjectForm):
                 "fields": [FieldConf(id="name", name=_("Email"), datatype="string")],
                 "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"),hidden=False)],
                 "defaultAction": "default"
+            },
+            "contact": {
+                "fields": [FieldConf(id="message", name=_("Message"), datatype="text", required=True, size=3000),
+                           FieldConf(id="receiver", name=_("Receiver"), datatype="string", hidden=True),],
+                "actions": [Conf(id="contact", method="Contact", name=_(u"Send message"),hidden=False)],
+                "defaultAction": Conf(id="default", method="StartRequestPOST", name=_(u"Initialize"), hidden=True)
             },
         }
 
@@ -316,6 +325,42 @@ class UserForm(ObjectForm):
         return self._FinishFormProcessing(result, data, msgs, None, **kw)
 
 
+    def Contact(self, action, **kw):
+        """
+        Sends a email to the user 'receiver'
+
+        :param action:
+        :param kw: mail, receiver
+        :return:
+        """
+        result,data,errors = self.Validate(self.request)
+        if not result:
+            return result, self.Render(data, msgs=[], errors=errors)
+        kw.update(data)
+
+        recv = data.get("receiver") or kw.get("receiver")
+        if "receiver" in kw:
+            del kw["receiver"]
+        recv = self.context.root().GetUser(recv)
+        if recv is None:
+            result = False
+            msgs = (_(u"No receiver specified."),)
+            return result, self.Render(data, msgs=msgs, errors=errors)
+
+        kw["receiver"] = recv
+        mail = kw.get("mail") or self.context.app.configuration.mailContact
+        title = mail.title
+        body = mail(sender=self.view.User(), **kw)
+        tool = self.context.app.GetTool("sendMail")
+        if not tool:
+            raise ConfigurationError, "Mail tool 'sendMail' not found"
+        result, value = tool(body=body, title=title, recvmails=[(recv.data.get("email"), recv.meta.get("title"))], force=1)
+        if not result:
+            msgs=(_(u"The email could not be sent."),)
+        else:
+            msgs = (_(u"The email has been sent."),)
+        return self._FinishFormProcessing(result, data, msgs, None, **kw)
+
 
 
 class UserView(BaseView):
@@ -343,7 +388,7 @@ class UserView(BaseView):
         # form rendering settings
         # form setup
         typeconf=self.context.app.GetObjectConf("user")
-        form = UserForm(view=self, loadFromType=typeconf)
+        form = UserForm(view=self, context=self.context.root(), loadFromType=typeconf)
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.app.configuration.settings
 
@@ -504,6 +549,18 @@ class UserView(BaseView):
         form.Setup(subset="updatemail2")
         return self._render(form=form, renderSuccess=False)
 
+    def contact(self):
+        subset = u"contact"
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            subset = viewconf.settings.get("form")
+        form = self._loadSimpleForm()
+        form.startEmpty = True
+        form.Setup(subset=subset)
+        receiver = self.context.root().GetUser(self.GetFormValue("receiver"))
+        result, data, action = form.Process(form=form, renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), "receiver":receiver }
+
     def login(self):
         if self.context.app.configuration.loginByEmail:
             subset = "loginMail"
@@ -551,7 +608,34 @@ class UserView(BaseView):
             return self.context.app.portal.configuration.logoutUrl
         except:
             return self.request.url
-    
+
+
+    def closefirstrun(self):
+        user = self.User(sessionuser=False)
+        if user is None:
+            return {"result": False}
+        user.data["tempcache"] = u""
+        user.Commit(user=user)
+        return {"result": True}
+
+    def remove(self):
+        user=self.User(sessionuser=False)
+        title = u""
+        description = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
+            description = viewconf.settings.get("description",u"")
+        values = {u"title": title, u"description": description, u"result":False}
+        remove = self.GetFormValue(u"remove", method="POST")==u"1"
+        if remove:
+            # delete the object, cache and sign out
+            self.context.root().DeleteUser(user, currentUser=user)
+            self.context.app.ForgetLogin(self.request)
+            values[u"result"] = True
+        return values
+
+
     def insertMessages(self):
         messages = self.request.session.pop_flash("")
         if not messages:

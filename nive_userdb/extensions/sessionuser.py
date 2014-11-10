@@ -169,8 +169,9 @@ class UserListener(object):
     def Init(self):
         self.ListenEvent("commit", self.InvalidateCache)
         self.ListenEvent("logout", self.InvalidateCache)
-    
-    def InvalidateCache(self):
+        self.ListenEvent("delete", self.InvalidateCache)
+
+    def InvalidateCache(self, **kw):
         self.app.usercache.Invalidate(self.identity)
 
 

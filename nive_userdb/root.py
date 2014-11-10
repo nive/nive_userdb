@@ -349,6 +349,7 @@ class root(RootBase):
             report.append(_(u"You cannot delete the admin user."))
             return False, report
 
+        self.Logout(user)
         if not self.Delete(user.id, obj=user, user=currentUser):
             report.append(_(u"Sorry. An error occurred."))
             return False, report

@@ -1,0 +1,4 @@
+
+Message sent by <span tal:replace="sender.meta.title"></span><br>
+<br>
+<span tal:replace="message"></span>

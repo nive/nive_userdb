@@ -52,6 +52,7 @@ configuration = AppConf(
     mailVerifyMail = Mail(_(u"Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
     mailResetPass = Mail(_(u"Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
     mailSendPass = Mail(_(u"Your password"), "nive_userdb:userview/mails/mailpass.pt"),
+    mailContact = Mail(_(u"Contact form"), "nive_userdb:userview/mails/contact.pt"),
 
     # messages customizations
     #welcomeMessage = u"",
@@ -84,12 +85,15 @@ configuration.modules = [
 ]
 
 configuration.acl= [
-    #(Allow, Everyone, 'signup'), # disabled by default
-    (Allow, Everyone, 'view'),
-    (Allow, Authenticated, 'updateuser'),
-    (Allow, "group:useradmin", 'signup'), 
-    (Allow, "group:useradmin", 'manage users'),
-    (Allow, "group:admin", ALL_PERMISSIONS),
+    #(Allow, Everyone,         "signup"), # signup is disabled by default
+    (Allow, Everyone,          "view"),
+    (Allow, Authenticated,     "updateuser"),
+    (Allow, "group:useradmin", "contactuser"),
+    (Allow, "group:useradmin", "removeuser"),
+    (Allow, "group:useradmin", "signup"),
+    (Allow, "group:useradmin", "manage users"),
+    (Allow, "group:admin",     ALL_PERMISSIONS),
+    (Deny,  Everyone,          ALL_PERMISSIONS),
 ]
 
 configuration.groups = [ 
