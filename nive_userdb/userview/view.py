@@ -507,7 +507,8 @@ class UserView(BaseView):
             title = viewconf.settings.get("title",u"")
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit", defaultaction=UserForm.subsets["edit"])
         if user and user.id == 0:
-            return {u"content": _(u"Your current user can only be edited on file system level."), u"result": False, u"head": form.HTMLHead()}
+            return {u"content": _(u"Your current user can only be edited on file system level."),
+                    u"result": False, u"head": form.HTMLHead(),u"title": title}
         form.Setup(subset=subset)
         try:
             result, data, action = form.Process()
