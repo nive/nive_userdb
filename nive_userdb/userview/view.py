@@ -3,7 +3,7 @@
 #
 
 from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
-
+from nive.definitions import ConfigurationError
 from nive.views import BaseView, Unauthorized, Mail
 from nive.forms import ObjectForm
 
@@ -457,11 +457,14 @@ class UserView(BaseView):
         """
         subset = None
         viewconf = self.GetViewConf()
+        title = u""
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
+            title = viewconf.settings.get("title")
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="create", defaultaction=UserForm.subsets["create"])
         form.Setup(subset=subset)
-        return self._render(form=form, url=self.Url()+"activate", renderSuccess=False)
+        result, data, action = form.Process(url=self.Url()+"activate", renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
 
     def update(self):
         """
@@ -508,7 +511,7 @@ class UserView(BaseView):
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit", defaultaction=UserForm.subsets["edit"])
         if user and user.id == 0:
             return {u"content": _(u"Your current user can only be edited on file system level."),
-                    u"result": False, u"head": form.HTMLHead(),u"title": title}
+                    u"result": False, u"head": form.HTMLHead(), u"title": title}
         form.Setup(subset=subset)
         try:
             result, data, action = form.Process()
@@ -517,12 +520,21 @@ class UserView(BaseView):
             return {u"content": _(u"User not found"), u"result": False, u"head": form.HTMLHead(), u"title": title}
             
     def activate(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="activate")
-        return self._render(form=form, renderSuccess=False)
+        result, data, action = form.Process(renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
 
     def resetpass(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         form = self._loadSimpleForm()
         form.startEmpty = True
         if self.context.app.configuration.loginByEmail:
@@ -530,27 +542,47 @@ class UserView(BaseView):
         else:
             subset = "resetpass"
         form.Setup(subset=subset)
-        return self._render(form=form, renderSuccess=False)
+        result, data, action = form.Process(renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
 
     def updatepass(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="updatepass")
-        return self._render(form=form, renderSuccess=False)
+        result, data, action = form.Process(renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
 
     def updatemail1(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="updatemail1")
-        return self._render(form=form, url=self.Url()+"updatemail2",renderSuccess=False)
+        result, data, action = form.Process(url=self.Url()+"updatemail2", renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
 
     def updatemail2(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="updatemail2")
-        return self._render(form=form, renderSuccess=False)
+        result, data, action = form.Process(renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
 
     def contact(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         subset = u"contact"
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
@@ -560,9 +592,13 @@ class UserView(BaseView):
         form.Setup(subset=subset)
         receiver = self.context.root().GetUser(self.GetFormValue("receiver"))
         result, data, action = form.Process(form=form, renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), "receiver":receiver }
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"receiver":receiver, u"title":title }
 
     def login(self):
+        title = u""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
         if self.context.app.configuration.loginByEmail:
             subset = "loginMail"
         else:
@@ -581,8 +617,8 @@ class UserView(BaseView):
                 except:
                     redirect = self.request.url
             result, data, action = form.Process(redirectSuccess=redirect)
-            return {u"content": data, u"result": result, u"head": form.HTMLHead(), "showPasswordLink":showPasswordLink}
-        return {u"content": u"", u"result": True, u"head": form.HTMLHead(), "showPasswordLink":showPasswordLink}
+            return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"showPasswordLink":showPasswordLink, u"title":title}
+        return {u"content": u"", u"result": True, u"head": form.HTMLHead(), u"showPasswordLink":showPasswordLink, u"title":title}
             
     def logoutlink(self):
         return {}
@@ -644,7 +680,3 @@ class UserView(BaseView):
         html = u"""<div class="alert alert-success">%s</div>"""
         return html % (u"</li><li>".join(messages))
 
-    def _render(self,form,**kw):
-        result, data, action = form.Process(**kw)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead()}
-    
