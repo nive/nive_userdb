@@ -45,6 +45,7 @@ class tViews(__local.DefaultTestCase):
 
     def test_views(self):
         v = view.UsermanagementView(context=self.root, request=self.request)
+        v.__configuration__ = lambda: view.configuration
         self.assert_(v.GetAdminWidgets())
         self.assert_(v.add())
         self.assert_(v.edit())
@@ -54,7 +55,7 @@ class tViews(__local.DefaultTestCase):
     def test_templates(self):
         user = User(u"test")
         v = view.UsermanagementView(context=self.root, request=self.request)
-        v.__configuration__ = lambda: Conf(template="nive.adminview:index.pt",templates="",assets=[])
+        v.__configuration__ = lambda: view.configuration
         vrender = {"context":self.root, "view":v, "request": self.request}
         
         values = v.add()
@@ -82,6 +83,7 @@ class tViews(__local.DefaultTestCase):
         if user:
             self.root.DeleteUser("testuser")
         v = view.UsermanagementView(context=self.root, request=self.request)
+        v.__configuration__ = lambda: view.configuration
         r = v.add()
         self.assert_(r["result"])
         if self.root.GetUserByName("testuser"):
@@ -111,6 +113,7 @@ class tViews(__local.DefaultTestCase):
         if user:
             self.root.DeleteUser("testuser")
         v = view.UsermanagementView(context=self.root, request=self.request)
+        v.__configuration__ = lambda: view.configuration
         self.request.POST = {"name":"testuser", "email":"test@aaa.com", "groups":("group:admin",)}
         self.request.POST["password"] = "password"
         self.request.POST["password-confirm"] = "password"
@@ -121,6 +124,7 @@ class tViews(__local.DefaultTestCase):
             self.assert_(False, "User should exist")
         
         v = view.UsermanagementView(context=user, request=self.request)
+        v.__configuration__ = lambda: view.configuration
         self.request.POST = {}
         r = v.edit()
         self.assert_(r["result"])
@@ -144,6 +148,7 @@ class tViews(__local.DefaultTestCase):
 
     def test_delete(self):
         v = view.UsermanagementView(context=self.root, request=self.request)
+        v.__configuration__ = lambda: view.configuration
         user = self.root.GetUserByName("testuser")
         if not user:
             self.request.POST = {"name":"testuser", "email":"test@aaa.com", "groups":("group:admin",)}

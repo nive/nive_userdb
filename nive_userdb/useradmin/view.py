@@ -1,14 +1,15 @@
-# Copyright 2012, 2013 Arndt Droullier, Nive GmbH. All rights reserved.
+# Copyright 2012-2014 Arndt Droullier, Nive GmbH. All rights reserved.
 # Released under GPL3. See license.txt
 #
 
-
 from pyramid.renderers import get_renderer, render, render_to_response
 
-from nive_userdb.i18n import _
-from nive.definitions import ViewConf, ViewModuleConf, Conf
+from nive.definitions import ViewConf, ViewModuleConf, Conf, FieldConf
 from nive.definitions import IApplication, IUser
 
+from nive.components.reform.widget import RadioChoiceWidget
+
+from nive_userdb.i18n import _
 
 # view module definition ------------------------------------------------------------------
 
@@ -16,21 +17,29 @@ from nive.definitions import IApplication, IUser
 configuration = ViewModuleConf("nive.adminview.view",
     id = "useradmin",
     name = _(u"User management"),
-    containment = "nive_userdb.useradmin.adminroot.adminroot",
+    containment = IApplication,
     context = "nive_userdb.useradmin.adminroot.adminroot",
     view = "nive_userdb.useradmin.view.UsermanagementView",
     templates = "nive_userdb.useradmin:",
-    template = "index.pt",
-    permission = "manage users"
+    template = "nive.adminview:index.pt",
+    permission = "manage users",
+    # user interface configuration
+    listfields = ("pool_state","name","email","groups","lastlogin","id"),
+    addfields = ("name","password","email","groups"),
+    editfields = (FieldConf(id="pool_state", name=_("Active"), datatype="bool",
+                            widget=RadioChoiceWidget(values=((u"true", _(u"Yes")),(u"false", _(u"No"))))),
+                  "name",
+                  FieldConf(id="password", name=_("Password"), datatype="password", settings={"update": True}),
+                  "email","groups")
 )
 t = configuration.templates
 configuration.views = [
     # User Management Views
-    ViewConf(name = "",       attr = "view",   containment=IApplication, renderer = t+"root.pt"),
-    ViewConf(name = "list",   attr = "view",   containment=IApplication, renderer = t+"root.pt"),
-    ViewConf(name = "add",    attr = "add",    containment=IApplication, renderer = t+"add.pt"),
-    ViewConf(name = "delete", attr = "delete", containment=IApplication, renderer = t+"delete.pt"),
-    ViewConf(name = "",       attr = "edit",   context = IUser, renderer = t+"edit.pt"),
+    ViewConf(name="",       attr="view",   renderer=t+"root.pt"),
+    ViewConf(name="list",   attr="view",   renderer=t+"root.pt"),
+    ViewConf(name="add",    attr="add",    renderer=t+"add.pt"),
+    ViewConf(name="delete", attr="delete", renderer=t+"delete.pt"),
+    ViewConf(name="",       attr="edit",   context=IUser, containment="nive_userdb.useradmin.adminroot.adminroot", renderer=t+"edit.pt"),
 ]
 
 
@@ -66,7 +75,7 @@ class UsermanagementView(AdminBasics):
         name.settings["validator"] = UsernameValidator
         form = ObjectForm(loadFromType="user", view=self)
         form.subsets = {
-            "create": {"fields":  [name, "password", "email", "groups", "surname", "lastname"],
+            "create": {"fields": self.configuration.addfields,
                        "actions": ["create"],
                        "defaultAction": "default"}
         }
@@ -87,7 +96,7 @@ class UsermanagementView(AdminBasics):
                 pass
         form.ListenEvent("loadDataObj", removepasswd)
         form.subsets = {
-            "edit":   {"fields":  [pwd, "email", "groups", "surname", "lastname", "token", "tempcache"],
+            "edit":   {"fields": self.configuration.editfields,
                        "actions": ["edit"],
                        "defaultAction": "defaultEdit"},
         }        

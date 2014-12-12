@@ -7,8 +7,8 @@
       action="${view.FolderUrl(context)}delete">
 <table tal:define="app context.app;
                    url view.FolderUrl(context.root());
-                   fields ('pool_state','name','groups','email','lastlogin','id');
-                   users context.SearchType('user', parameter={}, fields=fields, sort='name', max=500, skipRender=('groups',))"
+                   fields view.configuration.listfields;
+                   users context.SearchType('user', parameter={}, fields=fields, sort='name', max=500, skipRender=())"
        class="table table-striped">
 <thead>
 <tr>
