@@ -2,8 +2,11 @@
 # Released under GPL3. See license.txt
 #
 
+import copy
+
 from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
 from nive.definitions import ConfigurationError
+from nive.definitions import IUser
 from nive.views import BaseView, Unauthorized, Mail
 from nive.forms import ObjectForm
 
@@ -59,8 +62,8 @@ class UserForm(ObjectForm):
         ObjectForm.__init__(self, view=view, loadFromType=loadFromType, context=context, request=request, app=app, **kw)
         
         self.actions = [
-            Conf(id="default",    method="StartForm", name=_(u"Initialize"),    hidden=True),
-            Conf(id="defaultEdit",method="LoadUser",  name=_(u"Initialize"),    hidden=True),
+            Conf(id="default",    method="StartForm", name=u"Initialize",    hidden=True),
+            Conf(id="defaultEdit",method="LoadUser",  name=u"Initialize",    hidden=True),
             Conf(id="create",     method="AddUser",   name=_(u"Signup"),        hidden=False),
             Conf(id="edit",       method="Update",    name=_(u"Confirm"),       hidden=False),
             Conf(id="login",      method="Login",     name=_(u"Login"),         hidden=False),
@@ -81,7 +84,8 @@ class UserForm(ObjectForm):
             "login":  {
                 "fields":  [
                     FieldConf(id="name", name=_("Name"), datatype="string"),
-                    FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True})
+                    FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True}),
+                    FieldConf(id="redirect", datatype="string", size="500", name="redirect url", hidden=True),
                 ],
                 "actions": ["login"],
                 "defaultAction": "default"
@@ -89,7 +93,8 @@ class UserForm(ObjectForm):
             "loginMail":  {
                 "fields":  [
                     FieldConf(id="name", name=_("Email"), datatype="string"),
-                    FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True})
+                    FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True}),
+                    FieldConf(id="redirect", datatype="string", size="500", name="redirect url", hidden=True),
                 ],
                 "actions": ["login"],
                 "defaultAction": "default"
@@ -137,18 +142,17 @@ class UserForm(ObjectForm):
 
             "resetpass": {
                 "fields": [FieldConf(id="name", name=_("Name"), datatype="string")],
-                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"),hidden=False)],
+                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"), hidden=False)],
                 "defaultAction": "default"
             },
             "resetpassMail": {
                 "fields": [FieldConf(id="name", name=_("Email"), datatype="string")],
-                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"),hidden=False)],
+                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"), hidden=False)],
                 "defaultAction": "default"
             },
             "contact": {
-                "fields": [FieldConf(id="message", name=_("Message"), datatype="text", required=True, size=3000),
-                           FieldConf(id="receiver", name=_("Receiver"), datatype="string", hidden=True),],
-                "actions": [Conf(id="contact", method="Contact", name=_(u"Send message"),hidden=False)],
+                "fields": [FieldConf(id="message", name=_("Message"), datatype="text", required=True, size=3000)],
+                "actions": [Conf(id="contact", method="Contact", name=_(u"Send message"), hidden=False)],
                 "defaultAction": Conf(id="default", method="StartRequestPOST", name=_(u"Initialize"), hidden=True)
             },
         }
@@ -159,7 +163,9 @@ class UserForm(ObjectForm):
 
     def AddUser(self, action, **kw):
         """
-        Form action: safely add a user 
+        Form action: safely add a user
+
+        Pass additional user data as `values` in keywords.
         """
         msgs = []
         result,data,errors = self.Validate(self.request)
@@ -167,6 +173,9 @@ class UserForm(ObjectForm):
             opts = {}
             opts.update(kw)
             opts.update(self.settings)
+            # add additional user values if passed in kws
+            if kw.get("values"):
+                data.update(kw["values"])
             result, msgs = self.context.AddUser(data, 
                                                 currentUser=self.view.User(),
                                                 **opts)
@@ -195,6 +204,8 @@ class UserForm(ObjectForm):
     def Update(self, action, **kw):
         """
         Form action: safely update a user 
+
+        Pass additional user data as `values` in keywords.
         """
         user = self.view.User(sessionuser=False)
         if not user:
@@ -202,9 +213,12 @@ class UserForm(ObjectForm):
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
+            # add additional user values if passed in kws
+            if kw.get("values"):
+                data.update(kw["values"])
             result = user.SecureUpdate(data, user)
             if result:
-                msgs.append(_(u"OK"))
+                msgs.append(_(u"OK."))
 
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
         
@@ -240,7 +254,7 @@ class UserForm(ObjectForm):
             if user is not None:
                 result = True
                 user.Activate(currentUser=user)
-                msgs = [_(u"OK.")]
+                msgs = [self.context.app.configuration.get("activationMessage") or _(u"OK.")]
             else:
                 result = False
         if not result:
@@ -317,7 +331,8 @@ class UserForm(ObjectForm):
         Form action: generate a new password and mail to the user
         """
         data = self.GetFormValues(self.request)
-        result, msgs = self.context.MailUserPass(data.get("email"),
+        kw["form"] = self
+        result, msgs = self.context.MailUserPass(data.get("name"),
                                                  currentUser=self.view.User(),
                                                  **kw)
         if result:
@@ -330,31 +345,32 @@ class UserForm(ObjectForm):
         Sends a email to the user 'receiver'
 
         :param action:
-        :param kw: mail, receiver
+        :param kw: mail, receiver, replyToSender
         :return:
         """
         result,data,errors = self.Validate(self.request)
         if not result:
             return result, self.Render(data, msgs=[], errors=errors)
-        kw.update(data)
 
-        recv = data.get("receiver") or kw.get("receiver")
-        if "receiver" in kw:
-            del kw["receiver"]
-        recv = self.context.root().GetUser(recv)
-        if recv is None:
+        recv = kw.get("receiver")
+        if not isinstance(recv, (list, tuple)):
             result = False
             msgs = (_(u"No receiver specified."),)
             return result, self.Render(data, msgs=msgs, errors=errors)
 
-        kw["receiver"] = recv
+        replyTo = u""
+        user = self.view.User()
+        if kw.get("replyToSender")==True:
+            replyTo=user.data.email
+
         mail = kw.get("mail") or self.context.app.configuration.mailContact
         title = mail.title
-        body = mail(sender=self.view.User(), **kw)
+        body = mail(sender=user, data=data, form=self, **kw)
         tool = self.context.app.GetTool("sendMail")
         if not tool:
             raise ConfigurationError, "Mail tool 'sendMail' not found"
-        result, value = tool(body=body, title=title, recvmails=[(recv.data.get("email"), recv.meta.get("title"))], force=1)
+
+        result, value = tool(body=body, title=title, recvmails=recv, replyTo=replyTo, force=1)
         if not result:
             msgs=(_(u"The email could not be sent."),)
         else:
@@ -384,11 +400,12 @@ class UserView(BaseView):
                 form.ApplyOptions(formsettings)
         return form
 
-    def _loadForm(self, subset, viewconf, defaultsubset, defaultaction=None):
+    def _loadForm(self, subset, viewconf, defaultsubset):
         # form rendering settings
         # form setup
         typeconf=self.context.app.GetObjectConf("user")
         form = UserForm(view=self, context=self.context.root(), loadFromType=typeconf)
+        defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.app.configuration.settings
 
@@ -396,9 +413,13 @@ class UserView(BaseView):
         subset = subset or defaultsubset
         if isinstance(subset, basestring):
             # the subset is referenced as string -> look it up in typeconf.forms
-            form.subsets = typeconf.forms
+            if not subset in form.subsets:
+                cp = copy.deepcopy(typeconf.forms)
+                form.subsets = cp
         else:
-            form.subsets = {defaultsubset: subset}
+            form.ApplyOptions(subset)
+            cp = copy.deepcopy(subset)
+            form.subsets = {defaultsubset: cp}
             subset = defaultsubset
 
         if not subset in form.subsets:
@@ -406,7 +427,10 @@ class UserView(BaseView):
 
         # set up action
         if not "actions" in form.subsets[subset] and defaultaction:
-            form.subsets[subset].update(defaultaction)
+            if "defaultAction" in defaultaction:
+                form.subsets[subset]["defaultAction"] = defaultaction["defaultAction"]
+            if "actions" in defaultaction:
+                form.subsets[subset]["actions"] = defaultaction["actions"]
 
         # customize form widget. values are applied to form.widget
         form.widget.item_template = "field_onecolumn"
@@ -455,16 +479,17 @@ class UserView(BaseView):
             {"fields": ("email", "name", "password"), "use_ajax": True}
 
         """
-        subset = None
+        subset = values = None
         viewconf = self.GetViewConf()
         title = u""
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title")
-        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="create", defaultaction=UserForm.subsets["create"])
+            values = viewconf.settings.get("values")
+        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="create")
         form.Setup(subset=subset)
-        result, data, action = form.Process(url=self.Url()+"activate", renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+        result, data, action = form.Process(url=self.Url()+"activate", values=values, renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
 
     def update(self):
         """
@@ -502,22 +527,23 @@ class UserView(BaseView):
 
         """
         user=self.User(sessionuser=False)
-        subset = None
+        subset = values = None
         title = u""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title",u"")
-        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit", defaultaction=UserForm.subsets["edit"])
+            values = viewconf.settings.get("values")
+        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit")
         if user and user.id == 0:
             return {u"content": _(u"Your current user can only be edited on file system level."),
-                    u"result": False, u"head": form.HTMLHead(), u"title": title}
+                    u"result": False, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
         form.Setup(subset=subset)
         try:
-            result, data, action = form.Process()
-            return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+            result, data, action = form.Process(values=values)
+            return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
         except Unauthorized:
-            return {u"content": _(u"User not found"), u"result": False, u"head": form.HTMLHead(), u"title": title}
+            return {u"content": _(u"User not found"), u"result": False, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
             
     def activate(self):
         title = u""
@@ -528,7 +554,7 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="activate")
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
 
     def resetpass(self):
         title = u""
@@ -543,7 +569,7 @@ class UserView(BaseView):
             subset = "resetpass"
         form.Setup(subset=subset)
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
 
     def updatepass(self):
         title = u""
@@ -554,7 +580,7 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="updatepass")
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
 
     def updatemail1(self):
         title = u""
@@ -565,7 +591,7 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="updatemail1")
         result, data, action = form.Process(url=self.Url()+"updatemail2", renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
 
     def updatemail2(self):
         title = u""
@@ -576,49 +602,64 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="updatemail2")
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"title": title}
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
 
     def contact(self):
         title = u""
-        viewconf = self.GetViewConf()
-        if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+        mail = receiver = None
+        replyToSender = False
         subset = u"contact"
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title",u"")
+            receiver = viewconf.settings.get("receiver")
+            replyToSender = viewconf.settings.get("replyToSender")
             subset = viewconf.settings.get("form")
-        form = self._loadSimpleForm()
+            mail = viewconf.settings.get("mail")
+        # get the receiver
+        if isinstance(receiver, basestring):
+            user = self.context.root().GetUser(receiver)
+            receiver = ((user.data.get("email"), user.meta.get("title")),)
+        elif IUser.providedBy(receiver):
+            receiver = ((receiver.data.get("email"), receiver.meta.get("title")),)
+        elif callable(receiver):
+            receiver = receiver(self)
+        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="contact")
         form.startEmpty = True
         form.Setup(subset=subset)
-        receiver = self.context.root().GetUser(self.GetFormValue("receiver"))
-        result, data, action = form.Process(form=form, renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"receiver":receiver, u"title":title }
+        result, data, action = form.Process(receiver=receiver, replyToSender=replyToSender, mail=mail, renderSuccess=False)
+        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title":title}
 
     def login(self):
         title = u""
+        showPasswordLink = False
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title",u"")
+            showPasswordLink = viewconf.settings.get("showPasswordLink",showPasswordLink)
         if self.context.app.configuration.loginByEmail:
             subset = "loginMail"
         else:
             subset = "login"
-        showPasswordLink = False
         form = self._loadSimpleForm()
         form.Setup(subset=subset)
         form.widget.item_template = "field_onecolumn"
         user = self.User()
         if not user:
-            form.startEmpty = True
             redirect = self.GetFormValue(u"redirect")
             if not redirect:
                 try:
                     redirect = self.context.app.portal.configuration.loginSuccessUrl
                 except:
                     redirect = self.request.url
-            result, data, action = form.Process(redirectSuccess=redirect)
-            return {u"content": data, u"result": result, u"head": form.HTMLHead(), u"showPasswordLink":showPasswordLink, u"title":title}
-        return {u"content": u"", u"result": True, u"head": form.HTMLHead(), u"showPasswordLink":showPasswordLink, u"title":title}
+                result, data, action = form.Process(redirectSuccess=redirect)
+            else:
+                # pass redirect to form as hidden field
+                result, data, action = form.Process(defaultData={u"redirect":redirect}, redirectSuccess=redirect)
+            return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)),
+                    u"showPasswordLink":showPasswordLink, u"title":title}
+        return {u"content": u"", u"result": True, u"head": form.HTMLHead(ignore=(u"jquery.js",)),
+                u"showPasswordLink":showPasswordLink, u"title":title}
             
     def logoutlink(self):
         return {}

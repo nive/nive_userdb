@@ -4,6 +4,7 @@
 
 <div class="signup">
   <h3 tal:condition="title" tal:content="structure title"></h3>
+  <span tal:replace="structure head"/>
   <span tal:replace="structure content"/>
 </div>
 

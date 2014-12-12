@@ -4,15 +4,17 @@
 
 <div tal:define="user view.User()"
      class="widget">
+  <h3 tal:condition="title" tal:content="structure title"></h3>
   <span tal:replace="structure view.insertMessages()"/>
   <tal:block tal:condition="not user">
-	<ul tal:condition="view.GetFormValue('redirect') and not view.GetFormValue('name')" class="boxOK"><li i18n:translate="">Please log in!</li></ul>
+	<div tal:condition="view.GetFormValue('redirect') and not view.GetFormValue('name')" class="alert alert-warning" i18n:translate="">Please log in!</div>
     <span tal:replace="structure content"/>
-    <p tal:condition="showPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
+    <p tal:condition="resetPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
+    <p tal:condition="sendPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
   </tal:block>
   <div tal:condition="user" class="logout">
-    <p tal:condition="view.GetFormValue('redirect')" class="boxError" i18n:translate="">You do not have the required permissions to access the page.</p>
-    <p><a href="${view.FolderUrl(context)}logout?redirect=${view.logouturl()}" i18n:translate="">Log out</a></p>
+    <div tal:condition="view.GetFormValue('redirect')" class="alert alert-warning" i18n:translate="">You do not have the required permissions to access the page.</div>
+    <p><a href="${view.FolderUrl(context)}logout" i18n:translate="">Log out</a></p>
   </div>
 </div>
 

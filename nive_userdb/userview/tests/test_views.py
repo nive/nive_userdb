@@ -5,6 +5,7 @@ import unittest
 
 from nive.definitions import Conf
 from nive_userdb.userview.view import UserForm, UserView
+from nive_userdb.userview.view import configuration as view_configuration
 from nive.views import BaseView
 from nive.security import User
 
@@ -66,7 +67,7 @@ class tViews(__local.DefaultTestCase):
 
     def test_templates(self):    
         view = UserView(context=self.root, request=self.request)
-        view.__configuration__ = lambda: Conf(template="nive_userdb.userview:main.pt",templates="",assets=[],views=[])
+        view.__configuration__ = lambda: view_configuration
         vrender = {"context":self.root, "view":view, "request": self.request}
         
         values = view.login()

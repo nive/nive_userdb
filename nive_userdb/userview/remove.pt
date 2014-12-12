@@ -7,7 +7,7 @@
   <p tal:condition="description and not result" tal:content="structure description"></p>
   <form tal:condition="not result" action="" method="POST">
       <input type="hidden" name="remove" value="1">
-      <button type="submit">Permanently delete your user profile</button>
+      <button type="submit" i18n:translate="">Permanently remove your user profile. Click to continue.</button>
   </form>
   <h3 tal:condition="result" i18n:translate="">Ok. Your profile has been removed.</h3>
 </div>
