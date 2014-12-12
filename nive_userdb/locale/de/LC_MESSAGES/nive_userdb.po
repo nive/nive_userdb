@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nive 0.9.12\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-26 11:27+0200\n"
+"POT-Creation-Date: 2014-12-12 14:04+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -15,138 +15,204 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: nive_userdb/app.py:31 nive_userdb/useradmin/delete.pt:28
+#: nive_userdb/app.py:36 nive_userdb/useradmin/delete.pt:28
 msgid "Users"
 msgstr "Benutzer"
 
-#: nive_userdb/root.py:443
-msgid "User account"
-msgstr "Konto"
-
-#: nive_userdb/root.py:464 nive_userdb/root.py:58
+#: nive_userdb/app.py:192 nive_userdb/app.py:204 nive_userdb/root.py:69
 #, python-format
 msgid "Username '${name}' already in use. Please choose a different name."
 msgstr "Name '${name}' wird bereits verwendet. Bitte einen anderen auswählen."
 
-#: nive_userdb/root.py:482
+#: nive_userdb/app.py:215 nive_userdb/app.py:227
 #, python-format
-msgid ""
-"Email '${name}' already in use. Please use the login form if you already "
-"have a account."
-msgstr "E-Mail '${name}' wird bereits verwendet. "
+msgid "Email '${name}' already in use. Please choose a different email."
+msgstr "E-Mail '${name}' wird bereits verwendet. Bitte eine andere auswählen."
 
-#: nive_userdb/root.py:124
+#: nive_userdb/app.py:238
+msgid "Password is too simple. It should have at least 5 different characters."
+msgstr "Passwort ist zu kurz. Bitte mindestens 5 Zeichen eingeben."
+
+#: nive_userdb/app.py:247
+msgid "The old password does not match."
+msgstr "Das alte Passwort stimmt nicht."
+
+#: nive_userdb/app.py:255
+msgid "Please accept the terms and conditions."
+msgstr "Sie müssen die Nutzungsbedingungen akzeptieren."
+
+#: nive_userdb/app.py:52
+msgid "Signup confirmation"
+msgstr "Anmeldebestätigung"
+
+#: nive_userdb/app.py:53
+msgid "Signup notification"
+msgstr "Neue Anmeldung eingegangen"
+
+#: nive_userdb/app.py:54
+msgid "Verify your new e-mail"
+msgstr "Neue E-Mail bestätigen"
+
+#: nive_userdb/app.py:55
+msgid "Your new password"
+msgstr "Ihr neues Passwort"
+
+#: nive_userdb/app.py:56
+msgid "Your password"
+msgstr "Ihr Passwort"
+
+#: nive_userdb/app.py:57
+msgid "Contact form"
+msgstr "Kontakt Formular"
+
+#: nive_userdb/root.py:595
+msgid "User account"
+msgstr "Benutzerkonto"
+
+#: nive_userdb/root.py:134
 msgid "Account created."
 msgstr "Konto erstellt."
 
-#: nive_userdb/root.py:165 nive_userdb/user.py:175
-#: nive_userdb/userview/view.py:67 nive_userdb/userview/view.py:71
-msgid "Password"
-msgstr "Passwort"
+#: nive_userdb/root.py:162
+msgid "You are now signed in."
+msgstr "Sie sind jetzt angemeldet."
 
-#: nive_userdb/root.py:177
+#: nive_userdb/root.py:220
+msgid "The link to verify your new email has been sent by mail."
+msgstr ""
+"Der Link zum Bestätigen der neuen E-Mail Adresse wurde per E-Mail verschickt."
+
+#: nive_userdb/root.py:274
 msgid ""
 "The new password has been sent to your email address. Please sign in and "
 "change it."
 msgstr ""
-"Das Passwort wurde an die eingetragene E-Mail verschickt. Nach dem Anmelden "
-"kann das Passwort geändert werden. "
+"Ein neues Passwort wurde an die eingetragene E-Mail verschickt. Bitte "
+"anmelden und das neue Passwort ändern. "
 
-#: nive_userdb/root.py:205
-msgid "You are now signed in."
-msgstr "Sie sind jetzt angemeldet."
+#: nive_userdb/root.py:324
+msgid "The link to reset your password has been sent to your email address."
+msgstr ""
+"Der Link zum Ändern des Passworts wurde an Ihre E-Mail Adresse geschickt."
 
-#: nive_userdb/root.py:404
+#: nive_userdb/root.py:357
 msgid "User deleted."
-msgstr "User gelöscht."
+msgstr "Benutzer gelöscht."
 
-#: nive_userdb/root.py:52
+#: nive_userdb/root.py:63
 msgid "Please enter your username"
 msgstr "Bitte den Login-Namen eingeben"
 
-#: nive_userdb/root.py:82
+#: nive_userdb/root.py:104
 msgid "Sorry. Account could not be created."
 msgstr "Entschuldigung. Das Konto konnte nicht erstellt werden."
 
-#: nive_userdb/root.py:137
+#: nive_userdb/root.py:151 nive_userdb/root.py:157
+msgid "Sign in failed. Please check your username and password."
+msgstr "Anmeldung fehlgeschlagen. Bitte die Eingaben überprüfen."
+
+#: nive_userdb/root.py:189
+msgid "Please enter your new email address."
+msgstr "Bitte geben Sie ihre neue E-Mail Adresse ein."
+
+#: nive_userdb/root.py:217 nive_userdb/root.py:271 nive_userdb/root.py:321
+#: nive_userdb/root.py:119 nive_userdb/userview/view.py:374
+msgid "The email could not be sent."
+msgstr "Die E-Mail konnte nicht verschickt werden."
+
+#: nive_userdb/root.py:233
 msgid "Please enter your email address or username."
 msgstr "Bitte den Login-Namen oder die E-Mail eingeben."
 
-#: nive_userdb/root.py:151
+#: nive_userdb/root.py:248 nive_userdb/root.py:298
 msgid "No email address found."
 msgstr "E-Mail Adresse nicht gefunden."
 
-#: nive_userdb/root.py:194 nive_userdb/root.py:200
-msgid "Sign in failed. Please check your username and password."
-msgstr "Login fehlgeschlagen. Bitte die Eingaben überprüfen."
+#: nive_userdb/root.py:285
+msgid "Please enter your sign in name or email address."
+msgstr "Bitte den Login-Namen oder die E-Mail eingeben."
 
-#: nive_userdb/root.py:397
+#: nive_userdb/root.py:334 nive_userdb/root.py:338
+msgid "Invalid user."
+msgstr "Ungültiger Name."
+
+#: nive_userdb/root.py:349
 msgid "You cannot delete the admin user."
 msgstr "Der Aministrator kann nicht gelöscht werden."
 
-#: nive_userdb/root.py:401
-msgid "Sorry. An error occured."
+#: nive_userdb/root.py:354
+msgid "Sorry. An error occurred."
 msgstr "Entschuldigung. Es ist ein Fehler aufgetreten."
 
-#: nive_userdb/root.py:64
+#: nive_userdb/root.py:75
 #, python-format
 msgid "Email '${name}' already in use. "
 msgstr "E-Mail '${name}' wird bereits verwendet. "
 
-#: nive_userdb/root.py:144
+#: nive_userdb/root.py:195 nive_userdb/root.py:291
+msgid "No matching account found."
+msgstr "Kein Konto gefunden."
+
+#: nive_userdb/root.py:239
 msgid "No matching account found. Please try again."
-msgstr "Kein Konto gefunden. Bitte die Eingaben überpüfen."
+msgstr "Kein Konto gefunden. Bitte die Eingaben überprüfen."
 
-#: nive_userdb/root.py:171 nive_userdb/root.py:174 nive_userdb/root.py:94
-#: nive_userdb/root.py:97
-msgid "The email could not be sent."
-msgstr "Die E-Mail konnte nicht verschickt werden."
-
-#: nive_userdb/root.py:386
-msgid "Invalid user."
-msgstr "Ungültiger Name."
-
-#: nive_userdb/root.py:391
+#: nive_userdb/root.py:343
 msgid "Invalid username."
-msgstr "Ungültiger Name."
+msgstr "Ungültiger Login-Name."
 
-#: nive_userdb/user.py:164
+#: nive_userdb/user.py:235
 msgid "User"
-msgstr "User"
+msgstr "Benutzer"
 
-#: nive_userdb/user.py:174
+#: nive_userdb/user.py:246
 msgid "User ID"
-msgstr "User ID"
+msgstr "Login-Name"
 
-#: nive_userdb/user.py:176
+#: nive_userdb/user.py:248 nive_userdb/userview/view.py:95
+#: nive_userdb/userview/view.py:149
 msgid "Email"
 msgstr "E-Mail"
 
-#: nive_userdb/user.py:177
+#: nive_userdb/user.py:250 nive_userdb/user.py:268
+#: nive_userdb/useradmin/view.py:32 nive_userdb/userview/view.py:87
+#: nive_userdb/userview/view.py:96
+msgid "Password"
+msgstr "Passwort"
+
+#: nive_userdb/user.py:253
 msgid "Groups"
 msgstr "Gruppen"
 
-#: nive_userdb/user.py:179
+#: nive_userdb/user.py:254
 msgid "Activate email notifications"
 msgstr "E-Mail Benachrichtigungen aktivieren"
 
-#: nive_userdb/user.py:181
-msgid "Surname"
-msgstr "Vorname"
-
-#: nive_userdb/user.py:182
-msgid "Lastname"
-msgstr "Nachname"
-
-#: nive_userdb/user.py:183
-msgid "Organisation"
-msgstr "Organisation/Firma"
-
-#: nive_userdb/user.py:185
+#: nive_userdb/user.py:255 nive_userdb/useradmin/edit.pt:15
 msgid "Last login"
 msgstr "Letzter Login"
 
-#: nive_userdb/user.py:93
+#: nive_userdb/user.py:256
+msgid "Token for activation or password reset"
+msgstr "Token zur Aktivierung oder Passwort zurücksetzen"
+
+#: nive_userdb/user.py:257
+msgid "Temp cache for additional verification data"
+msgstr "Temporärer Datenspeicher"
+
+#: nive_userdb/user.py:260
+msgid "Surname"
+msgstr "Vorname"
+
+#: nive_userdb/user.py:261
+msgid "Lastname"
+msgstr "Nachname"
+
+#: nive_userdb/user.py:262
+msgid "Organisation"
+msgstr "Organisation/Firma"
+
+#: nive_userdb/user.py:138
 msgid "Update failed."
 msgstr "Update fehlgeschlagen."
 
@@ -162,33 +228,53 @@ msgstr "Alle löschen"
 msgid "Please select a user first!"
 msgstr "Bitte erst eine/n Benutzer/in auswählen!"
 
-#: nive_userdb/useradmin/view.py:18
+#: nive_userdb/useradmin/view.py:19
 msgid "User management"
 msgstr "Benutzerverwaltung"
 
-#: nive_userdb/useradmin/view.py:54
+#: nive_userdb/useradmin/view.py:29 nive_userdb/useradmin/edit.pt:12
+msgid "Active"
+msgstr "Aktiv"
+
+#: nive_userdb/useradmin/view.py:63
 msgid "List users"
 msgstr "User auflisten"
 
-#: nive_userdb/useradmin/view.py:55
+#: nive_userdb/useradmin/view.py:64
 msgid "Add user"
 msgstr "User hinzufügen"
 
-#: nive_userdb/useradmin/view.py:112
+#: nive_userdb/useradmin/view.py:121
 msgid "User not found. (id %(name)s)"
 msgstr "Benutzer/in nicht gefunden. (id %(name)s)"
 
-#: nive_userdb/useradmin/view.py:121
+#: nive_userdb/useradmin/view.py:130
 msgid "Delete failed: User '%(name)s'"
 msgstr "Löschen fehlgeschlagen: '%(name)s'"
 
-#: nive_userdb/useradmin/view.py:125
+#: nive_userdb/useradmin/view.py:134
 msgid "OK. Users deleted."
-msgstr "Ok. BenutzerGelöscht."
+msgstr "Ok. Benutzer gelöscht."
 
-#: nive_userdb/useradmin/view.py:127
+#: nive_userdb/useradmin/view.py:136
 msgid "OK. User deleted."
-msgstr "Ok. BenutzerGelöscht."
+msgstr "Ok. Benutzer gelöscht."
+
+#: nive_userdb/useradmin/view.py:30
+msgid "Yes"
+msgstr "Ja"
+
+#: nive_userdb/useradmin/view.py:30
+msgid "No"
+msgstr "Nein"
+
+#: nive_userdb/useradmin/edit.pt:18
+msgid "Changed"
+msgstr "Geändert"
+
+#: nive_userdb/useradmin/edit.pt:21
+msgid "Created"
+msgstr "Erstellt"
 
 #: nive_userdb/useradmin/adminroot.py:27
 msgid "User listing"
@@ -198,83 +284,158 @@ msgstr "Benutzerliste"
 msgid "Delete selected"
 msgstr "Ausgewählte löschen"
 
-#: nive_userdb/userview/main.pt:5 nive_userdb/userview/main.pt:49
-#: nive_userdb/userview/view.py:56
+#: nive_userdb/userview/main.pt:5 nive_userdb/userview/main.pt:50
+#: nive_userdb/userview/view.py:69
 msgid "Login"
 msgstr "Einloggen"
 
-#: nive_userdb/userview/main.pt:52 nive_userdb/userview/view.py:55
+#: nive_userdb/userview/main.pt:53 nive_userdb/userview/loginpage.pt:18
+#: nive_userdb/userview/view.py:145 nive_userdb/userview/view.py:150
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
-#: nive_userdb/userview/main.pt:55 nive_userdb/userview/view.py:52
+#: nive_userdb/userview/main.pt:56 nive_userdb/userview/view.py:67
 msgid "Signup"
 msgstr "Anmelden"
 
-#: nive_userdb/userview/main.pt:58
+#: nive_userdb/userview/main.pt:59
 msgid "Account"
 msgstr "Mein Konto"
 
-#: nive_userdb/userview/main.pt:61 nive_userdb/userview/loginpage.pt:24
+#: nive_userdb/userview/main.pt:62 nive_userdb/userview/loginpage.pt:28
 msgid "Log out"
 msgstr "Ausloggen"
 
-#: nive_userdb/userview/main.pt:64
+#: nive_userdb/userview/main.pt:65
 msgid "Website"
 msgstr "Webseite"
 
-#: nive_userdb/userview/main.pt:67
+#: nive_userdb/userview/main.pt:68
 msgid "Editor"
 msgstr "Editor"
 
-#: nive_userdb/userview/update.pt:8
-msgid "Change account:"
-msgstr "Kontoeinstellungen bearbeiten:"
-
-#: nive_userdb/userview/loginpage.pt:9
+#: nive_userdb/userview/loginpage.pt:13
 msgid "Please log in!"
 msgstr "Bitte anmelden!"
 
-#: nive_userdb/userview/loginpage.pt:12
-msgid "You have been logged out!"
-msgstr "Ausgeloggt!"
+#: nive_userdb/userview/loginpage.pt:25
+msgid "You do not have the required permissions to access the page."
+msgstr "Fehlende Rechte zum Zugriff auf diese Seite."
 
-#: nive_userdb/userview/view.py:13
+#: nive_userdb/userview/view.py:23
 msgid "User signup"
 msgstr "Konto erstellen"
 
-#: nive_userdb/userview/view.py:219
-msgid "Your password"
-msgstr "Das Passwort"
+#: nive_userdb/userview/view.py:261 nive_userdb/userview/view.py:324
+msgid "The token is invalid. Please make sure it is complete."
+msgstr "Der Schlüssel ist ungültig. Bitte sicherstellen dass er komplett ist."
 
-#: nive_userdb/userview/view.py:225
-msgid "Your new password"
-msgstr "Das neue Passwort"
+#: nive_userdb/userview/view.py:280
+msgid "OK. Password changed."
+msgstr "OK. Passwort geändert."
 
-#: nive_userdb/userview/view.py:209
+#: nive_userdb/userview/view.py:358
+msgid "No receiver specified."
+msgstr "Kein Empfänger angegeben."
+
+#: nive_userdb/userview/view.py:376
+msgid "The email has been sent."
+msgstr "Die E-Mail wurde verschickt."
+
+#: nive_userdb/userview/view.py:535
 msgid "Your current user can only be edited on file system level."
 msgstr ""
 "Der aktuell eingeloggte Benutzer kann nur im Dateisystem geändert werden."
 
-#: nive_userdb/userview/view.py:50 nive_userdb/userview/view.py:51
-msgid "Initialize"
-msgstr "Initialisieren"
-
-#: nive_userdb/userview/view.py:53
+#: nive_userdb/userview/view.py:68
 msgid "Confirm"
 msgstr "Bestätigen"
 
-#: nive_userdb/userview/view.py:54
-msgid "Mail password"
-msgstr "Passwort anfordern"
+#: nive_userdb/userview/view.py:221 nive_userdb/userview/view.py:257
+msgid "OK."
+msgstr "OK."
 
-#: nive_userdb/userview/view.py:138
-msgid "OK"
-msgstr "OK"
-
-#: nive_userdb/userview/view.py:215
+#: nive_userdb/userview/view.py:542
 msgid "User not found"
-msgstr "User nicht gefunden"
+msgstr "Benutzer nicht gefunden"
+
+#: nive_userdb/userview/view.py:156
+msgid "Initialize"
+msgstr "Initialisieren"
+
+#: nive_userdb/userview/view.py:320
+msgid "OK. The new email address has been activated."
+msgstr "OK. Die neue E-Mail Adresse ist jetzt aktiv."
+
+#: nive_userdb/userview/view.py:86 nive_userdb/userview/view.py:144
+msgid "Name"
+msgstr "Name"
+
+#: nive_userdb/userview/view.py:105
+msgid "Activate"
+msgstr "Aktivieren"
+
+#: nive_userdb/userview/view.py:115
+msgid "Old password"
+msgstr "Altes Passwort"
+
+#: nive_userdb/userview/view.py:120
+msgid "Update password"
+msgstr "Passwort ändern"
+
+#: nive_userdb/userview/view.py:131
+msgid "New email"
+msgstr "Neue E-Mail Adresse"
+
+#: nive_userdb/userview/view.py:134
+msgid "Update email"
+msgstr "E-Mail Adresse ändern"
+
+#: nive_userdb/userview/view.py:139
+msgid "Verify email"
+msgstr "E-Mail Adresse bestätigen"
+
+#: nive_userdb/userview/view.py:154
+msgid "Message"
+msgstr "Nachricht"
+
+#: nive_userdb/userview/view.py:155
+msgid "Send message"
+msgstr "Nachricht absenden"
+
+#: nive_userdb/userview/view.py:675
+msgid "You have been logged out!"
+msgstr "Ausgeloggt!"
+
+#: nive_userdb/userview/remove.pt:15
+msgid "Permanently remove your user profile. Click to continue."
+msgstr "Benutzerkonto unwiderruflich löschen. Zum Fortfahren klicken."
+
+#: nive_userdb/userview/remove.pt:20
+msgid "Ok. Your profile has been removed."
+msgstr "OK. Das Profil wurde gelöscht."
+
+#: nive_userdb/userview/mails/mailpass.pt:3
+msgid "Your new password:"
+msgstr "Ihr neues Passwort:"
+
+#: nive_userdb/userview/mails/mailpass.pt:7
+msgid "Please login and change it."
+msgstr "Bitte anmelden und ändern."
+
+#~ msgid "Receiver"
+#~ msgstr "Empfänger"
+
+#~ msgid "OK"
+#~ msgstr "OK"
+
+#~ msgid ""
+#~ "Email '${name}' already in use. Please use the login form if you already "
+#~ "have a account."
+#~ msgstr "E-Mail '${name}' wird bereits verwendet. "
+
+#~ msgid "Change account:"
+#~ msgstr "Kontoeinstellungen bearbeiten:"
 
 #~ msgid "String"
 #~ msgstr "String"
@@ -374,12 +535,6 @@ msgstr "User nicht gefunden"
 
 #~ msgid "Filename"
 #~ msgstr "Dateiname"
-
-#~ msgid "Created"
-#~ msgstr "Erstellt"
-
-#~ msgid "Changed"
-#~ msgstr "Geändert"
 
 #~ msgid "Created by"
 #~ msgstr "Erstellt von"
@@ -984,9 +1139,6 @@ msgstr "User nicht gefunden"
 #~ msgid "Used as publish date on the website."
 #~ msgstr "Wird als Veröffentlichungs-Datum auf der Webseite angezeigt."
 
-#~ msgid "Note"
-#~ msgstr "Notiz"
-
 #~ msgid ""
 #~ "Simple text note for authors. The note is only visible to cms authors and "
 #~ "not published."
@@ -1427,9 +1579,6 @@ msgstr "User nicht gefunden"
 #~ msgid "${value} is not iterable"
 #~ msgstr "${value} is not iterable"
 
-#~ msgid "Fields did not match"
-#~ msgstr "Felder stimmen nicht überein"
-
 #~ msgid "Confirm Value"
 #~ msgstr "Wert bestätigen"
 
@@ -1621,17 +1770,8 @@ msgstr "User nicht gefunden"
 #~ msgid "SMTP password"
 #~ msgstr "SMTP Passwort"
 
-#~ msgid "Sender name"
-#~ msgstr "Absender Name"
-
-#~ msgid "Sender mail"
-#~ msgstr "Absender E-Mail"
-
 #~ msgid "Reply to"
 #~ msgstr "Antwort an (Reply-to)"
-
-#~ msgid "Receiver role"
-#~ msgstr "Empfänger Rollen"
 
 #~ msgid "Receiver User IDs"
 #~ msgstr "Empfänger User IDs"

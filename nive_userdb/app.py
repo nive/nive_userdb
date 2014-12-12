@@ -43,11 +43,13 @@ configuration = AppConf(
         generatePW=0,
         generateName=False
     ),
-    #userAdmin = (u"admin@mymail.com", u"Admin"),  # contact system information
-    #admin = {"name": "adminusername", "password": "adminpass", "email": "u"admin@mymail.com""}, # admin login
+    # contact system information
+    #userAdmin = (u"admin@mymail.com", u"Admin"),
+    # non-db admin login
+    #admin = {"name": "adminusername", "password": "adminpass", "email": "u"admin@mymail.com""},
 
     # mails
-    mailSignup = Mail(_(u"Signup confirmed"), "nive_userdb:userview/mails/signup.pt"),
+    mailSignup = Mail(_(u"Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
     mailNotify = Mail(_(u"Signup notification"), "nive_userdb:userview/mails/notify.pt"),
     mailVerifyMail = Mail(_(u"Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
     mailResetPass = Mail(_(u"Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
@@ -55,7 +57,8 @@ configuration = AppConf(
     mailContact = Mail(_(u"Contact form"), "nive_userdb:userview/mails/contact.pt"),
 
     # messages customizations
-    #welcomeMessage = u"",
+    welcomeMessage = u"",
+    activationMessage = u"",
 
     # sessionuser field cache
     sessionuser = ("name", "email", "surname", "lastname", "groups", "notify", "lastlogin"),
@@ -65,9 +68,6 @@ configuration = AppConf(
     translations="nive_userdb:locale/"
 )
 
-# configuration.systemAdmin = (u"email", u"display name")
-# configuration.admin = {"name": "admin", "password": "adminpass", "email": "admin@domain.com"}
-
 configuration.modules = [
     "nive_userdb.root", 
     "nive_userdb.user", 
@@ -75,7 +75,9 @@ configuration.modules = [
     "nive_userdb.extensions.sessionuser",
     # user actions
     "nive_userdb.userview.view",
+    "nive.components.reform.reformed",
     # user administration
+    "nive_userdb.useradmin.adminroot",
     "nive_userdb.useradmin", 
     # tools
     "nive.tools.dbStructureUpdater", 
@@ -210,7 +212,7 @@ def EmailValidator(node, value):
     # validate email format
     Email()(node, value)
     if IsReservedUserName(value):
-        err = _(u"Email '${name}' already in use. Please use the sign in form if you already have a account.", mapping={'name':value})
+        err = _(u"Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup email in database
     r = node.widget.form.context.root()
@@ -222,7 +224,7 @@ def EmailValidator(node, value):
         ctx = node.widget.form.context
         if len(u)==1 and ctx.id == u[0][0]:
             return
-        err = _(u"Email '${name}' already in use. Please use the sign in form if you already have a account.", mapping={'name':value})
+        err = _(u"Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
         raise Invalid(node, err)
 
 def PasswordValidator(node, value):
@@ -245,6 +247,13 @@ def OldPwValidator(node, value):
         err = _(u"The old password does not match.")
         raise Invalid(node, err)
 
+def AcceptValidator(node, value):
+    """
+    Validator which succeeds if the checkbox is ticked (true).
+    """
+    if not value==True:
+        err = _(u"Please accept the terms and conditions.")
+        raise Invalid(node, err)
 
 def Sha(password):
     return hashlib.sha224(password).hexdigest()

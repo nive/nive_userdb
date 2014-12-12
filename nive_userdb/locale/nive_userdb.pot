@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2014-09-03 15:34+0200\n"
+"POT-Creation-Date: 2014-12-12 14:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,349 +15,406 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
 
-#: ././nive_userdb/user.py:164
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:164
-msgid "User"
+#: ./nive_userdb/app.py:36 ./nive_userdb/useradmin/delete.pt:28
+msgid "Users"
 msgstr ""
 
-#: ././nive_userdb/user.py:174
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:174
-msgid "User ID"
-msgstr ""
-
-#: ././nive_userdb/user.py:175 ././nive_userdb/root.py:165
-#: ././nive_userdb/userview/view.py:67 ././nive_userdb/userview/view.py:71
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:175
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:165
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:67
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:71
-msgid "Password"
-msgstr ""
-
-#: ././nive_userdb/user.py:176
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:176
-msgid "Email"
-msgstr ""
-
-#: ././nive_userdb/user.py:177
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:177
-msgid "Groups"
-msgstr ""
-
-#: ././nive_userdb/user.py:179
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:179
-msgid "Activate email notifications"
-msgstr ""
-
-#: ././nive_userdb/user.py:181
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:181
-msgid "Surname"
-msgstr ""
-
-#: ././nive_userdb/user.py:182
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:182
-msgid "Lastname"
-msgstr ""
-
-#: ././nive_userdb/user.py:183
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:183
-msgid "Organisation"
-msgstr ""
-
-#: ././nive_userdb/user.py:185
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:185
-msgid "Last login"
-msgstr ""
-
-#: ././nive_userdb/user.py:93
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/user.py:93
-msgid "Update failed."
-msgstr ""
-
-#: ././nive_userdb/root.py:443
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:443
-msgid "User account"
-msgstr ""
-
-#: ././nive_userdb/root.py:464 ././nive_userdb/root.py:58
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:464
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:58
+#: ./nive_userdb/app.py:192 ./nive_userdb/app.py:204 ./nive_userdb/root.py:69
 #, python-format
 msgid "Username '${name}' already in use. Please choose a different name."
 msgstr ""
 
-#: ././nive_userdb/root.py:482
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:482
+#: ./nive_userdb/app.py:215 ./nive_userdb/app.py:227
 #, python-format
-msgid ""
-"Email '${name}' already in use. Please use the login form if you already have"
-" a account."
+msgid "Email '${name}' already in use. Please choose a different email."
 msgstr ""
 
-#: ././nive_userdb/root.py:124
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:124
+#: ./nive_userdb/app.py:238
+msgid "Password is too simple. It should have at least 5 different characters."
+msgstr ""
+
+#: ./nive_userdb/app.py:247
+msgid "The old password does not match."
+msgstr ""
+
+#: ./nive_userdb/app.py:255
+msgid "Please accept the terms and conditions."
+msgstr ""
+
+#: ./nive_userdb/app.py:52
+msgid "Signup confirmation"
+msgstr ""
+
+#: ./nive_userdb/app.py:53
+msgid "Signup notification"
+msgstr ""
+
+#: ./nive_userdb/app.py:54
+msgid "Verify your new e-mail"
+msgstr ""
+
+#: ./nive_userdb/app.py:55
+msgid "Your new password"
+msgstr ""
+
+#: ./nive_userdb/app.py:56
+msgid "Your password"
+msgstr ""
+
+#: ./nive_userdb/app.py:57
+msgid "Contact form"
+msgstr ""
+
+#: ./nive_userdb/root.py:595
+msgid "User account"
+msgstr ""
+
+#: ./nive_userdb/root.py:134
 msgid "Account created."
 msgstr ""
 
-#: ././nive_userdb/root.py:177
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:177
+#: ./nive_userdb/root.py:162
+msgid "You are now signed in."
+msgstr ""
+
+#: ./nive_userdb/root.py:220
+msgid "The link to verify your new email has been sent by mail."
+msgstr ""
+
+#: ./nive_userdb/root.py:274
 msgid ""
 "The new password has been sent to your email address. Please sign in and "
 "change it."
 msgstr ""
 
-#: ././nive_userdb/root.py:205
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:205
-msgid "You are now signed in."
+#: ./nive_userdb/root.py:324
+msgid "The link to reset your password has been sent to your email address."
 msgstr ""
 
-#: ././nive_userdb/root.py:404
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:404
+#: ./nive_userdb/root.py:357
 msgid "User deleted."
 msgstr ""
 
-#: ././nive_userdb/root.py:52
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:52
+#: ./nive_userdb/root.py:63
 msgid "Please enter your username"
 msgstr ""
 
-#: ././nive_userdb/root.py:82
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:82
+#: ./nive_userdb/root.py:104
 msgid "Sorry. Account could not be created."
 msgstr ""
 
-#: ././nive_userdb/root.py:137
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:137
-msgid "Please enter your email address or username."
-msgstr ""
-
-#: ././nive_userdb/root.py:151
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:151
-msgid "No email address found."
-msgstr ""
-
-#: ././nive_userdb/root.py:194 ././nive_userdb/root.py:200
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:194
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:200
+#: ./nive_userdb/root.py:151 ./nive_userdb/root.py:157
 msgid "Sign in failed. Please check your username and password."
 msgstr ""
 
-#: ././nive_userdb/root.py:397
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:397
+#: ./nive_userdb/root.py:189
+msgid "Please enter your new email address."
+msgstr ""
+
+#: ./nive_userdb/root.py:217 ./nive_userdb/root.py:271
+#: ./nive_userdb/root.py:321 ./nive_userdb/root.py:119
+#: ./nive_userdb/userview/view.py:374
+msgid "The email could not be sent."
+msgstr ""
+
+#: ./nive_userdb/root.py:233
+msgid "Please enter your email address or username."
+msgstr ""
+
+#: ./nive_userdb/root.py:248 ./nive_userdb/root.py:298
+msgid "No email address found."
+msgstr ""
+
+#: ./nive_userdb/root.py:285
+msgid "Please enter your sign in name or email address."
+msgstr ""
+
+#: ./nive_userdb/root.py:334 ./nive_userdb/root.py:338
+msgid "Invalid user."
+msgstr ""
+
+#: ./nive_userdb/root.py:349
 msgid "You cannot delete the admin user."
 msgstr ""
 
-#: ././nive_userdb/root.py:401
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:401
-msgid "Sorry. An error occured."
+#: ./nive_userdb/root.py:354
+msgid "Sorry. An error occurred."
 msgstr ""
 
-#: ././nive_userdb/root.py:64
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:64
+#: ./nive_userdb/root.py:75
 #, python-format
 msgid "Email '${name}' already in use. "
 msgstr ""
 
-#: ././nive_userdb/root.py:144
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:144
+#: ./nive_userdb/root.py:195 ./nive_userdb/root.py:291
+msgid "No matching account found."
+msgstr ""
+
+#: ./nive_userdb/root.py:239
 msgid "No matching account found. Please try again."
 msgstr ""
 
-#: ././nive_userdb/root.py:171 ././nive_userdb/root.py:174
-#: ././nive_userdb/root.py:94 ././nive_userdb/root.py:97
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:171
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:174
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:94
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:97
-msgid "The email could not be sent."
-msgstr ""
-
-#: ././nive_userdb/root.py:386
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:386
-msgid "Invalid user."
-msgstr ""
-
-#: ././nive_userdb/root.py:391
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/root.py:391
+#: ./nive_userdb/root.py:343
 msgid "Invalid username."
 msgstr ""
 
-#: ././nive_userdb/app.py:31 ././nive_userdb/useradmin/delete.pt:28
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/app.py:31
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/delete.pt:28
-msgid "Users"
+#: ./nive_userdb/user.py:235
+msgid "User"
 msgstr ""
 
-#: ././nive_userdb/userview/loginpage.pt:9
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/loginpage.pt:9
-msgid "Please log in!"
+#: ./nive_userdb/user.py:246
+msgid "User ID"
 msgstr ""
 
-#: ././nive_userdb/userview/loginpage.pt:12
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/loginpage.pt:12
-msgid "You have been logged out!"
+#: ./nive_userdb/user.py:248 ./nive_userdb/userview/view.py:95
+#: ./nive_userdb/userview/view.py:149
+msgid "Email"
 msgstr ""
 
-#: ././nive_userdb/userview/loginpage.pt:21
-msgid "You do not have the required permissions to access the page."
+#: ./nive_userdb/user.py:250 ./nive_userdb/user.py:268
+#: ./nive_userdb/useradmin/view.py:32 ./nive_userdb/userview/view.py:87
+#: ./nive_userdb/userview/view.py:96
+msgid "Password"
 msgstr ""
 
-#: ././nive_userdb/userview/loginpage.pt:24 ././nive_userdb/userview/main.pt:61
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/loginpage.pt:24
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:61
-msgid "Log out"
+#: ./nive_userdb/user.py:253
+msgid "Groups"
 msgstr ""
 
-#: ././nive_userdb/userview/main.pt:5 ././nive_userdb/userview/main.pt:49
-#: ././nive_userdb/userview/view.py:56
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:5
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:49
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:56
-msgid "Login"
+#: ./nive_userdb/user.py:254
+msgid "Activate email notifications"
 msgstr ""
 
-#: ././nive_userdb/userview/main.pt:52 ././nive_userdb/userview/view.py:55
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:52
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:55
-msgid "Reset password"
+#: ./nive_userdb/user.py:255 ./nive_userdb/useradmin/edit.pt:15
+msgid "Last login"
 msgstr ""
 
-#: ././nive_userdb/userview/main.pt:55 ././nive_userdb/userview/view.py:52
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:55
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:52
-msgid "Signup"
+#: ./nive_userdb/user.py:256
+msgid "Token for activation or password reset"
 msgstr ""
 
-#: ././nive_userdb/userview/main.pt:58
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:58
-msgid "Account"
+#: ./nive_userdb/user.py:257
+msgid "Temp cache for additional verification data"
 msgstr ""
 
-#: ././nive_userdb/userview/main.pt:64
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:64
-msgid "Website"
+#: ./nive_userdb/user.py:260
+msgid "Surname"
 msgstr ""
 
-#: ././nive_userdb/userview/main.pt:67
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/main.pt:67
-msgid "Editor"
+#: ./nive_userdb/user.py:261
+msgid "Lastname"
 msgstr ""
 
-#: ././nive_userdb/userview/update.pt:8
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/update.pt:8
-msgid "Change account:"
+#: ./nive_userdb/user.py:262
+msgid "Organisation"
 msgstr ""
 
-#: ././nive_userdb/userview/view.py:13
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:13
-msgid "User signup"
+#: ./nive_userdb/user.py:138
+msgid "Update failed."
 msgstr ""
 
-#: ././nive_userdb/userview/view.py:219
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:219
-msgid "Your password"
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:225
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:225
-msgid "Your new password"
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:209
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:209
-msgid "Your current user can only be edited on file system level."
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:50 ././nive_userdb/userview/view.py:51
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:50
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:51
-msgid "Initialize"
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:53
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:53
-msgid "Confirm"
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:54
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:54
-msgid "Mail password"
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:138
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:138
-msgid "OK"
-msgstr ""
-
-#: ././nive_userdb/userview/view.py:215
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/userview/view.py:215
-msgid "User not found"
-msgstr ""
-
-#: ././nive_userdb/userview/resetpassmail.pt:3
-msgid "Your new password:"
-msgstr ""
-
-#: ././nive_userdb/userview/resetpassmail.pt:6
-msgid "Please login and change it."
-msgstr ""
-
-#: ././nive_userdb/useradmin/root.pt:30
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/root.pt:30
-msgid "Delete selected"
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:18
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:18
-msgid "User management"
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:54
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:54
-msgid "List users"
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:55
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:55
-msgid "Add user"
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:112
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:112
-msgid "User not found. (id %(name)s)"
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:121
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:121
-msgid "Delete failed: User '%(name)s'"
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:125
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:125
-msgid "OK. Users deleted."
-msgstr ""
-
-#: ././nive_userdb/useradmin/view.py:127
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/view.py:127
-msgid "OK. User deleted."
-msgstr ""
-
-#: ././nive_userdb/useradmin/adminroot.py:27
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/adminroot.py:27
-msgid "User listing"
-msgstr ""
-
-#: ././nive_userdb/useradmin/delete.pt:10
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/delete.pt:10
+#: ./nive_userdb/useradmin/delete.pt:10
 msgid "Confirm delete"
 msgstr ""
 
-#: ././nive_userdb/useradmin/delete.pt:41
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/delete.pt:41
+#: ./nive_userdb/useradmin/delete.pt:41
 msgid "Delete all"
 msgstr ""
 
-#: ././nive_userdb/useradmin/delete.pt:48
-#: ././build/lib.linux-x86_64-2.7/nive_userdb/useradmin/delete.pt:48
+#: ./nive_userdb/useradmin/delete.pt:48
 msgid "Please select a user first!"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:19
+msgid "User management"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:29 ./nive_userdb/useradmin/edit.pt:12
+msgid "Active"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:63
+msgid "List users"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:64
+msgid "Add user"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:121
+msgid "User not found. (id %(name)s)"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:130
+msgid "Delete failed: User '%(name)s'"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:134
+msgid "OK. Users deleted."
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:136
+msgid "OK. User deleted."
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:30
+msgid "Yes"
+msgstr ""
+
+#: ./nive_userdb/useradmin/view.py:30
+msgid "No"
+msgstr ""
+
+#: ./nive_userdb/useradmin/edit.pt:18
+msgid "Changed"
+msgstr ""
+
+#: ./nive_userdb/useradmin/edit.pt:21
+msgid "Created"
+msgstr ""
+
+#: ./nive_userdb/useradmin/adminroot.py:27
+msgid "User listing"
+msgstr ""
+
+#: ./nive_userdb/useradmin/root.pt:30
+msgid "Delete selected"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:5 ./nive_userdb/userview/main.pt:50
+#: ./nive_userdb/userview/view.py:69
+msgid "Login"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:53 ./nive_userdb/userview/loginpage.pt:18
+#: ./nive_userdb/userview/view.py:145 ./nive_userdb/userview/view.py:150
+msgid "Reset password"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:56 ./nive_userdb/userview/view.py:67
+msgid "Signup"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:59
+msgid "Account"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:62 ./nive_userdb/userview/loginpage.pt:28
+msgid "Log out"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:65
+msgid "Website"
+msgstr ""
+
+#: ./nive_userdb/userview/main.pt:68
+msgid "Editor"
+msgstr ""
+
+#: ./nive_userdb/userview/loginpage.pt:13
+msgid "Please log in!"
+msgstr ""
+
+#: ./nive_userdb/userview/loginpage.pt:25
+msgid "You do not have the required permissions to access the page."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:23
+msgid "User signup"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:261 ./nive_userdb/userview/view.py:324
+msgid "The token is invalid. Please make sure it is complete."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:280
+msgid "OK. Password changed."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:358
+msgid "No receiver specified."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:376
+msgid "The email has been sent."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:535
+msgid "Your current user can only be edited on file system level."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:68
+msgid "Confirm"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:221 ./nive_userdb/userview/view.py:257
+msgid "OK."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:542
+msgid "User not found"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:156
+msgid "Initialize"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:320
+msgid "OK. The new email address has been activated."
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:86 ./nive_userdb/userview/view.py:144
+msgid "Name"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:105
+msgid "Activate"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:115
+msgid "Old password"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:120
+msgid "Update password"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:131
+msgid "New email"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:134
+msgid "Update email"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:139
+msgid "Verify email"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:154
+msgid "Message"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:155
+msgid "Send message"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:675
+msgid "You have been logged out!"
+msgstr ""
+
+#: ./nive_userdb/userview/remove.pt:15
+msgid "Permanently remove your user profile. Click to continue."
+msgstr ""
+
+#: ./nive_userdb/userview/remove.pt:20
+msgid "Ok. Your profile has been removed."
+msgstr ""
+
+#: ./nive_userdb/userview/mails/mailpass.pt:3
+msgid "Your new password:"
+msgstr ""
+
+#: ./nive_userdb/userview/mails/mailpass.pt:7
+msgid "Please login and change it."
 msgstr ""
