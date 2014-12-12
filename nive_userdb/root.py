@@ -243,7 +243,6 @@ class root(RootBase):
 
         email = obj.data.get("email")
         title = obj.meta.get("title")
-        name = obj.data.get("name")
         if email == "":
             report.append(_("No email address found."))
             return False, report
@@ -254,13 +253,13 @@ class root(RootBase):
         else:
             pwd = newPassword
         obj.data["password"] = pwd
-        obj.Commit(user=currentUser)
 
         if mail=="default":
             try:
                 mail = self.app.configuration.mailSendPass
             except AttributeError, e:
                 raise ConfigurationError, str(e)
+
         title = mail.title
         body = mail(user=obj, password=pwd, **kw)
         tool = self.app.GetTool("sendMail")
@@ -270,6 +269,8 @@ class root(RootBase):
         if not result:
             report.append(_(u"The email could not be sent."))
             return False, report
+
+        obj.Commit(user=currentUser)
 
         report.append(_(u"The new password has been sent to your email address. Please sign in and change it."))
         return True, report
@@ -419,6 +420,17 @@ class root(RootBase):
     def GetUserByID(self, id, activeOnly=1):
         """ """
         return self.LookupUser(id=id, activeOnly=activeOnly)
+
+
+    def GetUserByFilename(self, filename, activeOnly=1):
+        """
+        Look up a user by filename (meta.pool_filename). Use this function only if your application explicitly manages
+        unique user filenames. By default filenames are not used at all.
+        """
+        ident = self.Select(pool_type=u"user", parameter={"pool_filename":filename}, fields=[u"id"], max=2)
+        if len(ident)>1:
+            raise ValueError, "Filename is not unique"
+        return self.LookupUser(id=ident[0][0], activeOnly=activeOnly)
 
 
     def LookupUser(self, id=None, ident=None, name=None, email=None, activeOnly=1, reloadFromDB=0):
