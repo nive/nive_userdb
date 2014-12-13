@@ -19,7 +19,7 @@ requires = [
 
 setupkw = dict(
       name='nive_userdb',
-      version='0.9.12',
+      version='1.0rc1',
       description='Nive User Database',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
