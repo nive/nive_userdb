@@ -24,7 +24,7 @@ li { padding:0px;margin:0px; }
 .links {width:40%;float:right;margin-top:20px;}
 a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gray;margin-right:1px;text-decoration:none;color:white;}
 .alert { padding:2px 8px 2px 8px; display:block; width:100%; margin-bottom:10px; }
-.alert-success { background-color:#8de4d4; }
+.alert-success, .alert-warning { background-color:#8de4d4; }
 .alert-error { background-color:#FFDFDF; }
 </style>
 </head>

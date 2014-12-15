@@ -1,4 +1,4 @@
-# Copyright 2012, 2013 Arndt Droullier, Nive GmbH. All rights reserved.
+# Copyright 2012 - 2014 Arndt Droullier, Nive GmbH. All rights reserved.
 # Released under GPL3. See license.txt
 #
 
@@ -28,6 +28,7 @@ configuration = ViewModuleConf(
     templates = "nive_userdb.userview:",
     template = "main.pt",
     permission = "view",
+    assets = (),
     # form settings: additional slot to configure the forms used in the views
     form = {}
 )
@@ -67,6 +68,22 @@ class UserView(BaseView):
         nothing is given it defaults to `create`. `subset` is the form identifier
         used in the items configuration as `form`.
 
+        **Settings**
+
+        - *form*: (dict) form definition inlcuding fields and form settings used for the form.
+        - *values*: (dict) default values stored for the new user not include in the form.
+        - *title*: (string) title displayed above the form
+
+        **Request parameter**
+
+        - *assets*: You can call `create?assets=only` to get the required css+js assets only. The form
+                    iteself will not be processed.
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
+
         Form configuration lookup order :
 
         1) Customized `create` view ::
@@ -102,10 +119,20 @@ class UserView(BaseView):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title")
             values = viewconf.settings.get("values")
+
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="create")
         form.Setup(subset=subset)
+
+        if self.GetFormValue("assets")=="only":
+            self.AddHeader("X-Result", "true")
+            return {"content": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets])}
+
         result, data, action = form.Process(url=self.Url()+"activate", values=values, renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data,
+                u"result": result,
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                u"title": title}
 
     def update(self):
         """
@@ -113,6 +140,22 @@ class UserView(BaseView):
         Form form setup requires the `subset` or list of fields to be used. If
         nothing is given it defaults to `create`. `subset` is the form identifier
         used in the items configuration as `form`.
+
+        **Settings**
+
+        - *form*: (dict) form definition inlcuding fields and form settings used for the form.
+        - *values*: (dict) default values stored for the new user not include in the form.
+        - *title*: (string) title displayed above the form
+
+        **Request parameter**
+
+        - *assets*: You can call `create?assets=only` to get the required css+js assets only. The form
+                    iteself will not be processed.
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
 
         Form configuration lookup order :
 
@@ -151,19 +194,42 @@ class UserView(BaseView):
             title = viewconf.settings.get("title",u"")
             values = viewconf.settings.get("values")
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit")
+
+        if self.GetFormValue("assets")=="only":
+            self.AddHeader("X-Result", "true")
+            return {"content": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets])}
+
         if user and user.id == 0:
+            self.AddHeader("X-Result", "false")
             return {u"content": _(u"Your current user can only be edited on file system level."),
-                    u"result": False, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+                    u"result": False, u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), u"title": title}
         form.Setup(subset=subset)
         try:
             result, data, action = form.Process(values=values)
-            return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+            self.AddHeader("X-Result", str(result).lower())
+            return {u"content": data,
+                    u"result": result,
+                    u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                    u"title": title}
         except Unauthorized:
-            return {u"content": _(u"User not found"), u"result": False, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+            self.AddHeader("X-Result", "false")
+            return {u"content": _(u"User not found"),
+                    u"result": False,
+                    u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                    u"title": title}
             
     def activate(self):
         """
         Activates a user account. Requires the token generated in `create`.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         viewconf = self.GetViewConf()
@@ -173,11 +239,24 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="activate")
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data, 
+                u"result": result, 
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                u"title": title}
 
     def resetpass(self):
         """
         Resets the users password and sends a randomly generated password to the users email.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         viewconf = self.GetViewConf()
@@ -191,11 +270,24 @@ class UserView(BaseView):
             subset = "resetpass"
         form.Setup(subset=subset)
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data, 
+                u"result": result, 
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                u"title": title}
 
     def updatepass(self):
         """
         Update the users password. The user is forced to enter the current password to change it.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         viewconf = self.GetViewConf()
@@ -205,12 +297,25 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="updatepass")
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data, 
+                u"result": result, 
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                u"title": title}
 
     def updatemail1(self):
         """
         Change the users email. Sends a verification mail to the new email address. Use `updatemail2` to verify
         the email.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         viewconf = self.GetViewConf()
@@ -220,11 +325,24 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="updatemail1")
         result, data, action = form.Process(url=self.Url()+"updatemail2", renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data, 
+                u"result": result, 
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                u"title": title}
 
     def updatemail2(self):
         """
         Change the users email. Verifies the new user email by processing the token generated in `updatemail1`.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         viewconf = self.GetViewConf()
@@ -234,12 +352,31 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset="updatemail2")
         result, data, action = form.Process(renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title": title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data, 
+                u"result": result, 
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                u"title": title}
 
     def contact(self):
         """
         Contact form with several configuration options. Can be used to send mails to other users or the system
         administrator.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+        - *receiver*: (string/tuple/callback) send the email to this user. Can be a user id, a `(email, name)` tuple
+                      or callback to dynamically lookup the receiver. The callback takes one parameter `form`.
+        - *replyToSender*: (bool) sets the reply to adress to the authenticated sender.
+        - *form*: (dict) the form setup including fields and form settings for the form setup.
+        - *mail*: (nive.views.Mail) The template used to render the email. Form values are passed as `data` to the mail
+                  template. Uses `nive_userdb:userview/mails/contact.pt` by default. See nive_userdb.application configuration.
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         mail = receiver = None
@@ -264,11 +401,25 @@ class UserView(BaseView):
         form.startEmpty = True
         form.Setup(subset=subset)
         result, data, action = form.Process(receiver=receiver, replyToSender=replyToSender, mail=mail, renderSuccess=False)
-        return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)), u"title":title}
+        self.AddHeader("X-Result", str(result).lower())
+        return {u"content": data, 
+                u"result": result, 
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                u"title": title}
 
     def login(self):
         """
         Login page for user authentication
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+        - *resetPasswordLink*: (bool) shows the reset password link on the default template if true.
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = u""
         resetPasswordLink = False
@@ -295,10 +446,17 @@ class UserView(BaseView):
             else:
                 # pass redirect to form as hidden field
                 result, data, action = form.Process(defaultData={u"redirect":redirect}, redirectSuccess=redirect)
-            return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)),
-                    u"resetPasswordLink":resetPasswordLink, u"title":title}
-        return {u"content": u"", u"result": True, u"head": form.HTMLHead(ignore=(u"jquery.js",)),
-                u"resetPasswordLink":resetPasswordLink, u"title":title}
+            self.AddHeader("X-Result", str(result).lower())
+            return {u"content": data,
+                    u"result": result,
+                    u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                    u"resetPasswordLink":resetPasswordLink,
+                    u"title":title}
+        return {u"content": u"",
+                u"result": True,
+                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                u"resetPasswordLink":resetPasswordLink,
+                u"title":title}
             
     def logout(self):
         """
@@ -344,6 +502,16 @@ class UserView(BaseView):
     def remove(self):
         """
         This method gives the user a option to delete his user account through the web.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+        - *description*: (string) adds a description 
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         user=self.User(sessionuser=False)
         title = u""
@@ -353,12 +521,15 @@ class UserView(BaseView):
             title = viewconf.settings.get("title",u"")
             description = viewconf.settings.get("description",u"")
         values = {u"title": title, u"description": description, u"result":False}
+        if user is None:
+            return values
         remove = self.GetFormValue(u"remove", method="POST")==u"1"
         if remove:
             # delete the object, cache and sign out
             self.context.root().DeleteUser(user, currentUser=user)
             self.context.app.ForgetLogin(self.request)
             values[u"result"] = True
+            self.AddHeader("X-Result", "true")
         return values
 
 

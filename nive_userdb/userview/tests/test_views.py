@@ -50,6 +50,7 @@ class tViews(__local.DefaultTestCase):
     
     def test_views(self):
         view = UserView(context=self.root, request=self.request)
+        view.__configuration__ = lambda: view_configuration
         view.create()
         view.update()
         view.updatepass()
