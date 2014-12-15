@@ -271,11 +271,11 @@ class UserView(BaseView):
         Login page for user authentication
         """
         title = u""
-        showPasswordLink = False
+        resetPasswordLink = False
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title",u"")
-            showPasswordLink = viewconf.settings.get("showPasswordLink",showPasswordLink)
+            resetPasswordLink = viewconf.settings.get("resetPasswordLink",resetPasswordLink)
         if self.context.app.configuration.loginByEmail:
             subset = "loginMail"
         else:
@@ -296,9 +296,9 @@ class UserView(BaseView):
                 # pass redirect to form as hidden field
                 result, data, action = form.Process(defaultData={u"redirect":redirect}, redirectSuccess=redirect)
             return {u"content": data, u"result": result, u"head": form.HTMLHead(ignore=(u"jquery.js",)),
-                    u"showPasswordLink":showPasswordLink, u"title":title}
+                    u"resetPasswordLink":resetPasswordLink, u"title":title}
         return {u"content": u"", u"result": True, u"head": form.HTMLHead(ignore=(u"jquery.js",)),
-                u"showPasswordLink":showPasswordLink, u"title":title}
+                u"resetPasswordLink":resetPasswordLink, u"title":title}
             
     def logout(self):
         """

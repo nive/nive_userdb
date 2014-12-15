@@ -10,7 +10,6 @@
 	<div tal:condition="view.GetFormValue('redirect') and not view.GetFormValue('name')" class="alert alert-warning" i18n:translate="">Please log in!</div>
     <span tal:replace="structure content"/>
     <p tal:condition="resetPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
-    <p tal:condition="sendPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
   </tal:block>
   <div tal:condition="user" class="logout">
     <div tal:condition="view.GetFormValue('redirect')" class="alert alert-warning" i18n:translate="">You do not have the required permissions to access the page.</div>
