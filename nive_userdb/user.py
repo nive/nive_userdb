@@ -35,7 +35,7 @@ class user(ObjectBase):
         self.ListenEvent("commit", "OnCommit")
 
 
-    def OnCommit(self):
+    def OnCommit(self, **kw):
         self.HashPassword()
         t = self.ReadableName()
         if t != self.meta["title"]:
