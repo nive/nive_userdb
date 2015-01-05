@@ -35,8 +35,9 @@ configuration = AppConf(
     id = "userdb",
     title = _(u"Users"),
 
-    # signup settings
     loginByEmail = True,
+
+    # signup settings
     settings = Conf(
         groups=(),
         activate=1,

@@ -85,19 +85,17 @@ class ObjectTest_db(object):
         root=a.root()
         user = User("test")
         # root
-        root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
-        root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
-        root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user2@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
 
-        data["name"] = "user1"
-        data["email"] = "user1@aaa.ccc"
+        data["name"] = "user2"
+        data["email"] = "user2@aaa.ccc"
         o,r = root.AddUser(data, activate=1, generatePW=0, generateName=True, mail=None, groups="", currentUser=user, url=u"")
         self.assert_(o,r)
         self.assert_(o.data.name)
-        self.assert_(o.data.name!="user1")
+        self.assert_(o.data.name!="user2")
 
-        self.assert_(root.LookupUser(name=str(o), id=None, activeOnly=1))
+        self.assert_(root.LookupUser(name=o.data.name, id=None, activeOnly=1))
 
         root.DeleteUser(str(o))
 
@@ -108,8 +106,11 @@ class ObjectTest_db(object):
         user = User("test")
         # root
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         root.DeleteUser(str(root.GetUserByName("user2", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user2@aaa.ccc", activeOnly=0)))
         root.DeleteUser(str(root.GetUserByName("user3", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user3@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
         
         data["name"] = "user1"
@@ -178,6 +179,7 @@ class ObjectTest_db(object):
         user = User("test")
 
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
@@ -226,6 +228,7 @@ class ObjectTest_db(object):
         node = tn()
 
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         UsernameValidator(node, "user1")
 
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
@@ -257,6 +260,7 @@ class ObjectTest_db(object):
         node = tn()
 
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         EmailValidator(node, "user1@aaa.ccc")
 
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
@@ -278,6 +282,7 @@ class ObjectTest_db(object):
         user = User("test")
         # root
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
 
         data["name"] = "user1"
@@ -303,8 +308,8 @@ class ObjectTest_db(object):
         user = User("test")
         # root
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname"}
-
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
         o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"uuu")
@@ -324,7 +329,7 @@ class ObjectTest_db(object):
         user = User("test")
         # root
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
-
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
@@ -344,7 +349,7 @@ class ObjectTest_db(object):
         user = User("test")
         # root
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
-
+        root.DeleteUser(str(root.GetUserByMail("user1@aaa.ccc", activeOnly=0)))
         data = {"password": "11111", "surname": "surname", "lastname": "lastname", "token": "12345"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
