@@ -430,6 +430,8 @@ class root(RootBase):
         ident = self.Select(pool_type=u"user", parameter={"pool_filename":filename}, fields=[u"id"], max=2)
         if len(ident)>1:
             raise ValueError, "Filename is not unique"
+        if not len(ident):
+            return None
         return self.LookupUser(id=ident[0][0], activeOnly=activeOnly)
 
 
