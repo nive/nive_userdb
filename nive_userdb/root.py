@@ -494,7 +494,7 @@ class root(RootBase):
         requires fld token in user record
         returns tuple: the user object or None
         """
-        if not token or token == "":
+        if not token:
             return None
 
         p = {"token": token}

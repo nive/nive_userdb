@@ -41,7 +41,7 @@ configuration.views = [
     ViewConf(name="update",         attr="update",     renderer=t+"update.pt",    permission="updateuser"),
     ViewConf(name="updatepass",     attr="updatepass", renderer=t+"form.pt",      permission="updateuser"),
     ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",      permission="updateuser"),
-    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt",      permission="updateuser"),
+    ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt"),
     ViewConf(name="resetpass",      attr="resetpass",  renderer=t+"form.pt"),
     ViewConf(name="logout",         attr="logout"),
     ViewConf(name="contact",        attr="contact",    renderer=t+"form.pt",      permission="contactuser"),
@@ -870,8 +870,7 @@ class UserForm(ObjectForm):
                     user.data["token"] = u""
                     user.Commit(user=user)
                     msgs = [_(u"OK. The new email address has been activated.")]
-            else:
-                result = False
+                    result = True
         if not result:
             msgs = [_(u"The token is invalid. Please make sure it is complete.")]
         data = {"token": data or u""}
