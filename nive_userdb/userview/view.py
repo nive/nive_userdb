@@ -644,7 +644,7 @@ class UserForm(ObjectForm):
             },
             "loginMail":  {
                 "fields":  [
-                    FieldConf(id="name", name=_("Email"), datatype="string"),
+                    FieldConf(id="name", name=_("Name or email"), datatype="string"),
                     FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True}),
                     FieldConf(id="redirect", datatype="string", size="500", name="redirect url", hidden=True),
                 ],

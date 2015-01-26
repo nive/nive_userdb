@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-01-07 11:43+0100\n"
+"POT-Creation-Date: 2015-01-26 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,7 +113,7 @@ msgstr ""
 
 #: ./nive_userdb/root.py:217 ./nive_userdb/root.py:270
 #: ./nive_userdb/root.py:322 ./nive_userdb/root.py:119
-#: ./nive_userdb/userview/view.py:927
+#: ./nive_userdb/userview/view.py:926
 msgid "The email could not be sent."
 msgstr ""
 
@@ -166,8 +166,7 @@ msgstr ""
 msgid "User ID"
 msgstr ""
 
-#: ./nive_userdb/user.py:248 ./nive_userdb/userview/view.py:647
-#: ./nive_userdb/userview/view.py:701
+#: ./nive_userdb/user.py:248 ./nive_userdb/userview/view.py:701
 msgid "Email"
 msgstr ""
 
@@ -327,7 +326,7 @@ msgstr ""
 msgid "Your current user can only be edited on file system level."
 msgstr ""
 
-#: ./nive_userdb/userview/view.py:813 ./nive_userdb/userview/view.py:876
+#: ./nive_userdb/userview/view.py:813 ./nive_userdb/userview/view.py:875
 msgid "The token is invalid. Please make sure it is complete."
 msgstr ""
 
@@ -335,11 +334,11 @@ msgstr ""
 msgid "OK. Password changed."
 msgstr ""
 
-#: ./nive_userdb/userview/view.py:910
+#: ./nive_userdb/userview/view.py:909
 msgid "No receiver specified."
 msgstr ""
 
-#: ./nive_userdb/userview/view.py:929
+#: ./nive_userdb/userview/view.py:928
 msgid "The email has been sent."
 msgstr ""
 
@@ -369,6 +368,10 @@ msgstr ""
 
 #: ./nive_userdb/userview/view.py:638 ./nive_userdb/userview/view.py:696
 msgid "Name"
+msgstr ""
+
+#: ./nive_userdb/userview/view.py:647
+msgid "Name or email"
 msgstr ""
 
 #: ./nive_userdb/userview/view.py:657
