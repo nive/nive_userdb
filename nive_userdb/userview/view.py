@@ -415,6 +415,7 @@ class UserView(BaseView):
 
         - *title*: (string) title displayed above the form
         - *resetPasswordLink*: (bool) shows the reset password link on the default template if true.
+        - *form*: (dict) the form setup including fields and form settings for the form setup.
 
         **Return values**
 
@@ -425,15 +426,15 @@ class UserView(BaseView):
         resetPasswordLink = False
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
+            subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title",u"")
             resetPasswordLink = viewconf.settings.get("resetPasswordLink",resetPasswordLink)
         if self.context.app.configuration.loginByEmail:
-            subset = "loginMail"
+            defaultsubset = "loginMail"
         else:
-            subset = "login"
-        form = self._loadSimpleForm()
+            defaultsubset = "login"
+        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset=defaultsubset)
         form.Setup(subset=subset)
-        form.widget.item_template = "field_onecolumn"
         user = self.User()
         if not user:
             redirect = self.GetFormValue(u"redirect")
