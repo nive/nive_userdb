@@ -43,7 +43,7 @@ class user(ObjectBase):
 
 
     def _EncryptPW(self, password):
-        return Sha(password)
+        return Sha(password.encode(self.configuration.get("frontendCodepage", "utf-8")))
 
 
     def Authenticate(self, password):
