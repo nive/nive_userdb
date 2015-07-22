@@ -7,20 +7,25 @@
       action="${view.FolderUrl(context)}delete">
 <table tal:define="app context.app;
                    url view.FolderUrl(context.root());
-                   fields view.configuration.listfields;
-                   users context.SearchType('user', parameter={}, fields=fields, sort='name', max=500, skipRender=())"
+                   fields [app.GetFld(f, 'user') for f in view.configuration.listfields];
+                   sort view.GetFormValue('so','name');
+                   asc view.GetFormValue('as','1');
+                   users context.SearchType('user', parameter={}, fields=fields, sort=sort or 'name', ascending=asc, max=500, skipRender=())"
        class="table table-striped">
 <thead>
 <tr>
-  <td tal:repeat="fld fields"
-      tal:content="app.GetFldName(fld, typeID='user')"></td>
+  <th tal:repeat="fld fields">
+    <a tal:content="fld.name"
+       href="${view.CurrentUrl()}?so=${fld.id}&as=${'0' if asc=='1' else '1'}"></a>
+  </th>
+
   <td></td>
 </tr>
 </thead>
 <tr tal:repeat="user users['items']">
   <td tal:repeat="fld fields" onclick="document.location.href='${url + str(user.id)}'">
-  <span tal:condition="fld!='name'" tal:replace="user[fld]"/>
-  <a tal:condition="fld=='name'" tal:content="user[fld]" tal:attributes="href view.FolderUrl(context.root())+str(user.id)"></a>
+  <span tal:condition="fld.id!='name'" tal:replace="user[fld.id]"/>
+  <a tal:condition="fld.id=='name'" tal:content="user[fld.id]" tal:attributes="href view.FolderUrl(context.root())+str(user.id)"></a>
   </td>
   <td><input value="${user.id}" type="checkbox" name="ids"></td>
 </tr>
