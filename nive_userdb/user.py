@@ -85,6 +85,8 @@ class user(ObjectBase):
             result = wf.Action("deactivate", self, user=currentUser)
         else:
             self.meta.set("pool_state", 0)
+            self.data.set("token", u"")
+            self.data.set("tempcache", u"")
             result = True
         if result:
             self.Signal("deactivate")
