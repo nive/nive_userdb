@@ -136,7 +136,7 @@ class UserDB(ApplicationBase):
         groups = user.groups or ()
 
         # lookup context for local roles
-        if not context and hasattr(request, "context"):
+        if context is None and hasattr(request, "context"):
             context = request.context
         if context and ILocalGroups.providedBy(context):
             local = context.GetLocalGroups(userid, user=user)
