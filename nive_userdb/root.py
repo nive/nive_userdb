@@ -167,6 +167,8 @@ class root(RootBase):
         """
         Logout and delete session data
         """
+        if not ident:
+            return False
         user = self.GetUser(ident)
         if not user:
             return False
