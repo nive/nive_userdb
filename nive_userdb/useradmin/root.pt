@@ -11,7 +11,7 @@
                    sort view.EscapeSortField(fields);
                    asc '1' if view.GetFormValue('as','1')=='1' else '0';
                    start view.GetFormValue('st','0');
-                   users context.SearchType('user', parameter={}, fields=fields, sort=sort or 'name', ascending=asc, start=start, max=1, skipRender=())">
+                   users context.SearchType('user', parameter={}, fields=fields, sort=sort or 'name', ascending=asc, start=start, max=100, skipRender=())">
 <table class="table table-striped">
 <thead>
 <tr>
