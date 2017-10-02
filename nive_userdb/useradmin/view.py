@@ -1,8 +1,6 @@
-# Copyright 2012-2014 Arndt Droullier, Nive GmbH. All rights reserved.
+# Copyright 2012-2017 Arndt Droullier, Nive GmbH. All rights reserved.
 # Released under GPL3. See license.txt
 #
-
-from pyramid.renderers import get_renderer, render, render_to_response
 
 from nive.definitions import ViewConf, ViewModuleConf, Conf, FieldConf
 from nive.definitions import IApplication, IUser
@@ -47,9 +45,8 @@ configuration.views = [
     
 # view and form implementation ------------------------------------------------------------------
 
-from nive.views import BaseView, Unauthorized, Mail
-from nive.forms import ObjectForm, ValidationError
-from nive_userdb.app import UsernameValidator, EmailValidator
+from nive.forms import ObjectForm
+from nive_userdb.app import UsernameValidator
 
 from nive.adminview.view import AdminBasics
     
@@ -138,8 +135,75 @@ class UsermanagementView(AdminBasics):
         return {"ids": ids, "users":users, "result": result, "msgs": msgs, "confirm": confirm} 
     
 
+    def PageUrls(self, items, sort, ascending):
+        """
+        if paged result the previous, next and set links
+        """
+        if items.get('total', 0) == 0:
+            return u""
+
+        # pages
+        url = self.CurrentUrl()
+        start = items.get("start")
+        maxPage = items.get("max")
+        total = items.get("total")
+        pageCount = total / maxPage + (total % maxPage != 0)
+        pageHtml = u""
+
+        if total <= maxPage:
+            return u""
+
+        cntstr = u"%d - %d / %d"
+        cnt = cntstr % (items.get('start')+1, items.get('start')+items.get('count'), items.get('total'))
+        pageTmpl = u""" <a href="%s?st=%s&so=%s&as=%s">%s</a> """
+        prev = pageTmpl % (url, items.get("prev"), sort, ascending, "&laquo;")
+        next = pageTmpl % (url, items.get("next"), sort, ascending, "&raquo;")
+        pageTmpl1 = u""" [%s] """
+
+        if items.get("start")==0:
+            prev = u"&laquo;"
+        if items.get("next")==0:
+            next = u"&raquo;"
+
+        if pageCount > 1:
+            current = int(start / maxPage)
+            count = 10
+            pages = [0]
+            first = current - count / 2 + 1
+            if first < 1:
+                first = 1
+            elif pageCount < count:
+                first = 1
+                count = pageCount
+            elif first + count > pageCount - 1:
+                first = pageCount - count
+            for i in range(count - 1):
+                p = first + i
+                if p == pageCount - 1:
+                    break
+                pages.append(p)
+            pages.append(pageCount - 1)
+
+            # loop pages
+            for i in pages:
+                # check curent page
+                if start >= maxPage * i and start <= maxPage * i:
+                    pageHtml = pageHtml + pageTmpl1 % (str(i + 1))
+                else:
+                    pageHtml = pageHtml + pageTmpl % (url, maxPage * i, sort, ascending, str(i + 1))
+        else:
+            prev = u""
+            next = u""
+
+        html = u"""<div class="paging"><div>%s %s %s %s</div></div>""" % (cnt, prev, pageHtml, next)
+        return html
 
 
+    def EscapeSortField(self, fields):
+        sort = self.GetFormValue("so","name")
+        if not sort in fields:
+            return "name"
+        return sort
 
 
 

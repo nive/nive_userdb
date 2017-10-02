@@ -4,19 +4,20 @@
 <tal:block metal:fill-slot="editmain">
 <form id="userlist" name="userlist" method="post"
       enctype="multipart/form-data"
-      action="${view.FolderUrl(context)}delete">
-<table tal:define="app context.app;
+      action="${view.FolderUrl(context)}delete"
+      tal:define="app context.app;
                    url view.FolderUrl(context.root());
                    fields [app.GetFld(f, 'user') for f in view.configuration.listfields];
-                   sort view.GetFormValue('so','name');
-                   asc view.GetFormValue('as','1');
-                   users context.SearchType('user', parameter={}, fields=fields, sort=sort or 'name', ascending=asc, max=500, skipRender=())"
-       class="table table-striped">
+                   sort view.EscapeSortField(fields);
+                   asc '1' if view.GetFormValue('as','1')=='1' else '0';
+                   start view.GetFormValue('st','0');
+                   users context.SearchType('user', parameter={}, fields=fields, sort=sort or 'name', ascending=asc, start=start, max=1, skipRender=())">
+<table class="table table-striped">
 <thead>
 <tr>
   <th tal:repeat="fld fields">
     <a tal:content="fld.name"
-       href="${view.CurrentUrl()}?so=${fld.id}&as=${'0' if asc=='1' else '1'}"></a>
+       href="${view.CurrentUrl()}?so=${fld.id}&as=${'0' if asc=='1' else '1'}&st=${users.start}"></a>
   </th>
 
   <td></td>
@@ -30,6 +31,7 @@
   <td><input value="${user.id}" type="checkbox" name="ids"></td>
 </tr>
 </table>
+<div tal:content="structure view.PageUrls(users, sort=sort, ascending=asc)"></div>
 <div style="float:right;text-align:right;">
   <input type="submit" name="delete" value="Delete selected" i18n:attributes="value">
 </div>
