@@ -119,7 +119,7 @@ class UserDB(ApplicationBase):
         if request:
             try:
                 user = request.environ["authenticated_user"]
-            except:
+            except KeyError:
                 user = self.root().GetUser(userid)
                 request.environ["authenticated_user"] = user
                 def remove_user(request):
@@ -127,15 +127,16 @@ class UserDB(ApplicationBase):
                         del request.environ["authenticated_user"]
                 request.add_finished_callback(remove_user)
         else:
-                user = self.root().GetUser(userid)
-        if not user:
+            user = self.root().GetUser(userid)
+
+        if user is None:
             return None
 
         # users groups or empty list
         groups = user.groups or ()
 
         # lookup context for local roles
-        if not context and hasattr(request, "context"):
+        if context is None and hasattr(request, "context"):
             context = request.context
         if context and ILocalGroups.providedBy(context):
             local = context.GetLocalGroups(userid, user=user)

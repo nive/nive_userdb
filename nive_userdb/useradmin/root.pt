@@ -4,27 +4,34 @@
 <tal:block metal:fill-slot="editmain">
 <form id="userlist" name="userlist" method="post"
       enctype="multipart/form-data"
-      action="${view.FolderUrl(context)}delete">
-<table tal:define="app context.app;
+      action="${view.FolderUrl(context)}delete"
+      tal:define="app context.app;
                    url view.FolderUrl(context.root());
-                   fields view.configuration.listfields;
-                   users context.SearchType('user', parameter={}, fields=fields, sort='name', max=500, skipRender=())"
-       class="table table-striped">
+                   fields [app.GetFld(f, 'user') for f in view.configuration.listfields];
+                   sort view.EscapeSortField(view.configuration.listfields);
+                   asc '1' if view.GetFormValue('as','1')=='1' else '0';
+                   start view.GetFormValue('st','0');
+                   users context.SearchType('user', parameter={}, fields=fields, sort=sort or 'name', ascending=asc, start=start, max=100, skipRender=())">
+<table class="table table-striped">
 <thead>
 <tr>
-  <td tal:repeat="fld fields"
-      tal:content="app.GetFldName(fld, typeID='user')"></td>
+  <th tal:repeat="fld fields">
+    <a tal:content="fld.name"
+       href="${view.CurrentUrl()}?so=${fld.id}&as=${'0' if asc=='1' else '1'}&st=${users.start}"></a>
+  </th>
+
   <td></td>
 </tr>
 </thead>
 <tr tal:repeat="user users['items']">
   <td tal:repeat="fld fields" onclick="document.location.href='${url + str(user.id)}'">
-  <span tal:condition="fld!='name'" tal:replace="user[fld]"/>
-  <a tal:condition="fld=='name'" tal:content="user[fld]" tal:attributes="href view.FolderUrl(context.root())+str(user.id)"></a>
+  <span tal:condition="fld.id!='name'" tal:replace="user[fld.id]"/>
+  <a tal:condition="fld.id=='name'" tal:content="user[fld.id]" tal:attributes="href view.FolderUrl(context.root())+str(user.id)"></a>
   </td>
   <td><input value="${user.id}" type="checkbox" name="ids"></td>
 </tr>
 </table>
+<div tal:content="structure view.PageUrls(users, sort=sort, ascending=asc)"></div>
 <div style="float:right;text-align:right;">
   <input type="submit" name="delete" value="Delete selected" i18n:attributes="value">
 </div>

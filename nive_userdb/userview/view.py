@@ -425,6 +425,7 @@ class UserView(BaseView):
         title = u""
         resetPasswordLink = False
         viewconf = self.GetViewConf()
+        subset = "login"
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title",u"")
