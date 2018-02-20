@@ -42,7 +42,7 @@ configuration = AppConf(
         groups=(),
         activate=1,
         generatePW=0,
-        cookieAuthMaxAge=None,  #60*60*24*7, e.g. one week
+        cookieAuthMaxAge=0, # e.g. 60*60*24*7 one week
         generateName=False
     ),
     # contact system information
@@ -153,7 +153,8 @@ class UserDB(ApplicationBase):
         """
         if not hasattr(request.response, "headerlist"):
             request.response.headerlist = []
-        headers = remember(request, user, max_age=self.configuration.settings.cookieAuthMaxAge or None)
+        maxAge = self.configuration.settings.cookieAuthMaxAge
+        headers = remember(request, user, max_age=maxAge if maxAge else None)
         request.response.headerlist += list(headers)
 
 
