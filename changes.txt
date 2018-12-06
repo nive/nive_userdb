@@ -1,3 +1,6 @@
+1.0.3
+------
+- maintenance and bugfixes
 
 1.0rc1
 ------

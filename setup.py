@@ -19,7 +19,7 @@ requires = [
 
 setupkw = dict(
       name='nive_userdb',
-      version='1.0rc1',
+      version='1.0.3',
       description='Nive User Database',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -33,8 +33,8 @@ setupkw = dict(
       ],
       author='Arndt Droullier, Nive GmbH',
       author_email='info@nive.co',
-      url='http://os.nive.co/',
-      keywords='cms website publisher pyramid',
+      url='https://niveapps.com/',
+      keywords='cms framework pyramid',
       license='GPL 3',
       packages=find_packages(),
       include_package_data=True,
