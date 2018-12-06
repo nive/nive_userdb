@@ -1,4 +1,6 @@
 /nive_userdb.egg-info
 *.pyc
 .idea
+.settings
 /dist
+/build
