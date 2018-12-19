@@ -1,6 +1,28 @@
-/nive_userdb.egg-info
-*.pyc
-.idea
+*.py[co]
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+#Mr Developer
+.mr.developer.cfg
+
+#ide
 .settings
-/dist
-/build
+.idea
