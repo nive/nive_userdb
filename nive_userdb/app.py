@@ -18,11 +18,10 @@ The system admin for notification mails can be specified as `systemAdmin`.
 """
 import hashlib
 
-
 from nive.definitions import AppConf, GroupConf, Conf
-from nive.definitions import implements, IUserDatabase, ILocalGroups
+from nive.definitions import implementer, IUserDatabase, ILocalGroups
 from nive.security import Allow, Deny, Everyone, Authenticated, ALL_PERMISSIONS, remember, forget
-from nive.components.objects.base import ApplicationBase
+from nive.application import Application
 from nive.views import Mail
 from nive.components.reform.schema import Invalid
 from nive.components.reform.schema import Email
@@ -84,7 +83,7 @@ configuration.modules = [
     # tools
     "nive.tools.dbStructureUpdater", 
     # administration and persistence
-    "nive.adminview",
+    "nive.components.adminview",
     "nive.extensions.persistence.dbPersistenceConfiguration"
 ]
 
@@ -105,14 +104,14 @@ configuration.groups = [
     GroupConf(id="group:admin", name="group:admin")
 ]
 
+StagUser = 22
 
-class UserDB(ApplicationBase):
+
+@implementer(IUserDatabase)
+class UserDB(Application):
     """
     """
-    implements(IUserDatabase)
 
-
-        
     def Groupfinder(self, userid, request=None, context=None):
         """
         returns the list of groups assigned to the user 
@@ -121,14 +120,14 @@ class UserDB(ApplicationBase):
             try:
                 user = request.environ["authenticated_user"]
             except KeyError:
-                user = self.root().GetUser(userid)
+                user = self.GetUser(userid)
                 request.environ["authenticated_user"] = user
                 def remove_user(request):
                     if "authenticated_user" in request.environ:
                         del request.environ["authenticated_user"]
                 request.add_finished_callback(remove_user)
         else:
-            user = self.root().GetUser(userid)
+            user = self.GetUser(userid)
 
         if user is None:
             return None
@@ -196,10 +195,10 @@ def UsernameValidator(node, value):
         err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup name in database
-    r = node.widget.form.context.root()
-    u = r.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+    r = node.widget.form.context
+    u = r.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
     if not u:
-        u = r.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+        u = r.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context
@@ -219,10 +218,10 @@ def EmailValidator(node, value):
         err = _(u"Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup email in database
-    r = node.widget.form.context.root()
-    u = r.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+    r = node.widget.form.context
+    u = r.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
     if not u:
-        u = r.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+        u = r.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context
@@ -260,8 +259,8 @@ def AcceptValidator(node, value):
         raise Invalid(node, err)
 
 def Sha(password):
-    return hashlib.sha224(password).hexdigest()
+    return hashlib.sha224(password.encode("utf-8")).hexdigest()
 
 def Md5(password):
-    return hashlib.md5(password).hexdigest()
+    return hashlib.md5(password.encode("utf-8")).hexdigest()
 

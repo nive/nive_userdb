@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time
 import unittest
 
-from nive.definitions import Conf
 from nive_userdb.userview.view import UserForm, UserView
 from nive_userdb.userview.view import configuration as view_configuration
 from nive.views import BaseView
@@ -19,7 +17,7 @@ from pyramid.renderers import render
 class TestView(UserView):
     
     def User(self, sessionuser=None):
-        return self.context.root().GetUserByName("testuser")
+        return self.context.GetUserByName("testuser")
     
 
 class tViews(__local.DefaultTestCase):
@@ -34,7 +32,7 @@ class tViews(__local.DefaultTestCase):
         self.config.include('pyramid_chameleon')
         self._loadApp()
         self.app.Startup(self.config)
-        self.root = self.app.root()
+        self.root = self.app.root
         user = User(u"test")
         user.groups.append("group:admin")
         self.root.DeleteUser("testuser")
@@ -138,7 +136,7 @@ class tViews(__local.DefaultTestCase):
 
         self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
         r,v = form.AddUser("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r, r)
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="edit")
@@ -146,9 +144,9 @@ class tViews(__local.DefaultTestCase):
         self.request.GET = {}
 
         r,v = form.LoadUser("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r)
         r,v = form.Update("action", redirectSuccess="")
-        self.assert_(r,v)
+        self.assertTrue(r,v)
         self.request.POST = {"name": "testuser123", "email": "testuser@domain.net", "surname": "12345", "password": "12345"}
         r,v = form.Update("action", redirectSuccess="")
         self.assertFalse(r)
@@ -159,7 +157,7 @@ class tViews(__local.DefaultTestCase):
         self.request.POST = {"name": "testuser", "password": "12345"}
         self.request.GET = {}
         r,v = form.Login("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r)
 
         # activate -----------------------------------------------------------------------------------------------------
         u = self.root.LookupUser(name="testuser", reloadFromDB=1)
@@ -178,9 +176,9 @@ class tViews(__local.DefaultTestCase):
 
         self.request.GET = {"token": "1111111111"}
         r,v = form.Activate("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r)
         u = self.root.LookupUser(name="testuser", reloadFromDB=1)
-        self.assert_(u.meta["pool_state"])
+        self.assertTrue(u.meta["pool_state"])
         self.assertFalse(u.data["token"])
 
 
@@ -192,7 +190,7 @@ class tViews(__local.DefaultTestCase):
         self.request.GET = {}
         self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
         r,v = form.AddUser("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r, r)
 
         # UpdatePass -----------------------------------------------------------------------------------------------------
 
@@ -209,14 +207,14 @@ class tViews(__local.DefaultTestCase):
         self.request.POST = {"oldpassword": "12345", "password": "67890", "password-confirm": "67890"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r)
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
         self.request.POST = {"oldpassword": "67890", "password": "12345", "password-confirm": "12345"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
-        self.assert_(r)
+        self.assertTrue(r)
 
 
         # UpdateMail -----------------------------------------------------------------------------------------------------
@@ -241,7 +239,7 @@ class tViews(__local.DefaultTestCase):
         self.request.GET = {}
         form.UpdateMail("action", redirectSuccess="", url="")
         m = self.root.LookupUser(name="testuser", reloadFromDB=1).data.tempcache
-        self.assert_(m=="verifymail:newuser@domain.net", m)
+        self.assertTrue(m=="verifymail:newuser@domain.net", m)
 
 
         # UpdateMailToken -----------------------------------------------------------------------------------------------------
@@ -256,7 +254,7 @@ class tViews(__local.DefaultTestCase):
         form.Setup(subset="updatemail2")
         self.request.GET = {"token": self.root.LookupUser(name="testuser", reloadFromDB=1).data.token}
         form.UpdateMailToken("action", redirectSuccess="")
-        self.assert_(self.root.GetUser("testuser").data.email=="newuser@domain.net")
+        self.assertTrue(self.root.GetUser("testuser").data.email=="newuser@domain.net")
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail2")

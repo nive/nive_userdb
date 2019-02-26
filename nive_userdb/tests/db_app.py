@@ -63,12 +63,3 @@ def createpool(path,app):
     path.CreateDirectories()
     app.GetTool("nive.tools.dbStructureUpdater")()
 
-def create_user(name,email):
-    type = "user"
-    data = {"name": name, "password": "11111", "email": email, "surname": "surname", "lastname": "lastname", "organistion": "organisation"}
-    user = User("test")
-    r = a.GetRoot()
-    o = r.Create(type, data = data, user = user)
-    #o.Commit()
-    return o
-

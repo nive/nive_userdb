@@ -2,10 +2,10 @@
 # Released under GPL3. See license.txt
 #
 
-import thread
+import _thread
 import time
 
-from nive.definitions import Interface, implements
+from nive.definitions import Interface, implementer
 from nive.definitions import ModuleConf, Conf
 from nive.security import UserFound
 
@@ -48,12 +48,12 @@ class SessionUserCache(object):
         """
         lock = None
         try:
-            lock = thread.allocate_lock()
+            lock = _thread.allocate_lock()
             lock.acquire(1)
             setattr(self, self._Cachename(id), (obj, time.time()))
             if lock.locked():
                 lock.release()
-        except Exception, e:
+        except Exception as e:
             if lock and lock.locked():
                 lock.release()
 
@@ -63,7 +63,7 @@ class SessionUserCache(object):
         n = self._Cachename(id)
         lock = None
         try:
-            lock = thread.allocate_lock()
+            lock = _thread.allocate_lock()
             lock.acquire(1)
             if hasattr(self, n):
                 o = getattr(self, n)
@@ -81,9 +81,9 @@ class SessionUserCache(object):
         objs = []
         lock = None
         try:
-            lock = thread.allocate_lock()
+            lock = _thread.allocate_lock()
             lock.acquire(1)
-            for v in self.__dict__.keys():
+            for v in list(self.__dict__.keys()):
                 if v[:5] == "__c__":
                     objs.append(getattr(self, v)[0])
             if lock.locked():
@@ -98,7 +98,7 @@ class SessionUserCache(object):
         """
         lock = None
         try:
-            lock = thread.allocate_lock()
+            lock = _thread.allocate_lock()
             lock.acquire(1)
             try:
                 delattr(self, self._Cachename(id))
@@ -115,10 +115,10 @@ class SessionUserCache(object):
         """
         lock = None
         try:
-            lock = thread.allocate_lock()
+            lock = _thread.allocate_lock()
             lock.acquire(1)
             tt = time.time()
-            for v in self.__dict__.keys():
+            for v in list(self.__dict__.keys()):
                 if v[:5] == "__c__" and getattr(self, v)[1]+self.expires < tt:
                     delattr(self, v)
             if lock.locked():
@@ -140,7 +140,7 @@ class RootListener(object):
     def LookupCache(self, ident=None, activeOnly=None):
         user = self.app.usercache.Get(ident)
         if user:
-            raise UserFound, UserFound(user)
+            raise UserFound(UserFound(user))
 
     def AddToCache(self, user=None, lastlogin=None):
         sessionuser = self.SessionUserFactory(user.identity, user)
@@ -154,7 +154,7 @@ class RootListener(object):
         meta = Conf()
         app = self.app
         for f in fields:
-            if app.GetMetaFld(f):
+            if app.configurationQuery.GetMetaFld(f):
                 meta[f] = user.meta.get(f)
             else:
                 data[f] = user.data.get(f)
@@ -175,7 +175,7 @@ class UserListener(object):
         self.app.usercache.Invalidate(self.identity)
 
 
-
+@implementer(ISessionUser)
 class SessionUser(object):
     """
     The session user is created on login by the _real_ database user and cached on app
@@ -190,8 +190,7 @@ class SessionUser(object):
      
     Default data values: name, email, surname, lastname, groups
     """
-    implements(ISessionUser)
-    
+
     def __init__(self, ident, id, data, meta=None):
         self.id = id
         self.identity = ident
@@ -218,7 +217,7 @@ class SessionUser(object):
         """
         check if user has one of these groups
         """
-        if isinstance(groups, basestring):
+        if isinstance(groups, str):
             return groups in self.data.groups
         for g in groups:
             if g in self.data.groups:
@@ -250,9 +249,9 @@ def SetupRootAndUser(app, pyramidConfig):
             c.lock()
     
     rootextension = "nive_userdb.extensions.sessionuser.RootListener"
-    add(app.GetAllRootConfs(), rootextension)
+    add(app.configurationQuery.GetAllRootConfs(), rootextension)
     userextension = "nive_userdb.extensions.sessionuser.UserListener"
-    add([app.GetObjectConf("user",skipRoot=True)], userextension)
+    add([app.configurationQuery.GetObjectConf("user",skipRoot=True)], userextension)
     # add usercache to app
     app.usercache = SessionUserCache()
 

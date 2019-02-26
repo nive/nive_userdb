@@ -13,14 +13,14 @@ import base64, random
 import uuid
 import json
 
-from nive.definitions import RootConf, Conf, StagUser, IUser
+from nive.definitions import RootConf, Conf, IUser
 from nive.definitions import ConfigurationError
 from nive.security import User, AdminUser, IAdminUser, UserFound, Unauthorized
-from nive.components.objects.base import RootBase
+from nive.container import Root
 from nive_userdb.i18n import _
+from nive_userdb.app import StagUser
 
-
-class root(RootBase):
+class Userroot(Root):
     """
     """
     
@@ -113,7 +113,7 @@ class root(RootBase):
             body = mail(user=obj, **kw)
             tool = app.GetTool("sendMail")
             if not tool:
-                raise ConfigurationError, "Mail tool 'sendMail' not found"
+                raise ConfigurationError("Mail tool 'sendMail' not found")
             result, value = tool(body=body, title=title, recvids=[str(obj)], force=1)
             if not result:
                 report.append(_(u"The email could not be sent."))
@@ -128,7 +128,7 @@ class root(RootBase):
                 body = notifyMail(user=obj)
                 tool = app.GetTool("sendMail")
                 if not tool:
-                    raise ConfigurationError, "Mail tool 'sendMail' not found"
+                    raise ConfigurationError("Mail tool 'sendMail' not found")
                 result, value = tool(body=body, title=title, recvmails=[sysadmin], force=1)
 
         report.append(_(u"Account created."))
@@ -147,13 +147,13 @@ class root(RootBase):
         user = self.GetUserByName(name)
         if not user:
             if raiseUnauthorized:
-                raise Unauthorized, "Login failed"
+                raise Unauthorized("Login failed")
             report.append(_(u"Sign in failed. Please check your username and password."))
             return None, report
             
         if not user.Authenticate(password):
             if raiseUnauthorized:
-                raise Unauthorized, "Login failed"
+                raise Unauthorized("Login failed")
             report.append(_(u"Sign in failed. Please check your username and password."))
             return None, report
 
@@ -191,7 +191,7 @@ class root(RootBase):
             report.append(_(u"Please enter your new email address."))
             return False, report
 
-        if isinstance(name, basestring):
+        if isinstance(name, str):
             obj = self.GetUserByName(name)
             if not obj:
                 report.append(_(u"No matching account found."))
@@ -213,7 +213,7 @@ class root(RootBase):
         body = mail(user=obj, **kw)
         tool = app.GetTool("sendMail")
         if not tool:
-            raise ConfigurationError, "Mail tool 'sendMail' not found"
+            raise ConfigurationError("Mail tool 'sendMail' not found")
         result, value = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
             report.append(_(u"The email could not be sent."))
@@ -235,7 +235,7 @@ class root(RootBase):
             report.append(_(u"Please enter your email address or username."))
             return False, report
 
-        if isinstance(name, basestring):
+        if isinstance(name, str):
             obj = self.GetUserByName(name)
             if not obj:
                 report.append(_(u"No matching account found. Please try again."))
@@ -259,14 +259,14 @@ class root(RootBase):
         if mail=="default":
             try:
                 mail = self.app.configuration.mailSendPass
-            except AttributeError, e:
-                raise ConfigurationError, str(e)
+            except AttributeError as e:
+                raise ConfigurationError(str(e))
 
         title = mail.title
         body = mail(user=obj, password=pwd, **kw)
         tool = self.app.GetTool("sendMail")
         if not tool:
-            raise ConfigurationError, "Mail tool 'sendMail' not found"
+            raise ConfigurationError("Mail tool 'sendMail' not found")
         result, value = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
             report.append(_(u"The email could not be sent."))
@@ -288,7 +288,7 @@ class root(RootBase):
             report.append(_(u"Please enter your sign in name or email address."))
             return None, report
 
-        if isinstance(name, basestring):
+        if isinstance(name, str):
             obj = self.GetUserByName(name)
             if not obj:
                 report.append(_(u"No matching account found."))
@@ -310,15 +310,15 @@ class root(RootBase):
         if mail=="default":
             try:
                 mail = self.app.configuration.mailResetPass
-            except AttributeError, e:
-                raise ConfigurationError, str(e)
+            except AttributeError as e:
+                raise ConfigurationError(str(e))
         if not mail:
             raise ConfigurationError("Required  mailtemplate is required")
         title = mail.title
         body = mail(user=obj, **kw)
         tool = app.GetTool("sendMail")
         if not tool:
-            raise ConfigurationError, "Mail tool 'sendMail' not found"
+            raise ConfigurationError("Mail tool 'sendMail' not found")
         result, value = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
             report.append(_(u"The email could not be sent."))
@@ -336,7 +336,7 @@ class root(RootBase):
         if not ident:
             report.append(_(u"Invalid user."))
             return False, report
-        elif isinstance(ident, basestring):
+        elif isinstance(ident, str):
             if not ident:
                 report.append(_(u"Invalid user."))
                 return False, report
@@ -401,7 +401,7 @@ class root(RootBase):
         """
         try:
             self.Signal("getuser", ident=ident, activeOnly=activeOnly)
-        except UserFound, user:
+        except UserFound as user:
             return user.user
         user = self.LookupUser(ident=ident, activeOnly=activeOnly)
         if user:
@@ -429,9 +429,9 @@ class root(RootBase):
         Look up a user by filename (meta.pool_filename). Use this function only if your application explicitly manages
         unique user filenames. By default filenames are not used at all.
         """
-        ident = self.Select(pool_type=u"user", parameter={"pool_filename":filename}, fields=[u"id"], max=2)
+        ident = self.search.Select(pool_type=u"user", parameter={"pool_filename":filename}, fields=[u"id"], max=2)
         if len(ident)>1:
-            raise ValueError, "Filename is not unique"
+            raise ValueError("Filename is not unique")
         if not len(ident):
             return None
         return self.LookupUser(id=ident[0][0], activeOnly=activeOnly)
@@ -462,21 +462,21 @@ class root(RootBase):
                 param[u"email"] = email
             elif ident:
                 if not self.identityField:
-                    raise ValueError, "user identity field not set"
+                    raise ValueError("user identity field not set")
                 param[self.identityField] = ident
 
-            user = self.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
+            user = self.search.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
             
             # check multiple identity fields
             if len(user)==0 and loginByEmail:
                 if name:
                     del param[u"name"]
                     param[u"email"] = name
-                    user = self.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
+                    user = self.search.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
                 elif email:
                     del param[u"email"]
                     param[u"name"] = email
-                    user = self.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
+                    user = self.search.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
                 else:
                     return None
 
@@ -502,7 +502,7 @@ class root(RootBase):
         p = {"token": token}
         if activeOnly:
             p["pool_state"] = 1
-        users = self.Select(pool_type=u"user",
+        users = self.search.Select(pool_type=u"user",
                             parameter=p,
                             fields=[u"id"],
                             max=2)
@@ -521,7 +521,7 @@ class root(RootBase):
         fields = [u"id", u"name", u"email", u"title", u"groups", u"lastlogin"]
         if not self.identityField in fields:
             fields.append(self.identityField)
-        return self.SearchType(u"user", {u"pool_state":1}, fields)
+        return self.search.SearchType(u"user", {u"pool_state":1}, fields)
 
 
     def GetUserInfos(self, userids, fields=None, activeOnly=True):
@@ -535,7 +535,7 @@ class root(RootBase):
         if not self.identityField in fields:
             fields = list(fields)
             fields.append(self.identityField)
-        return self.SelectDict(pool_type=u"user", 
+        return self.search.SelectDict(pool_type=u"user",
                                parameter=param, fields=fields, operators={self.identityField:u"IN"})
 
     
@@ -551,7 +551,7 @@ class root(RootBase):
         elif not u"groups" in fields:
             fields = list(fields)
             fields.append(u"groups")
-        users = self.SelectDict(pool_type=u"user", parameter=param, fields=fields, operators=operators)
+        users = self.search.SelectDict(pool_type=u"user", parameter=param, fields=fields, operators=operators)
         # verify groups
         verified = []
         for u in users:
@@ -564,36 +564,13 @@ class root(RootBase):
         return verified
 
 
-    # to be removed ------------------------------------------------------
-    def GetUserGroups(self, name, activeOnly=1):
-        """
-        """
-        user = self.GetUser(name, activeOnly=activeOnly)
-        if not user:
-            return None
-        return user.data.groups
-
-    def Encrypt(self, string):
-        try:
-            return base64.encodestring(string)
-        except:
-            return string
-
-    def Decrypt(self, string):
-        try:
-            return base64.decodestring(string)
-        except:
-            return string
-
-
-
 
 # Root definition ------------------------------------------------------------------
 
 #@nive_module
 configuration = RootConf(
     id = "udb",
-    context = "nive_userdb.root.root",
+    context = "nive_userdb.root.Userroot",
     template = "root.pt",
     default = 1,
     subtypes = "*",

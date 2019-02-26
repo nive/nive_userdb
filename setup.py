@@ -14,12 +14,12 @@ except:
     CHANGES = ''
 
 requires = [
-    'nive'
+    'nive>=1.3.1'
 ]
 
 setupkw = dict(
       name='nive_userdb',
-      version='1.0.4',
+      version='1.3.1',
       description='Nive User Database',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -28,8 +28,7 @@ setupkw = dict(
         "Framework :: Pyramid",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Development Status :: 4 - Beta",
-        "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python :: 2.7"
+        "Programming Language :: Python :: 3.7"
       ],
       author='Arndt Droullier, Nive GmbH',
       author_email='info@nive.co',

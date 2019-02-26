@@ -8,11 +8,12 @@ from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
 from nive.definitions import ConfigurationError
 from nive.definitions import IUser
 from nive.views import BaseView, Unauthorized, Mail
-from nive.forms import ObjectForm
+from nive.components.reform.forms import ObjectForm
 
 from nive_userdb.i18n import _
 from nive_userdb.i18n import translator
 from nive_userdb.app import EmailValidator, UsernameValidator, OldPwValidator
+import collections
 
 
 # view module definition ------------------------------------------------------------------
@@ -23,7 +24,7 @@ configuration = ViewModuleConf(
     name = _(u"User signup"),
     static = "nive_userdb.userview:static",
     containment = "nive_userdb.app.UserDB",
-    context = "nive_userdb.root.root",
+    context = "nive_userdb.root.Userroot",
     view = "nive_userdb.userview.view.UserView",
     templates = "nive_userdb.userview:",
     template = "main.pt",
@@ -390,12 +391,12 @@ class UserView(BaseView):
             subset = viewconf.settings.get("form")
             mail = viewconf.settings.get("mail")
         # get the receiver
-        if isinstance(receiver, basestring):
-            user = self.context.root().GetUser(receiver)
+        if isinstance(receiver, str):
+            user = self.context.GetUser(receiver)
             receiver = ((user.data.get("email"), user.meta.get("title")),)
         elif IUser.providedBy(receiver):
             receiver = ((receiver.data.get("email"), receiver.meta.get("title")),)
-        elif callable(receiver):
+        elif isinstance(receiver, collections.abc.Callable):
             receiver = receiver(self)
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="contact")
         form.startEmpty = True
@@ -467,7 +468,7 @@ class UserView(BaseView):
         self.ResetFlashMessages()
         app = self.context.app
         user = self.UserName()
-        a = self.context.root().Logout(user)
+        a = self.context.Logout(user)
         app.ForgetLogin(self.request)
         redirect = self.GetFormValue(u"redirect")
         if not redirect:
@@ -528,7 +529,7 @@ class UserView(BaseView):
         remove = self.GetFormValue(u"remove", method="POST")==u"1"
         if remove:
             # delete the object, cache and sign out
-            self.context.root().DeleteUser(user, currentUser=user)
+            self.context.DeleteUser(user, currentUser=user)
             self.context.app.ForgetLogin(self.request)
             values[u"result"] = True
             self.AddHeader("X-Result", "true")
@@ -546,7 +547,7 @@ class UserView(BaseView):
     def _loadSimpleForm(self):
         # form rendering settings
         # form setup
-        form = UserForm(view=self, context=self.context.root(), loadFromType="user")
+        form = UserForm(view=self, context=self.context, loadFromType="user")
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.app.configuration.settings
 
@@ -555,9 +556,9 @@ class UserView(BaseView):
         form.widget.action_template = "form_actions_onecolumn"
         #form.use_ajax = True
         form.action = self.request.url
-        vm = self.viewModule
+        vm = self.configuration
         if vm:
-            formsettings = self.viewModule.get("form")
+            formsettings = vm.get("form")
             if isinstance(formsettings, dict):
                 form.ApplyOptions(formsettings)
         return form
@@ -565,15 +566,15 @@ class UserView(BaseView):
     def _loadForm(self, subset, viewconf, defaultsubset):
         # form rendering settings
         # form setup
-        typeconf=self.context.app.GetObjectConf("user")
-        form = UserForm(view=self, context=self.context.root(), loadFromType=typeconf)
+        typeconf=self.context.app.configurationQuery.GetObjectConf("user")
+        form = UserForm(view=self, context=self.context, loadFromType=typeconf)
         defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.app.configuration.settings
 
         # load subset
         subset = subset or defaultsubset
-        if isinstance(subset, basestring):
+        if isinstance(subset, str):
             # the subset is referenced as string -> look it up in typeconf.forms
             if not subset in form.subsets:
                 cp = copy.deepcopy(typeconf.forms)
@@ -599,9 +600,9 @@ class UserView(BaseView):
         form.widget.action_template = "form_actions_onecolumn"
         #form.use_ajax = True
         form.action = self.request.url
-        vm = self.viewModule
+        vm = self.configuration
         if vm:
-            formsettings = self.viewModule.get("form")
+            formsettings = vm.get("form")
             if isinstance(formsettings, dict):
                 form.ApplyOptions(formsettings)
         return form, subset
@@ -746,7 +747,7 @@ class UserForm(ObjectForm):
         """
         user = self.view.User(sessionuser=False)
         if not user:
-            raise Unauthorized, "User not found."
+            raise Unauthorized("User not found.")
         data = self.LoadObjData(user)
         try:
             del data["password"]
@@ -763,7 +764,7 @@ class UserForm(ObjectForm):
         """
         user = self.view.User(sessionuser=False)
         if not user:
-            raise Unauthorized, "User not found."
+            raise Unauthorized("User not found.")
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
@@ -823,7 +824,7 @@ class UserForm(ObjectForm):
         """
         user = self.view.User(sessionuser=False)
         if user is None:
-            raise Unauthorized, "User not found."
+            raise Unauthorized("User not found.")
         msgs = []
         result,data,errors = self.Validate(self.request)
         if not result:
@@ -842,7 +843,7 @@ class UserForm(ObjectForm):
         """
         user = self.view.User(sessionuser=False)
         if not user:
-            raise Unauthorized, "User not found."
+            raise Unauthorized("User not found.")
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
@@ -921,7 +922,7 @@ class UserForm(ObjectForm):
         body = mail(sender=user, data=data, form=self, **kw)
         tool = self.context.app.GetTool("sendMail")
         if not tool:
-            raise ConfigurationError, "Mail tool 'sendMail' not found"
+            raise ConfigurationError("Mail tool 'sendMail' not found")
 
         result, value = tool(body=body, title=title, recvmails=recv, replyTo=replyTo, force=1)
         if not result:

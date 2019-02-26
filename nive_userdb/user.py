@@ -6,22 +6,21 @@ import hashlib
 from datetime import datetime
 
 from nive_userdb.i18n import _
-from nive.definitions import implements, IUser
+from nive.definitions import implementer, IUser
 
-from nive.components.objects.base import ObjectBase
+from nive.objects import Object
 
 
 
 def Sha(password):
     return hashlib.sha224(password).hexdigest()
 
-
-class user(ObjectBase):
+@implementer(IUser)
+class Userobject(Object):
     """
     User object with groups and login possibility. 
     """
-    implements(IUser)
-    
+
     @property
     def identity(self):
         return self.data.get(self.parent.identityField,str(self.id))
@@ -59,7 +58,7 @@ class user(ObjectBase):
 
         signals event: activate
         """
-        wf = self.GetWf()
+        wf = self.workflow.GetWf()
         if wf:
             result = wf.Action("activate", self, user=currentUser)
         else:
@@ -80,7 +79,7 @@ class user(ObjectBase):
 
         signals event: activate
         """
-        wf = self.GetWf()
+        wf = self.workflow.GetWf()
         if wf:
             result = wf.Action("deactivate", self, user=currentUser)
         else:
@@ -219,7 +218,7 @@ class user(ObjectBase):
         """
         check if user has one of these groups
         """
-        if isinstance(groups, basestring):
+        if isinstance(groups, str):
             return groups in self.groups
         for g in groups:
             if g in self.groups:
@@ -228,15 +227,15 @@ class user(ObjectBase):
 
 
 # user definition ------------------------------------------------------------------
-from nive.definitions import StagUser, ObjectConf, FieldConf
-from nive_userdb.app import UsernameValidator, EmailValidator, PasswordValidator
+from nive.definitions import ObjectConf, FieldConf
+from nive_userdb.app import UsernameValidator, EmailValidator, PasswordValidator, StagUser
 
 #@nive_module
 configuration = ObjectConf(
     id = "user",
     name = _(u"User"),
     dbparam = "users",
-    context = "nive_userdb.user.user",
+    context = "nive_userdb.user.Userobject",
     template = "user.pt",
     selectTag = StagUser,
     container = False,

@@ -2,20 +2,19 @@
 
 import unittest
 
-from nive_userdb.tests import db_app
-
-from nive.definitions import Conf, AppConf
 from nive_userdb.extensions.sessionuser import *
-from nive.portal import Portal
-from nive_userdb.app import UserDB
+from nive.helper import FormatConfTestFailure
 
+
+class cq(object):
+    def GetMetaFld(self, id):
+        return True
 
 class testobj(object):
     configuration = Conf()
+    configurationQuery = cq()
     def Listen(self, name, fnc):
         pass
-    def GetMetaFld(self, id):
-        return True
 
 class Conftest(unittest.TestCase):
     
@@ -23,8 +22,8 @@ class Conftest(unittest.TestCase):
         r=configuration.test()
         if not r:
             return
-        print FormatConfTestFailure(r)
-        self.assert_(False, "Configuration Error")
+        print(FormatConfTestFailure(r))
+        self.assertTrue(False, "Configuration Error")
 
 
 class CacheTest(unittest.TestCase):
@@ -44,42 +43,42 @@ class CacheTest(unittest.TestCase):
         self.assertFalse(self.cache.GetAll())
 
         self.cache.Add(user1, "user1")
-        self.assert_(self.cache.Get("user1"))
-        self.assert_(len(self.cache.GetAll())==1)
+        self.assertTrue(self.cache.Get("user1"))
+        self.assertTrue(len(self.cache.GetAll())==1)
 
         self.cache.Add(user1, "user1")
-        self.assert_(self.cache.Get("user1"))
-        self.assert_(len(self.cache.GetAll())==1)
+        self.assertTrue(self.cache.Get("user1"))
+        self.assertTrue(len(self.cache.GetAll())==1)
 
         self.cache.Add(user2, "user2")
-        self.assert_(self.cache.Get("user1"))
-        self.assert_(self.cache.Get("user2"))
-        self.assert_(len(self.cache.GetAll())==2)
+        self.assertTrue(self.cache.Get("user1"))
+        self.assertTrue(self.cache.Get("user2"))
+        self.assertTrue(len(self.cache.GetAll())==2)
 
         self.cache.Add(user3, "user3")
-        self.assert_(self.cache.Get("user1"))
-        self.assert_(self.cache.Get("user2"))
-        self.assert_(self.cache.Get("user3"))
-        self.assert_(len(self.cache.GetAll())==3)
+        self.assertTrue(self.cache.Get("user1"))
+        self.assertTrue(self.cache.Get("user2"))
+        self.assertTrue(self.cache.Get("user3"))
+        self.assertTrue(len(self.cache.GetAll())==3)
 
         self.cache.Invalidate("user1")
         self.assertFalse(self.cache.Get("user1"))
-        self.assert_(self.cache.Get("user2"))
-        self.assert_(self.cache.Get("user3"))
-        self.assert_(len(self.cache.GetAll())==2)
+        self.assertTrue(self.cache.Get("user2"))
+        self.assertTrue(self.cache.Get("user3"))
+        self.assertTrue(len(self.cache.GetAll())==2)
 
         self.cache.Purge()
         self.assertFalse(self.cache.Get("user1"))
-        self.assert_(self.cache.Get("user2"))
-        self.assert_(self.cache.Get("user3"))
-        self.assert_(len(self.cache.GetAll())==2)
+        self.assertTrue(self.cache.Get("user2"))
+        self.assertTrue(self.cache.Get("user3"))
+        self.assertTrue(len(self.cache.GetAll())==2)
 
         self.cache.expires = 0
         self.cache.Purge()
         self.assertFalse(self.cache.Get("user1"))
         self.assertFalse(self.cache.Get("user2"))
         self.assertFalse(self.cache.Get("user3"))
-        self.assert_(len(self.cache.GetAll())==0)
+        self.assertTrue(len(self.cache.GetAll())==0)
 
 class ListenerTest(unittest.TestCase):
     
@@ -106,7 +105,7 @@ class ListenerTest(unittest.TestCase):
         u.meta = Conf()
         u.id = 1
         sessionuser = r.SessionUserFactory("user1", u)
-        self.assert_(sessionuser)
+        self.assertTrue(sessionuser)
         r.AddToCache(sessionuser)
         
     def test_user(self):
@@ -140,22 +139,22 @@ class SessionuserTest(unittest.TestCase):
         i = ISessionUser
         
     def test_user(self):
-        self.assert_(self.user.lastlogin)
-        self.assert_(self.user.currentlogin)
-        self.assert_(self.user.data)
-        self.assert_(self.user.data.name)
-        self.assert_(self.user.data.email)
-        self.assert_(self.user.data.groups)
-        self.assert_(self.user.meta.id==1)
-        self.assert_(self.user.meta.pool_state==1)
+        self.assertTrue(self.user.lastlogin)
+        self.assertTrue(self.user.currentlogin)
+        self.assertTrue(self.user.data)
+        self.assertTrue(self.user.data.name)
+        self.assertTrue(self.user.data.email)
+        self.assertTrue(self.user.data.groups)
+        self.assertTrue(self.user.meta.id==1)
+        self.assertTrue(self.user.meta.pool_state==1)
     
     def test_groups(self):
         grps = self.user.GetGroups()
-        self.assert_(self.user.data.groups==grps)
+        self.assertTrue(self.user.data.groups==grps)
         
     def test_ingroups(self):
-        self.assert_(self.user.InGroups("here"))
-        self.assert_(self.user.InGroups(["there", "ohno"]))
+        self.assertTrue(self.user.InGroups("here"))
+        self.assertTrue(self.user.InGroups(["there", "ohno"]))
         self.assertFalse(self.user.InGroups(["ahaha", "ohno"]))
         
         

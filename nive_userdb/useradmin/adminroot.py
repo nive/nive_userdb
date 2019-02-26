@@ -8,10 +8,10 @@ Root for context to run adminview
 """
 
 from nive.definitions import RootConf
-from nive_userdb.root import root
+from nive_userdb.root import Userroot
 from nive_userdb.i18n import _
 
-class adminroot(root):
+class adminroot(Userroot):
 	"""
 	"""
 

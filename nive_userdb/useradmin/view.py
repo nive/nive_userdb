@@ -12,14 +12,14 @@ from nive_userdb.i18n import _
 # view module definition ------------------------------------------------------------------
 
 #@nive_module
-configuration = ViewModuleConf("nive.adminview.view",
+configuration = ViewModuleConf("nive.components.adminview.view",
     id = "useradmin",
     name = _(u"User management"),
     containment = IApplication,
     context = "nive_userdb.useradmin.adminroot.adminroot",
     view = "nive_userdb.useradmin.view.UsermanagementView",
     templates = "nive_userdb.useradmin:",
-    template = "nive.adminview:index.pt",
+    template = "nive.components.adminview:index.pt",
     permission = "manage users",
     # user interface configuration
     listfields = ("pool_state","name","email","groups","lastlogin","id"),
@@ -45,10 +45,10 @@ configuration.views = [
     
 # view and form implementation ------------------------------------------------------------------
 
-from nive.forms import ObjectForm
+from nive.components.reform.forms import ObjectForm
 from nive_userdb.app import UsernameValidator
 
-from nive.adminview.view import AdminBasics
+from nive.components.adminview.view import AdminBasics
     
 
 class UsermanagementView(AdminBasics):
@@ -68,7 +68,7 @@ class UsermanagementView(AdminBasics):
 
 
     def add(self):
-        name = self.context.app.GetObjectFld("name", "user").copy()
+        name = self.context.app.configurationQuery.GetObjectFld("name", "user").copy()
         name.settings["validator"] = UsernameValidator
         form = ObjectForm(loadFromType="user", view=self)
         form.subsets = {
@@ -82,7 +82,7 @@ class UsermanagementView(AdminBasics):
 
 
     def edit(self):
-        pwd = self.context.app.GetObjectFld("password", "user").copy()
+        pwd = self.context.app.configurationQuery.GetObjectFld("password", "user").copy()
         pwd.settings["update"] = True
         pwd.required = False
         form = ObjectForm(loadFromType="user", subset="edit", view=self)
@@ -108,7 +108,7 @@ class UsermanagementView(AdminBasics):
         users = []
         msgs = []
         root = self.context.dataroot
-        if isinstance(ids, basestring):
+        if isinstance(ids, str):
             ids = (ids,)
         elif not ids:
             ids = ()
