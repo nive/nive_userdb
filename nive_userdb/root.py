@@ -342,7 +342,7 @@ class Userroot(Root):
                 return False, report
 
             user = self.LookupUser(ident=ident, activeOnly=0)
-            if not user:
+            if user is None:
                 report.append(_(u"Invalid username."))
                 return False, report
         else:

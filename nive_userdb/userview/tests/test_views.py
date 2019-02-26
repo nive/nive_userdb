@@ -35,10 +35,10 @@ class tViews(__local.DefaultTestCase):
         self.root = self.app.root
         user = User(u"test")
         user.groups.append("group:admin")
-        self.root.DeleteUser("testuser")
-        self.root.DeleteUser("testuser123")
         self.request.context = self.root
         self.request.content_type = ""
+        self.app.Query("delete from pool_meta")
+        self.app.Query("delete from users")
 
     def tearDown(self):
         self.app.Close()

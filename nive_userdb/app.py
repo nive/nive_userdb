@@ -195,10 +195,14 @@ def UsernameValidator(node, value):
         err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup name in database
-    r = node.widget.form.context
-    u = r.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+    c = node.widget.form.context
+    if not c.IsRoot():
+        root = c.dataroot
+    else:
+        root = c
+    u = root.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
     if not u:
-        u = r.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+        u = root.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context
@@ -218,10 +222,14 @@ def EmailValidator(node, value):
         err = _(u"Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup email in database
-    r = node.widget.form.context
-    u = r.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+    c = node.widget.form.context
+    if not c.IsRoot():
+        root = c.dataroot
+    else:
+        root = c
+    u = root.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
     if not u:
-        u = r.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+        u = root.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context

@@ -29,7 +29,9 @@ class tViews(__local.DefaultTestCase):
         self.root = self.app.GetRoot("usermanagement")
         self.request.context = self.root
         self.request.content_type = ""
-    
+        self.app.Query("delete from pool_meta")
+        self.app.Query("delete from users")
+
 
     def tearDown(self):
         self.app.Close()
@@ -143,14 +145,14 @@ class tViews(__local.DefaultTestCase):
         v = view.UsermanagementView(context=self.root, request=self.request)
         v.__configuration__ = lambda: view.configuration
         user = self.root.GetUserByName("testuser")
-        if not user:
+        if user is None:
             self.request.POST = {"name":"testuser", "email":"test@aaa.com", "groups":("group:admin",)}
             self.request.POST["password"] = "password"
             self.request.POST["password-confirm"] = "password"
             self.request.POST["create$"] = "create"
             self.assertRaises(HTTPFound, v.add)
         user = self.root.GetUserByName("testuser")
-        if not user:
+        if user is None:
             self.assertTrue(False, "User should exist")
             
         r = v.delete()

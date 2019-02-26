@@ -76,8 +76,9 @@ class UsermanagementView(AdminBasics):
                        "actions": ["create"],
                        "defaultAction": "default"}
         }
+        form.redirectSuccess = "obj_url"
         form.Setup(subset="create")
-        result, data, action = form.Process(redirectSuccess="obj_url", pool_type="user")
+        result, data, action = form.Process(pool_type="user")
         return {u"content": data, u"result": result, u"head": form.HTMLHead()}
 
 
