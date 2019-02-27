@@ -64,7 +64,7 @@ class Userobject(Object):
         else:
             self.meta.set("pool_state", 1)
             self.data.set("token", "")
-            self.data.set("tempcache", u"firstrun")
+            self.data.set("tempcache", "firstrun")
             result = True
         if result:
             self.Signal("activate")
@@ -84,8 +84,8 @@ class Userobject(Object):
             result = wf.Action("deactivate", self, user=currentUser)
         else:
             self.meta.set("pool_state", 0)
-            self.data.set("token", u"")
-            self.data.set("tempcache", u"")
+            self.data.set("token", "")
+            self.data.set("tempcache", "")
             result = True
         if result:
             self.Signal("deactivate")
@@ -121,7 +121,7 @@ class Userobject(Object):
 
     def ReadableName(self):
         if self.data.surname or self.data.lastname: 
-            return u" ".join([self.data.surname, self.data.lastname])
+            return " ".join([self.data.surname, self.data.lastname])
         return self.data.name
 
 
@@ -136,7 +136,7 @@ class Userobject(Object):
                 del data[f]
 
         if not self.Update(data, user):
-            return False, [_(u"Update failed.")]
+            return False, [_("Update failed.")]
         
         self.Commit(user)
         return True
@@ -149,7 +149,7 @@ class Userobject(Object):
         """
         self.data["password"] = password
         if resetActivation:
-            self.data["token"] = u""
+            self.data["token"] = ""
         self.Commit(user)
         return True
 
@@ -161,7 +161,7 @@ class Userobject(Object):
         """
         self.data["email"] = email
         if resetActivation:
-            self.data["token"] = u""
+            self.data["token"] = ""
         self.Commit(user)
         return True
 
@@ -233,7 +233,7 @@ from nive_userdb.app import UsernameValidator, EmailValidator, PasswordValidator
 #@nive_module
 configuration = ObjectConf(
     id = "user",
-    name = _(u"User"),
+    name = _("User"),
     dbparam = "users",
     context = "nive_userdb.user.Userobject",
     template = "user.pt",
@@ -244,23 +244,23 @@ configuration = ObjectConf(
 
 # split the fields up in system and extended data. Makes customizing easier.
 system = [
-    FieldConf(id="name",     datatype="string",      size= 30, default=u"", required=1, name=_(u"User ID"), description=u"",
+    FieldConf(id="name",     datatype="string",      size= 30, default="", required=1, name=_("User ID"), description="",
               validator=UsernameValidator),
-    FieldConf(id="email",    datatype="email",       size=255, default=u"", required=1, name=_(u"Email"), description=u"",
+    FieldConf(id="email",    datatype="email",       size=255, default="", required=1, name=_("Email"), description="",
               validator=EmailValidator),
-    FieldConf(id="password", datatype="password",    size=100, default=u"", required=1, name=_(u"Password"), description=u"",
+    FieldConf(id="password", datatype="password",    size=100, default="", required=1, name=_("Password"), description="",
               validator=PasswordValidator),
 
-    FieldConf(id="groups",   datatype="checkbox",    size=255, default=u"", name=_(u"Groups"), settings={"codelist":"groups"}, description=u""),
-    FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_(u"Activate email notifications"), description=u""),
-    FieldConf(id="lastlogin",datatype="datetime",    size=0,   default=u"", name=_(u"Last login"), description=u""),
-    FieldConf(id="token",    datatype="string",      size=30,  default=u"", name=_(u"Token for activation or password reset")),
-    FieldConf(id="tempcache",datatype="string",      size=255, default=u"", name=_(u"Temp cache for additional verification data")),
+    FieldConf(id="groups",   datatype="checkbox",    size=255, default="", name=_("Groups"), settings={"codelist":"groups"}, description=""),
+    FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_("Activate email notifications"), description=""),
+    FieldConf(id="lastlogin",datatype="datetime",    size=0,   default="", name=_("Last login"), description=""),
+    FieldConf(id="token",    datatype="string",      size=30,  default="", name=_("Token for activation or password reset")),
+    FieldConf(id="tempcache",datatype="string",      size=255, default="", name=_("Temp cache for additional verification data")),
 ]
 extended = [
-    FieldConf(id="surname",  datatype="string",      size=100, default=u"", name=_(u"Surname"), description=u""),
-    FieldConf(id="lastname", datatype="string",      size=100, default=u"", name=_(u"Lastname"), description=u""),
-    FieldConf(id="organisation", datatype="string",  size=255, default=u"", name=_(u"Organisation"), description=u""),
+    FieldConf(id="surname",  datatype="string",      size=100, default="", name=_("Surname"), description=""),
+    FieldConf(id="lastname", datatype="string",      size=100, default="", name=_("Lastname"), description=""),
+    FieldConf(id="organisation", datatype="string",  size=255, default="", name=_("Organisation"), description=""),
 ]
 configuration.data = tuple(system+extended)
 

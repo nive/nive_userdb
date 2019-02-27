@@ -33,7 +33,7 @@ class tViews(__local.DefaultTestCase):
         self._loadApp()
         self.app.Startup(self.config)
         self.root = self.app.root
-        user = User(u"test")
+        user = User("test")
         user.groups.append("group:admin")
         self.request.context = self.root
         self.request.content_type = ""
@@ -109,9 +109,9 @@ class tViews(__local.DefaultTestCase):
     
     
     def test_mails(self):
-        user = User(u"test")
+        user = User("test")
         user.data["token"] = "123"
-        values = {"user": user, "url":"uuu", "password": "12345"}
+        values = {"user": user, "url":"uu", "password": "12345"}
         render("nive_userdb.userview:mails/notify.pt", values)
         render("nive_userdb.userview:mails/signup.pt", values)
         render("nive_userdb.userview:mails/verifymail.pt", values)
@@ -168,7 +168,7 @@ class tViews(__local.DefaultTestCase):
         view = BaseView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="activate")
-        form.method = u"GET"
+        form.method = "GET"
         self.request.POST = {}
         self.request.GET = {"token": "aaaa"}
         r,v = form.Activate("action", redirectSuccess="")

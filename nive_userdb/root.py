@@ -25,7 +25,7 @@ class Userroot(Root):
     """
     
     # field used as unique user identity internally in sessions and cache
-    identityField = u"name"
+    identityField = "name"
     
     # User account handling ------------------------------------------------------------------------------------------------------
 
@@ -60,19 +60,19 @@ class Userroot(Root):
             name = data.get("name")
         
         if not name or name == "":
-            report.append(_(u"Please enter your username"))
+            report.append(_("Please enter your username"))
             return None, report
 
         # check user with name exists
         user = self.GetUserByName(name, activeOnly=0)
         if user:
-            report.append(_(u"Username '${name}' already in use. Please choose a different name.", mapping={u"name":name}))
+            report.append(_("Username '${name}' already in use. Please choose a different name.", mapping={"name":name}))
             return None, report
         email = data.get("email")
         if email and self.app.configuration.get("loginByEmail"):
             user = self.GetUserByMail(email, activeOnly=0)
             if user:
-                report.append(_(u"Email '${name}' already in use. ", mapping={'name':email}))
+                report.append(_("Email '${name}' already in use. ", mapping={'name':email}))
                 return None, report
         
         if generatePW is None:
@@ -93,7 +93,7 @@ class Userroot(Root):
             token = self.GenerateID(30)
             data["token"] = token
 
-        data["pool_type"] = u"user"
+        data["pool_type"] = "user"
         data["pool_state"] = int(activate)
         data["pool_stag"] = StagUser
 
@@ -101,7 +101,7 @@ class Userroot(Root):
             currentUser = User(name)
         obj = self.Create("user", data=data, user=currentUser)
         if not obj:
-            report.append(_(u"Sorry. Account could not be created."))
+            report.append(_("Sorry. Account could not be created."))
             return None, report
         #obj.Commit(currentUser)
         
@@ -116,7 +116,7 @@ class Userroot(Root):
                 raise ConfigurationError("Mail tool 'sendMail' not found")
             result, value = tool(body=body, title=title, recvids=[str(obj)], force=1)
             if not result:
-                report.append(_(u"The email could not be sent."))
+                report.append(_("The email could not be sent."))
                 return None, report
 
         sysadmin = app.configuration.get("userAdmin")
@@ -131,7 +131,7 @@ class Userroot(Root):
                     raise ConfigurationError("Mail tool 'sendMail' not found")
                 result, value = tool(body=body, title=title, recvmails=[sysadmin], force=1)
 
-        report.append(_(u"Account created."))
+        report.append(_("Account created."))
         return obj, report
 
 
@@ -148,18 +148,18 @@ class Userroot(Root):
         if not user:
             if raiseUnauthorized:
                 raise Unauthorized("Login failed")
-            report.append(_(u"Sign in failed. Please check your username and password."))
+            report.append(_("Sign in failed. Please check your username and password."))
             return None, report
             
         if not user.Authenticate(password):
             if raiseUnauthorized:
                 raise Unauthorized("Login failed")
-            report.append(_(u"Sign in failed. Please check your username and password."))
+            report.append(_("Sign in failed. Please check your username and password."))
             return None, report
 
         # call user
         user.Login()
-        report.append(_(u"You are now signed in."))
+        report.append(_("You are now signed in."))
         return user, report
 
 
@@ -188,13 +188,13 @@ class Userroot(Root):
         report=[]
 
         if not newmail:
-            report.append(_(u"Please enter your new email address."))
+            report.append(_("Please enter your new email address."))
             return False, report
 
         if isinstance(name, str):
             obj = self.GetUserByName(name)
             if not obj:
-                report.append(_(u"No matching account found."))
+                report.append(_("No matching account found."))
                 return False, report
         else:
             obj = name
@@ -216,10 +216,10 @@ class Userroot(Root):
             raise ConfigurationError("Mail tool 'sendMail' not found")
         result, value = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
-            report.append(_(u"The email could not be sent."))
+            report.append(_("The email could not be sent."))
             return None, report
 
-        report.append(_(u"The link to verify your new email has been sent by mail."))
+        report.append(_("The link to verify your new email has been sent by mail."))
         return obj, report
 
 
@@ -232,13 +232,13 @@ class Userroot(Root):
         report=[]
 
         if not name:
-            report.append(_(u"Please enter your email address or username."))
+            report.append(_("Please enter your email address or username."))
             return False, report
 
         if isinstance(name, str):
             obj = self.GetUserByName(name)
             if not obj:
-                report.append(_(u"No matching account found. Please try again."))
+                report.append(_("No matching account found. Please try again."))
                 return False, report
         else:
             obj = name
@@ -269,12 +269,12 @@ class Userroot(Root):
             raise ConfigurationError("Mail tool 'sendMail' not found")
         result, value = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
-            report.append(_(u"The email could not be sent."))
+            report.append(_("The email could not be sent."))
             return False, report
 
         obj.Commit(user=currentUser)
 
-        report.append(_(u"The new password has been sent to your email address. Please sign in and change it."))
+        report.append(_("The new password has been sent to your email address. Please sign in and change it."))
         return True, report
 
 
@@ -285,13 +285,13 @@ class Userroot(Root):
         report=[]
 
         if not name:
-            report.append(_(u"Please enter your sign in name or email address."))
+            report.append(_("Please enter your sign in name or email address."))
             return None, report
 
         if isinstance(name, str):
             obj = self.GetUserByName(name)
             if not obj:
-                report.append(_(u"No matching account found."))
+                report.append(_("No matching account found."))
                 return None, report
         else:
             obj = name
@@ -321,10 +321,10 @@ class Userroot(Root):
             raise ConfigurationError("Mail tool 'sendMail' not found")
         result, value = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
-            report.append(_(u"The email could not be sent."))
+            report.append(_("The email could not be sent."))
             return None, report
 
-        report.append(_(u"The link to reset your password has been sent to your email address."))
+        report.append(_("The link to reset your password has been sent to your email address."))
         return obj, report
 
 
@@ -334,30 +334,30 @@ class Userroot(Root):
         """
         report = []
         if not ident:
-            report.append(_(u"Invalid user."))
+            report.append(_("Invalid user."))
             return False, report
         elif isinstance(ident, str):
             if not ident:
-                report.append(_(u"Invalid user."))
+                report.append(_("Invalid user."))
                 return False, report
 
             user = self.LookupUser(ident=ident, activeOnly=0)
             if user is None:
-                report.append(_(u"Invalid username."))
+                report.append(_("Invalid username."))
                 return False, report
         else:
             user = ident
 
         if IAdminUser.providedBy(user):
-            report.append(_(u"You cannot delete the admin user."))
+            report.append(_("You cannot delete the admin user."))
             return False, report
 
         self.Logout(user)
         if not self.Delete(user.id, obj=user, user=currentUser):
-            report.append(_(u"Sorry. An error occurred."))
+            report.append(_("Sorry. An error occurred."))
             return False, report
 
-        report.append(_(u"User deleted."))
+        report.append(_("User deleted."))
         return True, report
 
 
@@ -370,9 +370,9 @@ class Userroot(Root):
 
     def GeneratePassword(self, mincount=5, maxcount=5):
         # generates a password
-        vowels = u"aeiou0123456789#*"
-        consonants = u"bcdfghjklmnpqrstvwxyz"
-        password = u""
+        vowels = "aeiou0123456789#*"
+        consonants = "bcdfghjklmnpqrstvwxyz"
+        password = ""
 
         for x in range(1,random.randint(mincount+1,maxcount+1)):
             if random.choice([1,0]):
@@ -429,7 +429,7 @@ class Userroot(Root):
         Look up a user by filename (meta.pool_filename). Use this function only if your application explicitly manages
         unique user filenames. By default filenames are not used at all.
         """
-        ident = self.search.Select(pool_type=u"user", parameter={"pool_filename":filename}, fields=[u"id"], max=2)
+        ident = self.search.Select(pool_type="user", parameter={"pool_filename":filename}, fields=["id"], max=2)
         if len(ident)>1:
             raise ValueError("Filename is not unique")
         if not len(ident):
@@ -455,28 +455,28 @@ class Userroot(Root):
             # lookup id for name, email or ident
             param = {}
             if activeOnly:
-                param[u"pool_state"] = 1
+                param["pool_state"] = 1
             if name:
-                param[u"name"] = name
+                param["name"] = name
             elif email:
-                param[u"email"] = email
+                param["email"] = email
             elif ident:
                 if not self.identityField:
                     raise ValueError("user identity field not set")
                 param[self.identityField] = ident
 
-            user = self.search.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
+            user = self.search.Select(pool_type="user", parameter=param, fields=["id"], max=2)
             
             # check multiple identity fields
             if len(user)==0 and loginByEmail:
                 if name:
-                    del param[u"name"]
-                    param[u"email"] = name
-                    user = self.search.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
+                    del param["name"]
+                    param["email"] = name
+                    user = self.search.Select(pool_type="user", parameter=param, fields=["id"], max=2)
                 elif email:
-                    del param[u"email"]
-                    param[u"name"] = email
-                    user = self.search.Select(pool_type=u"user", parameter=param, fields=[u"id"], max=2)
+                    del param["email"]
+                    param["name"] = email
+                    user = self.search.Select(pool_type="user", parameter=param, fields=["id"], max=2)
                 else:
                     return None
 
@@ -502,9 +502,9 @@ class Userroot(Root):
         p = {"token": token}
         if activeOnly:
             p["pool_state"] = 1
-        users = self.search.Select(pool_type=u"user",
+        users = self.search.Select(pool_type="user",
                             parameter=p,
-                            fields=[u"id"],
+                            fields=["id"],
                             max=2)
         if len(users) != 1:
             return None
@@ -518,10 +518,10 @@ class Userroot(Root):
     def GetUsers(self, **kw):
         """
         """
-        fields = [u"id", u"name", u"email", u"title", u"groups", u"lastlogin"]
+        fields = ["id", "name", "email", "title", "groups", "lastlogin"]
         if not self.identityField in fields:
             fields.append(self.identityField)
-        return self.search.SearchType(u"user", {u"pool_state":1}, fields)
+        return self.search.SearchType("user", {"pool_state":1}, fields)
 
 
     def GetUserInfos(self, userids, fields=None, activeOnly=True):
@@ -529,29 +529,29 @@ class Userroot(Root):
         """
         param = {self.identityField:userids}
         if activeOnly:
-            param[u"pool_state"] = 1
+            param["pool_state"] = 1
         if not fields:
-            fields = [u"id", u"name", u"email", u"title", u"groups", u"lastlogin"]
+            fields = ["id", "name", "email", "title", "groups", "lastlogin"]
         if not self.identityField in fields:
             fields = list(fields)
             fields.append(self.identityField)
-        return self.search.SelectDict(pool_type=u"user",
-                               parameter=param, fields=fields, operators={self.identityField:u"IN"})
+        return self.search.SelectDict(pool_type="user",
+                               parameter=param, fields=fields, operators={self.identityField:"IN"})
 
     
     def GetUsersWithGroup(self, group, fields=None, activeOnly=True):
         """
         """
-        param = {u"groups":group}
+        param = {"groups":group}
         if activeOnly:
-            param[u"pool_state"] = 1
-        operators = {u"groups": "LIKE"}
+            param["pool_state"] = 1
+        operators = {"groups": "LIKE"}
         if not fields:
-            fields = [u"name",u"groups"]
-        elif not u"groups" in fields:
+            fields = ["name","groups"]
+        elif not "groups" in fields:
             fields = list(fields)
-            fields.append(u"groups")
-        users = self.search.SelectDict(pool_type=u"user", parameter=param, fields=fields, operators=operators)
+            fields.append("groups")
+        users = self.search.SelectDict(pool_type="user", parameter=param, fields=fields, operators=operators)
         # verify groups
         verified = []
         for u in users:
@@ -574,7 +574,7 @@ configuration = RootConf(
     template = "root.pt",
     default = 1,
     subtypes = "*",
-    name = _(u"User account"),
+    name = _("User account"),
     description = __doc__
 )
 

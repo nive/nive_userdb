@@ -196,7 +196,7 @@ class SessionUser(object):
         self.identity = ident
         self.data = data
         self.meta = meta
-        self.lastlogin = data.get(u"lastlogin")
+        self.lastlogin = data.get("lastlogin")
         self.currentlogin = time.time()
     
     def __str__(self):
@@ -226,7 +226,7 @@ class SessionUser(object):
     
     def ReadableName(self):
         if self.data.surname or self.data.lastname: 
-            return u" ".join([self.data.surname, self.data.lastname])
+            return " ".join([self.data.surname, self.data.lastname])
         return self.data.name
     
     
@@ -259,7 +259,7 @@ def SetupRootAndUser(app, pyramidConfig):
 
 configuration = ModuleConf(
     id = "sessionuser",
-    name = u"Session user cache",
+    name = "Session user cache",
     events = (Conf(event="startRegistration", callback=SetupRootAndUser),),
 
 )

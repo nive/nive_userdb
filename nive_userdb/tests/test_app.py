@@ -36,27 +36,27 @@ class ObjectTest_db(object):
         
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"")
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url="")
         self.assertTrue(o,r)
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"")
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url="")
         self.assertFalse(o,r)
 
         data["name"] = "user2"
         data["email"] = "user2@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, groups="group:author", currentUser=user, url=u"")
+        o,r = root.AddUser(data, activate=1, generatePW=1, mail=None, groups="group:author", currentUser=user, url="")
         self.assertTrue(o,r)
 
         data["name"] = "user3"
         data["email"] = "user3@aaa.ccc"
-        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, groups="group:editor", currentUser=user, url=u"")
+        o,r = root.AddUser(data, activate=0, generatePW=1, mail=None, groups="group:editor", currentUser=user, url="")
         self.assertTrue(o,r)
         self.assertTrue("group:editor" in o.data.groups, o.data.groups)
         self.assertTrue(o.data.password != "11111")
         self.assertFalse(o.meta.pool_state)
         
-        root.MailUserPass(name = "user1", url=u"")
-        root.MailUserPass(name = "user2@aaa.ccc", newPasswd="111111", url=u"")
-        root.MailUserPass(name = "user3@aaa.ccc", url=u"")
+        root.MailUserPass(name = "user1", url="")
+        root.MailUserPass(name = "user2@aaa.ccc", newPasswd="111111", url="")
+        root.MailUserPass(name = "user3@aaa.ccc", url="")
 
         self.assertTrue(root.GetUserByName("user2", activeOnly=1))
         self.assertTrue(root.GetUserByID(o.id, activeOnly=0))
@@ -90,7 +90,7 @@ class ObjectTest_db(object):
 
         data["name"] = "user2"
         data["email"] = "user2@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, generateName=True, mail=None, groups="", currentUser=user, url=u"")
+        o,r = root.AddUser(data, activate=1, generatePW=0, generateName=True, mail=None, groups="", currentUser=user, url="")
         self.assertTrue(o,r)
         self.assertTrue(o.data.name)
         self.assertTrue(o.data.name!="user2")
@@ -241,7 +241,7 @@ class ObjectTest_db(object):
 
         self.assertRaises(Invalid, UsernameValidator, node, "ua")
         self.assertRaises(Invalid, UsernameValidator, node, "#+§$%")
-        self.assertRaises(Invalid, UsernameValidator, node, "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
+        self.assertRaises(Invalid, UsernameValidator, node, "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
         self.assertRaises(Invalid, UsernameValidator, node, "group:")
         self.assertRaises(Invalid, UsernameValidator, node, "group:test")
 
@@ -312,12 +312,12 @@ class ObjectTest_db(object):
         data = {"password": "11111", "surname": "surname", "lastname": "lastname"}
         data["name"] = "user1"
         data["email"] = "user1@aaa.ccc"
-        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url=u"uuu")
+        o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user, url="uu")
         self.assertTrue(o,r)
 
-        root.MailResetPass("user1@aaa.ccc", currentUser=user, url=u"")
+        root.MailResetPass("user1@aaa.ccc", currentUser=user, url="")
         self.assertTrue(root.GetUserByName("user1").data.token)
-        o,r = root.MailResetPass("no mail", currentUser=user, url=u"")
+        o,r = root.MailResetPass("no mail", currentUser=user, url="")
         self.assertFalse(o,r)
 
         root.DeleteUser(str(root.GetUserByName("user1", activeOnly=0)))
@@ -400,7 +400,7 @@ class AdminuserTest_db(__local.DefaultTestCase):
         user = User("test")
         a=self.app
         root=a.root
-        root.identityField=u"name"
+        root.identityField="name"
         root.DeleteUser("adminXXXXX")
         root.DeleteUser("admin")
 

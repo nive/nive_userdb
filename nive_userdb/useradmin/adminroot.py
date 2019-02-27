@@ -24,6 +24,6 @@ configuration = RootConf(
 	context = "nive_userdb.useradmin.adminroot.adminroot",
     default = False,
 	subtypes = "*",
-	name = _(u"User listing"),
+	name = _("User listing"),
 	description = ""
 )

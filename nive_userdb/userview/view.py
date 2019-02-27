@@ -21,7 +21,7 @@ import collections
 #@nive_module
 configuration = ViewModuleConf(
     id = "userview",
-    name = _(u"User signup"),
+    name = _("User signup"),
     static = "nive_userdb.userview:static",
     containment = "nive_userdb.app.UserDB",
     context = "nive_userdb.root.Userroot",
@@ -115,7 +115,7 @@ class UserView(BaseView):
         """
         subset = values = None
         viewconf = self.GetViewConf()
-        title = u""
+        title = ""
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title")
@@ -130,10 +130,10 @@ class UserView(BaseView):
 
         result, data, action = form.Process(url=self.Url()+"activate", values=values, renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data,
-                u"result": result,
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
-                u"title": title}
+        return {"content": data,
+                "result": result,
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                "title": title}
 
     def update(self):
         """
@@ -188,11 +188,11 @@ class UserView(BaseView):
         """
         user=self.User(sessionuser=False)
         subset = values = None
-        title = u""
+        title = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
             values = viewconf.settings.get("values")
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit")
 
@@ -202,22 +202,22 @@ class UserView(BaseView):
 
         if user and user.id == 0:
             self.AddHeader("X-Result", "false")
-            return {u"content": _(u"Your current user can only be edited on file system level."),
-                    u"result": False, u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), u"title": title}
+            return {"content": _("Your current user can only be edited on file system level."),
+                    "result": False, "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), "title": title}
         form.Setup(subset=subset)
         try:
             result, data, action = form.Process(values=values)
             self.AddHeader("X-Result", str(result).lower())
-            return {u"content": data,
-                    u"result": result,
-                    u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
-                    u"title": title}
+            return {"content": data,
+                    "result": result,
+                    "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                    "title": title}
         except Unauthorized:
             self.AddHeader("X-Result", "false")
-            return {u"content": _(u"User not found"),
-                    u"result": False,
-                    u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
-                    u"title": title}
+            return {"content": _("User not found"),
+                    "result": False,
+                    "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                    "title": title}
             
     def activate(self):
         """
@@ -232,19 +232,19 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="activate")
         result, data, action = form.Process(renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data, 
-                u"result": result, 
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
-                u"title": title}
+        return {"content": data, 
+                "result": result, 
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
 
     def resetpass(self):
         """
@@ -259,10 +259,10 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
         form = self._loadSimpleForm()
         form.startEmpty = True
         if self.context.app.configuration.loginByEmail:
@@ -272,10 +272,10 @@ class UserView(BaseView):
         form.Setup(subset=subset)
         result, data, action = form.Process(renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data, 
-                u"result": result, 
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
-                u"title": title}
+        return {"content": data, 
+                "result": result, 
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
 
     def updatepass(self):
         """
@@ -290,19 +290,19 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="updatepass")
         result, data, action = form.Process(renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data, 
-                u"result": result, 
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
-                u"title": title}
+        return {"content": data, 
+                "result": result, 
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
 
     def updatemail1(self):
         """
@@ -318,19 +318,19 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="updatemail1")
         result, data, action = form.Process(url=self.Url()+"updatemail2", renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data, 
-                u"result": result, 
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
-                u"title": title}
+        return {"content": data, 
+                "result": result, 
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
 
     def updatemail2(self):
         """
@@ -345,19 +345,19 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
         form = self._loadSimpleForm()
         form.startEmpty = True
         form.Setup(subset="updatemail2")
         result, data, action = form.Process(renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data, 
-                u"result": result, 
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
-                u"title": title}
+        return {"content": data, 
+                "result": result, 
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
 
     def contact(self):
         """
@@ -379,13 +379,13 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         mail = receiver = None
         replyToSender = False
-        subset = u"contact"
+        subset = "contact"
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
             receiver = viewconf.settings.get("receiver")
             replyToSender = viewconf.settings.get("replyToSender")
             subset = viewconf.settings.get("form")
@@ -403,10 +403,10 @@ class UserView(BaseView):
         form.Setup(subset=subset)
         result, data, action = form.Process(receiver=receiver, replyToSender=replyToSender, mail=mail, renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
-        return {u"content": data, 
-                u"result": result, 
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
-                u"title": title}
+        return {"content": data, 
+                "result": result, 
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
 
     def login(self):
         """
@@ -423,13 +423,13 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        title = u""
+        title = ""
         resetPasswordLink = False
         viewconf = self.GetViewConf()
         subset = "login"
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
-            title = viewconf.settings.get("title",u"")
+            title = viewconf.settings.get("title","")
             resetPasswordLink = viewconf.settings.get("resetPasswordLink",resetPasswordLink)
         if self.context.app.configuration.loginByEmail:
             defaultsubset = "loginMail"
@@ -439,7 +439,7 @@ class UserView(BaseView):
         form.Setup(subset=subset)
         user = self.User()
         if not user:
-            redirect = self.GetFormValue(u"redirect")
+            redirect = self.GetFormValue("redirect")
             if not redirect:
                 try:
                     redirect = self.context.app.portal.configuration.loginSuccessUrl
@@ -448,18 +448,18 @@ class UserView(BaseView):
                 result, data, action = form.Process(redirectSuccess=redirect)
             else:
                 # pass redirect to form as hidden field
-                result, data, action = form.Process(defaultData={u"redirect":redirect}, redirectSuccess=redirect)
+                result, data, action = form.Process(defaultData={"redirect":redirect}, redirectSuccess=redirect)
             self.AddHeader("X-Result", str(result).lower())
-            return {u"content": data,
-                    u"result": result,
-                    u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
-                    u"resetPasswordLink":resetPasswordLink,
-                    u"title":title}
-        return {u"content": u"",
-                u"result": True,
-                u"head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
-                u"resetPasswordLink":resetPasswordLink,
-                u"title":title}
+            return {"content": data,
+                    "result": result,
+                    "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                    "resetPasswordLink":resetPasswordLink,
+                    "title":title}
+        return {"content": "",
+                "result": True,
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                "resetPasswordLink":resetPasswordLink,
+                "title":title}
             
     def logout(self):
         """
@@ -470,7 +470,7 @@ class UserView(BaseView):
         user = self.UserName()
         a = self.context.Logout(user)
         app.ForgetLogin(self.request)
-        redirect = self.GetFormValue(u"redirect")
+        redirect = self.GetFormValue("redirect")
         if not redirect:
             try:
                 redirect = self.context.app.portal.configuration.logoutSuccessUrl
@@ -478,7 +478,7 @@ class UserView(BaseView):
                 redirect = self.context.app.portal.configuration.portalDefaultUrl
         if redirect:
             localizer = translator(self.request)
-            self.Redirect(redirect, messages=[localizer(_(u"You have been logged out!"))])
+            self.Redirect(redirect, messages=[localizer(_("You have been logged out!"))])
         return {}
     
     def logoutlink(self):
@@ -498,7 +498,7 @@ class UserView(BaseView):
         user = self.User(sessionuser=False)
         if user is None:
             return {"result": False}
-        user.data["tempcache"] = u""
+        user.data["tempcache"] = ""
         user.Commit(user=user)
         return {"result": True}
 
@@ -517,21 +517,21 @@ class UserView(BaseView):
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         user=self.User(sessionuser=False)
-        title = u""
-        description = u""
+        title = ""
+        description = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
-            title = viewconf.settings.get("title",u"")
-            description = viewconf.settings.get("description",u"")
-        values = {u"title": title, u"description": description, u"result":False}
+            title = viewconf.settings.get("title","")
+            description = viewconf.settings.get("description","")
+        values = {"title": title, "description": description, "result":False}
         if user is None:
             return values
-        remove = self.GetFormValue(u"remove", method="POST")==u"1"
+        remove = self.GetFormValue("remove", method="POST")=="1"
         if remove:
             # delete the object, cache and sign out
             self.context.DeleteUser(user, currentUser=user)
             self.context.app.ForgetLogin(self.request)
-            values[u"result"] = True
+            values["result"] = True
             self.AddHeader("X-Result", "true")
         return values
 
@@ -539,9 +539,9 @@ class UserView(BaseView):
     def insertMessages(self):
         messages = self.request.session.pop_flash("")
         if not messages:
-            return u""
-        html = u"""<div class="alert alert-success">%s</div>"""
-        return html % (u"</li><li>".join(messages))
+            return ""
+        html = """<div class="alert alert-success">%s</div>"""
+        return html % ("</li><li>".join(messages))
 
 
     def _loadSimpleForm(self):
@@ -617,11 +617,11 @@ class UserForm(ObjectForm):
         ObjectForm.__init__(self, view=view, loadFromType=loadFromType, context=context, request=request, app=app, **kw)
 
         self.actions = [
-            Conf(id="default",    method="StartForm", name=u"Initialize",    hidden=True),
-            Conf(id="defaultEdit",method="LoadUser",  name=u"Initialize",    hidden=True),
-            Conf(id="create",     method="AddUser",   name=_(u"Signup"),        hidden=False),
-            Conf(id="edit",       method="Update",    name=_(u"Confirm"),       hidden=False),
-            Conf(id="login",      method="Login",     name=_(u"Login"),         hidden=False),
+            Conf(id="default",    method="StartForm", name="Initialize",    hidden=True),
+            Conf(id="defaultEdit",method="LoadUser",  name="Initialize",    hidden=True),
+            Conf(id="create",     method="AddUser",   name=_("Signup"),        hidden=False),
+            Conf(id="edit",       method="Update",    name=_("Confirm"),       hidden=False),
+            Conf(id="login",      method="Login",     name=_("Login"),         hidden=False),
         ]
 
         self.subsets = {
@@ -657,7 +657,7 @@ class UserForm(ObjectForm):
 
             "activate": {
                 "fields": [FieldConf(id="token", datatype="string", size="500", name="Activation token", required=True, hidden=False)],
-                "actions": [Conf(id="activate", method="Activate", name=_(u"Activate"), hidden=False)],
+                "actions": [Conf(id="activate", method="Activate", name=_("Activate"), hidden=False)],
                 "defaultAction": "activate"
             },
             "updatepass":{
@@ -665,14 +665,14 @@ class UserForm(ObjectForm):
                     FieldConf(id="oldpassword",
                               datatype="password",
                               size=100,
-                              default=u"",
+                              default="",
                               required=1,
-                              name=_(u"Old password"),
+                              name=_("Old password"),
                               settings={"single":True},
                               validator=OldPwValidator),
                     "password"
                 ],
-                "actions": [Conf(id="updatepass", method="UpdatePass", name=_(u"Update password"), hidden=False)],
+                "actions": [Conf(id="updatepass", method="UpdatePass", name=_("Update password"), hidden=False)],
                 "defaultAction": "default"
             },
 
@@ -681,34 +681,34 @@ class UserForm(ObjectForm):
                     FieldConf(id="newmail",
                            datatype="email",
                            size=255,
-                           default=u"",
+                           default="",
                            required=1,
-                           name=_(u"New email"),
+                           name=_("New email"),
                            validator=EmailValidator)
                 ],
-                "actions": [Conf(id="updatemail", method="UpdateMail", name=_(u"Update email"), hidden=False)],
+                "actions": [Conf(id="updatemail", method="UpdateMail", name=_("Update email"), hidden=False)],
                 "defaultAction": "default"
             },
             "updatemail2": {
                 "fields": [FieldConf(id="token", datatype="string", size="500", name="Activation token", required=True, hidden=False)],
-                "actions": [Conf(id="updatemail_token", method="UpdateMailToken", name=_(u"Verify email"), hidden=False)],
+                "actions": [Conf(id="updatemail_token", method="UpdateMailToken", name=_("Verify email"), hidden=False)],
                 "defaultAction": "updatemail_token"
             },
 
             "resetpass": {
                 "fields": [FieldConf(id="name", name=_("Name"), datatype="string")],
-                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"), hidden=False)],
+                "actions": [Conf(id="resetpass", method="ResetPass", name=_("Reset password"), hidden=False)],
                 "defaultAction": "default"
             },
             "resetpassMail": {
                 "fields": [FieldConf(id="name", name=_("Email"), datatype="string")],
-                "actions": [Conf(id="resetpass", method="ResetPass", name=_(u"Reset password"), hidden=False)],
+                "actions": [Conf(id="resetpass", method="ResetPass", name=_("Reset password"), hidden=False)],
                 "defaultAction": "default"
             },
             "contact": {
                 "fields": [FieldConf(id="message", name=_("Message"), datatype="text", required=True, size=3000)],
-                "actions": [Conf(id="contact", method="Contact", name=_(u"Send message"), hidden=False)],
-                "defaultAction": Conf(id="default", method="StartRequestPOST", name=_(u"Initialize"), hidden=True)
+                "actions": [Conf(id="contact", method="Contact", name=_("Send message"), hidden=False)],
+                "defaultAction": Conf(id="default", method="StartRequestPOST", name=_("Initialize"), hidden=True)
             },
         }
 
@@ -773,7 +773,7 @@ class UserForm(ObjectForm):
                 data.update(kw["values"])
             result = user.SecureUpdate(data, user)
             if result:
-                msgs.append(_(u"OK."))
+                msgs.append(_("OK."))
 
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
 
@@ -803,18 +803,18 @@ class UserForm(ObjectForm):
         result = False
         data = self.GetFormValue("token",method="ALL")
         if data:
-            if data.find(u"token=")!=-1:
-                data = data.split(u"token=")[-1]
+            if data.find("token=")!=-1:
+                data = data.split("token=")[-1]
             user = self.context.GetUserForToken(data, activeOnly=False)
             if user is not None:
                 result = True
                 user.Activate(currentUser=user)
-                msgs = [self.context.app.configuration.get("activationMessage") or _(u"OK.")]
+                msgs = [self.context.app.configuration.get("activationMessage") or _("OK.")]
             else:
                 result = False
         if not result:
-            msgs = [_(u"The token is invalid. Please make sure it is complete.")]
-        data = {"token": data or u""}
+            msgs = [_("The token is invalid. Please make sure it is complete.")]
+        data = {"token": data or ""}
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
 
 
@@ -832,7 +832,7 @@ class UserForm(ObjectForm):
 
         result = user.UpdatePassword(data["password"], user)
         if result:
-            msgs.append(_(u"OK. Password changed."))
+            msgs.append(_("OK. Password changed."))
             return result, self.Render(data, msgs=msgs, errors=None, messagesOnly=True)
         return result, self.Render(data)
 
@@ -861,22 +861,22 @@ class UserForm(ObjectForm):
         result = False
         data = self.GetFormValue("token",method="ALL")
         if data:
-            if data.find(u"token=")!=-1:
-                data = data.split(u"token=")[-1]
+            if data.find("token=")!=-1:
+                data = data.split("token=")[-1]
             user = self.context.GetUserForToken(data)
             if user:
                 mail = user.data.tempcache
-                if mail.startswith(u"verifymail:"):
-                    mail = mail.replace(u"verifymail:",u"")
+                if mail.startswith("verifymail:"):
+                    mail = mail.replace("verifymail:","")
                     user.data["email"] = mail
-                    user.data["tempcache"] = u""
-                    user.data["token"] = u""
+                    user.data["tempcache"] = ""
+                    user.data["token"] = ""
                     user.Commit(user=user)
-                    msgs = [_(u"OK. The new email address has been activated.")]
+                    msgs = [_("OK. The new email address has been activated.")]
                     result = True
         if not result:
-            msgs = [_(u"The token is invalid. Please make sure it is complete.")]
-        data = {"token": data or u""}
+            msgs = [_("The token is invalid. Please make sure it is complete.")]
+        data = {"token": data or ""}
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
 
 
@@ -909,10 +909,10 @@ class UserForm(ObjectForm):
         recv = kw.get("receiver")
         if not isinstance(recv, (list, tuple)):
             result = False
-            msgs = (_(u"No receiver specified."),)
+            msgs = (_("No receiver specified."),)
             return result, self.Render(data, msgs=msgs, errors=errors)
 
-        replyTo = u""
+        replyTo = ""
         user = self.view.User()
         if kw.get("replyToSender")==True:
             replyTo=user.data.email
@@ -926,8 +926,8 @@ class UserForm(ObjectForm):
 
         result, value = tool(body=body, title=title, recvmails=recv, replyTo=replyTo, force=1)
         if not result:
-            msgs=(_(u"The email could not be sent."),)
+            msgs=(_("The email could not be sent."),)
         else:
-            msgs = (_(u"The email has been sent."),)
+            msgs = (_("The email has been sent."),)
         return self._FinishFormProcessing(result, data, msgs, None, **kw)
 

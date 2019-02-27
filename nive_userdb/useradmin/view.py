@@ -14,7 +14,7 @@ from nive_userdb.i18n import _
 #@nive_module
 configuration = ViewModuleConf("nive.components.adminview.view",
     id = "useradmin",
-    name = _(u"User management"),
+    name = _("User management"),
     containment = IApplication,
     context = "nive_userdb.useradmin.adminroot.adminroot",
     view = "nive_userdb.useradmin.view.UsermanagementView",
@@ -25,7 +25,7 @@ configuration = ViewModuleConf("nive.components.adminview.view",
     listfields = ("pool_state","name","email","groups","lastlogin","id"),
     addfields = ("name","password","email","groups"),
     editfields = (FieldConf(id="pool_state", name=_("Active"), datatype="bool",
-                            widget=RadioChoiceWidget(values=((u"true", _(u"Yes")),(u"false", _(u"No"))))),
+                            widget=RadioChoiceWidget(values=(("true", _("Yes")),("false", _("No"))))),
                   "name",
                   FieldConf(id="password", name=_("Password"), datatype="password", settings={"update": True}),
                   "email","groups")
@@ -57,8 +57,8 @@ class UsermanagementView(AdminBasics):
     def GetAdminWidgets(self):
         url = self.FolderUrl(self.context.dataroot)
         confs = [
-            Conf(id="admin.root", viewmapper=url+"list", name=_(u"List users")),
-            Conf(id="admin.add", viewmapper=url+"add", name=_(u"Add user"))
+            Conf(id="admin.root", viewmapper=url+"list", name=_("List users")),
+            Conf(id="admin.add", viewmapper=url+"add", name=_("Add user"))
         ]
         return confs
 
@@ -79,7 +79,7 @@ class UsermanagementView(AdminBasics):
         form.redirectSuccess = "obj_url"
         form.Setup(subset="create")
         result, data, action = form.Process(pool_type="user")
-        return {u"content": data, u"result": result, u"head": form.HTMLHead()}
+        return {"content": data, "result": result, "head": form.HTMLHead()}
 
 
     def edit(self):
@@ -100,7 +100,7 @@ class UsermanagementView(AdminBasics):
         }        
         form.Setup(subset="edit")
         result, data, action = form.Process()#, redirectSuccess="obj_url")
-        return {u"content": data, u"result": result, u"head": form.HTMLHead()}
+        return {"content": data, "result": result, "head": form.HTMLHead()}
             
     
     def delete(self):
@@ -116,7 +116,7 @@ class UsermanagementView(AdminBasics):
         for i in ids:
             u = root.GetUserByID(i, activeOnly=0)
             if not u:
-                msgs.append(self.Translate(_(u"User not found. (id %(name)s)", mapping={"name": i})))
+                msgs.append(self.Translate(_("User not found. (id %(name)s)", mapping={"name": i})))
             else:
                 users.append(u)
         result = True
@@ -125,13 +125,13 @@ class UsermanagementView(AdminBasics):
                 name = u.data.name
                 if not root.Delete(id=u.id, obj=u, user=self.User()):
                     result = False
-                    msgs.append(self.Translate(_(u"Delete failed: User '%(name)s'", mapping={"name": u.meta.title})))
+                    msgs.append(self.Translate(_("Delete failed: User '%(name)s'", mapping={"name": u.meta.title})))
             users=()
             if result:
                 if len(ids)>1:
-                    msgs.append(self.Translate(_(u"OK. Users deleted.")))
+                    msgs.append(self.Translate(_("OK. Users deleted.")))
                 else:
-                    msgs.append(self.Translate(_(u"OK. User deleted.")))
+                    msgs.append(self.Translate(_("OK. User deleted.")))
             return self.Redirect(self.Url(root), msgs)
         return {"ids": ids, "users":users, "result": result, "msgs": msgs, "confirm": confirm} 
     
@@ -141,7 +141,7 @@ class UsermanagementView(AdminBasics):
         if paged result the previous, next and set links
         """
         if items.get('total', 0) == 0:
-            return u""
+            return ""
 
         # pages
         url = self.CurrentUrl()
@@ -149,22 +149,22 @@ class UsermanagementView(AdminBasics):
         maxPage = items.get("max")
         total = items.get("total")
         pageCount = total / maxPage + (total % maxPage != 0)
-        pageHtml = u""
+        pageHtml = ""
 
         if total <= maxPage:
-            return u""
+            return ""
 
-        cntstr = u"%d - %d / %d"
+        cntstr = "%d - %d / %d"
         cnt = cntstr % (items.get('start')+1, items.get('start')+items.get('count'), items.get('total'))
-        pageTmpl = u""" <a href="%s?st=%s&so=%s&as=%s">%s</a> """
+        pageTmpl = """ <a href="%s?st=%s&so=%s&as=%s">%s</a> """
         prev = pageTmpl % (url, items.get("prev"), sort, ascending, "&laquo;")
         next = pageTmpl % (url, items.get("next"), sort, ascending, "&raquo;")
-        pageTmpl1 = u""" [%s] """
+        pageTmpl1 = """ [%s] """
 
         if items.get("start")==0:
-            prev = u"&laquo;"
+            prev = "&laquo;"
         if items.get("next")==0:
-            next = u"&raquo;"
+            next = "&raquo;"
 
         if pageCount > 1:
             current = int(start / maxPage)
@@ -193,10 +193,10 @@ class UsermanagementView(AdminBasics):
                 else:
                     pageHtml = pageHtml + pageTmpl % (url, maxPage * i, sort, ascending, str(i + 1))
         else:
-            prev = u""
-            next = u""
+            prev = ""
+            next = ""
 
-        html = u"""<div class="paging"><div>%s %s %s %s</div></div>""" % (cnt, prev, pageHtml, next)
+        html = """<div class="paging"><div>%s %s %s %s</div></div>""" % (cnt, prev, pageHtml, next)
         return html
 
 

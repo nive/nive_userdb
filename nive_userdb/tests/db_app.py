@@ -49,12 +49,12 @@ def app_nodb():
 
 def emptypool(app):
     db = app.db
-    db.Query(u"delete FROM pool_meta")
-    db.Query(u"delete FROM pool_files")
-    db.Query(u"delete FROM pool_fulltext")
-    db.Query(u"delete FROM pool_groups")
-    db.Query(u"delete FROM pool_sys")
-    db.Query(u"delete FROM users")
+    db.Query("delete FROM pool_meta")
+    db.Query("delete FROM pool_files")
+    db.Query("delete FROM pool_fulltext")
+    db.Query("delete FROM pool_groups")
+    db.Query("delete FROM pool_sys")
+    db.Query("delete FROM users")
     import shutil
     shutil.rmtree(str(db.root), ignore_errors=True)
     db.root.CreateDirectories()

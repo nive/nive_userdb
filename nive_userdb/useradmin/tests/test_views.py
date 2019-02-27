@@ -48,7 +48,7 @@ class tViews(__local.DefaultTestCase):
         v.view()
 
     def test_templates(self):
-        user = User(u"test")
+        user = User("test")
         v = view.UsermanagementView(context=self.root, request=self.request)
         v.__configuration__ = lambda: view.configuration
         vrender = {"context":self.root, "view":v, "request": self.request}

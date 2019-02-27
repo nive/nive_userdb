@@ -13,7 +13,7 @@ The system admin for notification mails can be specified as `systemAdmin`.
 ::
 
     configuration.admin = {"name": "admin", "password": "adminpass", "email": "admin@domain.com"}
-    configuration.systemAdmin = (u"email", u"display name")
+    configuration.systemAdmin = ("email", "display name")
 
 """
 import hashlib
@@ -32,7 +32,7 @@ from nive_userdb.i18n import _
 #@nive_module
 configuration = AppConf(
     id = "userdb",
-    title = _(u"Users"),
+    title = _("Users"),
 
     loginByEmail = True,
     cookieAuthMaxAge=0, # e.g. 60*60*24*7 one week
@@ -45,21 +45,21 @@ configuration = AppConf(
         generateName=False
     ),
     # contact system information
-    #userAdmin = (u"admin@mymail.com", u"Admin"),
+    #userAdmin = ("admin@mymail.com", "Admin"),
     # non-db admin login
-    #admin = {"name": "adminusername", "password": "adminpass", "email": "u"admin@mymail.com""},
+    #admin = {"name": "adminusername", "password": "adminpass", "email": ""admin@mymail.com""},
 
     # mails
-    mailSignup = Mail(_(u"Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
-    mailNotify = Mail(_(u"Signup notification"), "nive_userdb:userview/mails/notify.pt"),
-    mailVerifyMail = Mail(_(u"Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
-    mailResetPass = Mail(_(u"Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
-    mailSendPass = Mail(_(u"Your password"), "nive_userdb:userview/mails/mailpass.pt"),
-    mailContact = Mail(_(u"Contact form"), "nive_userdb:userview/mails/contact.pt"),
+    mailSignup = Mail(_("Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
+    mailNotify = Mail(_("Signup notification"), "nive_userdb:userview/mails/notify.pt"),
+    mailVerifyMail = Mail(_("Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
+    mailResetPass = Mail(_("Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
+    mailSendPass = Mail(_("Your password"), "nive_userdb:userview/mails/mailpass.pt"),
+    mailContact = Mail(_("Contact form"), "nive_userdb:userview/mails/contact.pt"),
 
     # messages customizations
-    welcomeMessage = u"",
-    activationMessage = u"",
+    welcomeMessage = "",
+    activationMessage = "",
 
     # sessionuser field cache
     sessionuser = ("name", "email", "surname", "lastname", "groups", "notify", "lastlogin"),
@@ -179,7 +179,7 @@ def IsReservedUserName(name):
     if not name:
         return True
     name = name.lower()
-    if name.startswith(u"group:"):
+    if name.startswith("group:"):
         return True
     return False
 
@@ -192,7 +192,7 @@ def UsernameValidator(node, value):
     Literal()(node, value)
     Length(min=5,max=30)(node, value)
     if IsReservedUserName(value):
-        err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
+        err = _("Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup name in database
     c = node.widget.form.context
@@ -200,15 +200,15 @@ def UsernameValidator(node, value):
         root = c.dataroot
     else:
         root = c
-    u = root.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+    u = root.search.Select(pool_type="user", parameter={"name": value}, fields=["id","name","email"], max=2, operators={"name":"="})
     if not u:
-        u = root.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+        u = root.search.Select(pool_type="user", parameter={"email": value}, fields=["id","name","email"], max=2, operators={"email":"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context
         if len(u)==1 and ctx.id == u[0][0]:
             return
-        err = _(u"Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
+        err = _("Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
         raise Invalid(node, err)
 
 def EmailValidator(node, value):
@@ -219,7 +219,7 @@ def EmailValidator(node, value):
     # validate email format
     Email()(node, value)
     if IsReservedUserName(value):
-        err = _(u"Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
+        err = _("Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
         raise Invalid(node, err)
     # lookup email in database
     c = node.widget.form.context
@@ -227,15 +227,15 @@ def EmailValidator(node, value):
         root = c.dataroot
     else:
         root = c
-    u = root.search.Select(pool_type=u"user", parameter={u"email": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"email":u"="})
+    u = root.search.Select(pool_type="user", parameter={"email": value}, fields=["id","name","email"], max=2, operators={"email":"="})
     if not u:
-        u = root.search.Select(pool_type=u"user", parameter={u"name": value}, fields=[u"id",u"name",u"email"], max=2, operators={u"name":u"="})
+        u = root.search.Select(pool_type="user", parameter={"name": value}, fields=["id","name","email"], max=2, operators={"name":"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context
         if len(u)==1 and ctx.id == u[0][0]:
             return
-        err = _(u"Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
+        err = _("Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
         raise Invalid(node, err)
 
 def PasswordValidator(node, value):
@@ -246,7 +246,7 @@ def PasswordValidator(node, value):
     Length(min=5,max=30)(node, value)
     chars = ''.join(set(value))
     if len(chars)<5:
-        err = _(u"Password is too simple. It should have at least 5 different characters.")
+        err = _("Password is too simple. It should have at least 5 different characters.")
         raise Invalid(node, err)
 
 def OldPwValidator(node, value):
@@ -255,7 +255,7 @@ def OldPwValidator(node, value):
     """
     user = node.widget.form.view.User(sessionuser=False)
     if not user.Authenticate(value):
-        err = _(u"The old password does not match.")
+        err = _("The old password does not match.")
         raise Invalid(node, err)
 
 def AcceptValidator(node, value):
@@ -263,7 +263,7 @@ def AcceptValidator(node, value):
     Validator which succeeds if the checkbox is ticked (true).
     """
     if not value==True:
-        err = _(u"Please accept the terms and conditions.")
+        err = _("Please accept the terms and conditions.")
         raise Invalid(node, err)
 
 def Sha(password):
