@@ -140,7 +140,7 @@ class RootListener(object):
     def LookupCache(self, ident=None, activeOnly=None):
         user = self.app.usercache.Get(ident)
         if user:
-            raise UserFound(UserFound(user))
+            raise UserFound(user)
 
     def AddToCache(self, user=None, lastlogin=None):
         sessionuser = self.SessionUserFactory(user.identity, user)
