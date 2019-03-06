@@ -22,7 +22,7 @@ class adminroot(Userroot):
 configuration = RootConf(
 	id = "usermanagement",
 	context = "nive_userdb.useradmin.adminroot.adminroot",
-    default = False,
+	default = False,
 	subtypes = "*",
 	name = _("User listing"),
 	description = ""
