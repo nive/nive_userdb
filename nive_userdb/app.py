@@ -19,7 +19,7 @@ The system admin for notification mails can be specified as `systemAdmin`.
 import hashlib
 
 from nive.definitions import AppConf, GroupConf, Conf
-from nive.definitions import implementer, IUserDatabase, ILocalGroups
+from nive.definitions import implementer, IUserDatabase, ILocalGroups, IRoot
 from nive.security import Allow, Deny, Everyone, Authenticated, ALL_PERMISSIONS, remember, forget
 from nive.application import Application
 from nive.views import Mail
@@ -196,8 +196,8 @@ def UsernameValidator(node, value):
         raise Invalid(node, err)
     # lookup name in database
     c = node.widget.form.context
-    if not c.IsRoot():
-        root = c.dataroot
+    if not IRoot.providedBy(c):
+        root = c.root
     else:
         root = c
     u = root.search.Select(pool_type="user", parameter={"name": value}, fields=["id","name","email"], max=2, operators={"name":"="})
@@ -223,8 +223,8 @@ def EmailValidator(node, value):
         raise Invalid(node, err)
     # lookup email in database
     c = node.widget.form.context
-    if not c.IsRoot():
-        root = c.dataroot
+    if not IRoot.providedBy(c):
+        root = c.root
     else:
         root = c
     u = root.search.Select(pool_type="user", parameter={"email": value}, fields=["id","name","email"], max=2, operators={"email":"="})
