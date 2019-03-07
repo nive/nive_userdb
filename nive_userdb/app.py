@@ -127,7 +127,7 @@ class UserDB(Application):
                         del request.environ["authenticated_user"]
                 request.add_finished_callback(remove_user)
         else:
-            user = self.GetUser(userid)
+            user = self.root.GetUser(userid)
 
         if user is None:
             return None
