@@ -106,8 +106,8 @@ class Userroot(Root):
         #obj.Commit(currentUser)
         
         app = self.app
-        if mail=="default":
-            mail = app.configuration.mailSignup
+        if mail == "default":
+            mail = app.configuration.settings.get("signupMail")
         if mail:
             title = mail.title
             body = mail(user=obj, **kw)
@@ -121,9 +121,9 @@ class Userroot(Root):
 
         sysadmin = app.configuration.get("userAdmin")
         if sysadmin:
-            if notifyMail=="default":
-                notifyMail = self.app.configuration.mailNotify
-            if notifyMail:
+            if notifyMail == "default":
+                notifyMail = app.configuration.settings.get("notifyMail")
+            if notifyMail is not None:
                 title = notifyMail.title
                 body = notifyMail(user=obj)
                 tool = app.GetTool("sendMail")
@@ -207,8 +207,8 @@ class Userroot(Root):
         obj.Commit(user=currentUser)
 
         app = self.app
-        if mail=="default":
-            mail = self.app.configuration.mailVerifyMail
+        if mail == "default":
+            mail = self.app.configuration.settings.verifyPasswordMail
         title = mail.title
         body = mail(user=obj, **kw)
         tool = app.GetTool("sendMail")
@@ -258,7 +258,7 @@ class Userroot(Root):
 
         if mail=="default":
             try:
-                mail = self.app.configuration.mailSendPass
+                mail = self.app.configuration.settigs.sendPasswordMail
             except AttributeError as e:
                 raise ConfigurationError(str(e))
 
@@ -309,7 +309,7 @@ class Userroot(Root):
         app = self.app
         if mail=="default":
             try:
-                mail = self.app.configuration.mailResetPass
+                mail = self.app.configuration.settings.resetPasswordMail
             except AttributeError as e:
                 raise ConfigurationError(str(e))
         if not mail:

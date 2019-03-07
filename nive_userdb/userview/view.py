@@ -917,7 +917,7 @@ class UserForm(ObjectForm):
         if kw.get("replyToSender")==True:
             replyTo=user.data.email
 
-        mail = kw.get("mail") or self.context.app.configuration.mailContact
+        mail = kw.get("mail") or self.context.app.configuration.settings.contactMail
         title = mail.title
         body = mail(sender=user, data=data, form=self, **kw)
         tool = self.context.app.GetTool("sendMail")

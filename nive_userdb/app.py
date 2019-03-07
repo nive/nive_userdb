@@ -42,20 +42,20 @@ configuration = AppConf(
         groups=(),
         activate=1,
         generatePW=0,
-        generateName=False
+        generateName=False,
+        # mails
+        # disabled by default -> requires mailhost setup!
+        signupMail = None, #Mail(_("Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
+        notifyMail = None, #Mail(_("Signup notification"), "nive_userdb:userview/mails/notify.pt"),
+        sendPasswordMail = Mail(_("Your password"), "nive_userdb:userview/mails/mailpass.pt"),
+        verifyPasswordMail = Mail(_("Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
+        resetPasswordMail = Mail(_("Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
+        contactMail = Mail(_("Contact form"), "nive_userdb:userview/mails/contact.pt"),
     ),
     # contact system information
     #userAdmin = ("admin@mymail.com", "Admin"),
     # non-db admin login
     #admin = {"name": "adminusername", "password": "adminpass", "email": ""admin@mymail.com""},
-
-    # mails
-    mailSignup = Mail(_("Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
-    mailNotify = Mail(_("Signup notification"), "nive_userdb:userview/mails/notify.pt"),
-    mailVerifyMail = Mail(_("Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
-    mailResetPass = Mail(_("Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
-    mailSendPass = Mail(_("Your password"), "nive_userdb:userview/mails/mailpass.pt"),
-    mailContact = Mail(_("Contact form"), "nive_userdb:userview/mails/contact.pt"),
 
     # messages customizations
     welcomeMessage = "",
