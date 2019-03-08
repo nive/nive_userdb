@@ -74,17 +74,18 @@ configuration.modules = [
     "nive_userdb.user", 
     # session user cache
     "nive_userdb.extensions.sessionuser",
-    # user actions
-    "nive_userdb.userview.view",
-    "nive.components.reform.reformed",
-    # user administration
-    "nive_userdb.useradmin.adminroot",
-    "nive_userdb.useradmin", 
     # tools
-    "nive.tools.dbStructureUpdater", 
-    # administration and persistence
-    "nive.components.adminview",
-    "nive.extensions.persistence.dbPersistenceConfiguration"
+    "nive.components.reform.reformed",
+    "nive.tools.dbStructureUpdater",
+    "nive.extensions.persistence.dbPersistenceConfiguration",
+    # system administration
+    "nive.components.adminview"
+
+    # user actions
+    # "nive_userdb.userview.view", -> removed default userviews by default.
+    # user administration
+    #"nive_userdb.useradmin.adminroot", -> removed system views by default.
+    #"nive_userdb.useradmin", -> removed system views by default.
 ]
 
 configuration.acl= [

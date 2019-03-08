@@ -22,6 +22,7 @@ configuration = ViewModuleConf("nive.components.adminview.view",
     template = "nive.components.adminview:index.pt",
     permission = "manage users",
     # user interface configuration
+    adminLink = "app_folder_url/usermanagement",
     listfields = ("pool_state","name","email","groups","lastlogin","id"),
     addfields = ("name","password","email","groups"),
     editfields = (FieldConf(id="pool_state", name=_("Active"), datatype="bool",
@@ -45,7 +46,7 @@ configuration.views = [
     
 # view and form implementation ------------------------------------------------------------------
 
-from nive.components.reform.forms import ObjectForm
+from nive.components.reform.forms import ObjectForm, HTMLForm
 from nive_userdb.app import UsernameValidator
 
 from nive.components.adminview.view import AdminBasics
@@ -64,7 +65,19 @@ class UsermanagementView(AdminBasics):
 
 
     def view(self):
-        return {}
+
+        flds = self.configuration.searchfields
+        form = HTMLForm(view=self)
+        form.actions = [
+            Conf(id="default", method="StartForm", name="Initialize", hidden=True),
+            Conf(id="search",  method="ReturnDataOnSuccess", name="Aktualisieren", hidden=False),
+        ]
+        form.fields = flds
+        form.Setup()
+        result, formvalues, e = form.Validate(self.request)
+        formhtml = form.RenderBody(formvalues, msgs=None, errors=None, result=None)
+
+        return dict(formhtml=formhtml, formvalues=formvalues)
 
 
     def add(self):

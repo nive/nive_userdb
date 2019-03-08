@@ -17,7 +17,7 @@ msgstr ""
 
 #: nive_userdb/app.py:36 nive_userdb/useradmin/delete.pt:28
 msgid "Users"
-msgstr "Benutzer"
+msgstr "User"
 
 #: nive_userdb/app.py:193 nive_userdb/app.py:205 nive_userdb/root.py:69
 #, python-format
@@ -67,7 +67,7 @@ msgstr "Kontakt Formular"
 
 #: nive_userdb/root.py:598
 msgid "User account"
-msgstr "Benutzerkonto"
+msgstr "Userkonto"
 
 #: nive_userdb/root.py:134
 msgid "Account created."
@@ -97,7 +97,7 @@ msgstr ""
 
 #: nive_userdb/root.py:358
 msgid "User deleted."
-msgstr "Benutzer gelöscht."
+msgstr "User gelöscht."
 
 #: nive_userdb/root.py:63
 msgid "Please enter your username"
@@ -163,7 +163,7 @@ msgstr "Ungültiger Login-Name."
 
 #: nive_userdb/user.py:235
 msgid "User"
-msgstr "Benutzer"
+msgstr "User"
 
 #: nive_userdb/user.py:246
 msgid "User ID"
@@ -225,11 +225,11 @@ msgstr "Alle löschen"
 
 #: nive_userdb/useradmin/delete.pt:48
 msgid "Please select a user first!"
-msgstr "Bitte erst eine/n Benutzer/in auswählen!"
+msgstr "Bitte erst eine User auswählen!"
 
 #: nive_userdb/useradmin/view.py:19
 msgid "User management"
-msgstr "Benutzerverwaltung"
+msgstr "Userverwaltung"
 
 #: nive_userdb/useradmin/view.py:29 nive_userdb/useradmin/edit.pt:12
 msgid "Active"
@@ -245,7 +245,7 @@ msgstr "User hinzufügen"
 
 #: nive_userdb/useradmin/view.py:121
 msgid "User not found. (id %(name)s)"
-msgstr "Benutzer/in nicht gefunden. (id %(name)s)"
+msgstr "User nicht gefunden. (id %(name)s)"
 
 #: nive_userdb/useradmin/view.py:130
 msgid "Delete failed: User '%(name)s'"
@@ -253,11 +253,11 @@ msgstr "Löschen fehlgeschlagen: '%(name)s'"
 
 #: nive_userdb/useradmin/view.py:134
 msgid "OK. Users deleted."
-msgstr "Ok. Benutzer gelöscht."
+msgstr "Ok. User gelöscht."
 
 #: nive_userdb/useradmin/view.py:136
 msgid "OK. User deleted."
-msgstr "Ok. Benutzer gelöscht."
+msgstr "Ok. User gelöscht."
 
 #: nive_userdb/useradmin/view.py:30
 msgid "Yes"
@@ -277,7 +277,7 @@ msgstr "Erstellt"
 
 #: nive_userdb/useradmin/adminroot.py:27
 msgid "User listing"
-msgstr "Benutzerliste"
+msgstr "Userliste"
 
 #: nive_userdb/useradmin/root.pt:30
 msgid "Delete selected"
@@ -328,7 +328,7 @@ msgstr "Konto erstellen"
 #: nive_userdb/userview/view.py:204
 msgid "Your current user can only be edited on file system level."
 msgstr ""
-"Der aktuell eingeloggte Benutzer kann nur im Dateisystem geändert werden."
+"Der aktuell eingeloggte User kann nur im Dateisystem geändert werden."
 
 #: nive_userdb/userview/view.py:813 nive_userdb/userview/view.py:875
 msgid "The token is invalid. Please make sure it is complete."
@@ -348,7 +348,7 @@ msgstr "Die E-Mail wurde verschickt."
 
 #: nive_userdb/userview/view.py:216
 msgid "User not found"
-msgstr "Benutzer nicht gefunden"
+msgstr "User nicht gefunden"
 
 #: nive_userdb/userview/view.py:620
 msgid "Confirm"
@@ -412,7 +412,7 @@ msgstr "Nachricht absenden"
 
 #: nive_userdb/userview/remove.pt:15
 msgid "Permanently remove your user profile. Click to continue."
-msgstr "Benutzerkonto unwiderruflich löschen. Zum Fortfahren klicken."
+msgstr "Userkonto unwiderruflich löschen. Zum Fortfahren klicken."
 
 #: nive_userdb/userview/remove.pt:20
 msgid "Ok. Your profile has been removed."
@@ -578,7 +578,7 @@ msgstr "Bitte anmelden und ändern."
 
 #, fuzzy
 #~ msgid "User name"
-#~ msgstr "Benutzerverwaltung"
+#~ msgstr "Userverwaltung"
 
 #~ msgid "Group assignment"
 #~ msgstr "Gruppenzuweisung"
@@ -671,7 +671,7 @@ msgstr "Bitte anmelden und ändern."
 
 #, fuzzy
 #~ msgid "user management"
-#~ msgstr "Benutzerverwaltung"
+#~ msgstr "Userverwaltung"
 
 #~ msgid "Application title"
 #~ msgstr "Anwendung Titel"
@@ -714,7 +714,7 @@ msgstr "Bitte anmelden und ändern."
 #~ msgstr "Datenbank Server Port"
 
 #~ msgid "Database server user"
-#~ msgstr "Datenbank Server Benutzername"
+#~ msgstr "Datenbank Server Username"
 
 #~ msgid "Database server password"
 #~ msgstr "Datenbank Server Passwort"
@@ -758,7 +758,7 @@ msgstr "Bitte anmelden und ändern."
 #~ msgstr "Freigabe"
 
 #~ msgid "Only displayed to users in the selected group"
-#~ msgstr "Wird nur Benutzern/innen in der ausgewählten Gruppe angezeigt."
+#~ msgstr "Wird nur User in der ausgewählten Gruppe angezeigt."
 
 #~ msgid "Box"
 #~ msgstr "Box"
