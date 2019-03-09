@@ -65,7 +65,6 @@ class UsermanagementView(AdminBasics):
 
 
     def view(self):
-
         flds = self.configuration.searchfields
         form = HTMLForm(view=self)
         form.actions = [
@@ -73,11 +72,27 @@ class UsermanagementView(AdminBasics):
             Conf(id="search",  method="ReturnDataOnSuccess", name="Aktualisieren", hidden=False),
         ]
         form.fields = flds
+        #settings["widget.item_template"]
         form.Setup()
-        result, formvalues, e = form.Validate(self.request)
+        result, formvalues = form.Extract(self.request, removeNull=True, removeEmpty=True)
         formhtml = form.RenderBody(formvalues, msgs=None, errors=None, result=None)
 
-        return dict(formhtml=formhtml, formvalues=formvalues)
+        listfields = [self.context.app.configurationQuery.GetFld(f, 'user') for f in self.configuration.listfields]
+        sort = self.EscapeSortField(self.configuration.listfields)
+        asc = '1' if self.GetFormValue('ac', '1') == '1' else '0'
+        start = self.GetFormValue('st', '0')
+        users = self.context.search.SearchType('user',
+                                               parameter=formvalues,
+                                               operators=dict(groups="LIKE"),
+                                               fields=listfields,
+                                               sort=sort or 'name',
+                                               ascending=asc,
+                                               start=start,
+                                               max=100,
+                                               skipRender=())
+
+        searchvalues = dict(so=sort, st=start, ac=asc)
+        return dict(formhtml=formhtml, formvalues=formvalues, fields=listfields, users=users, searchvalues=searchvalues)
 
 
     def add(self):
@@ -149,12 +164,15 @@ class UsermanagementView(AdminBasics):
         return {"ids": ids, "users":users, "result": result, "msgs": msgs, "confirm": confirm} 
     
 
-    def PageUrls(self, items, sort, ascending):
+    def PageUrls(self, items, searchvalues):
         """
         if paged result the previous, next and set links
         """
         if items.get('total', 0) == 0:
             return ""
+
+        sort = searchvalues.get("so")
+        ascending = searchvalues.get("ac")
 
         # pages
         url = self.CurrentUrl()

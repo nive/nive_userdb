@@ -1,44 +1,66 @@
 <!DOCTYPE html>
 <tal:block metal:use-macro="view.index_tmpl().macros['main']" i18n:domain="nive_userdb">
-   
-<tal:block metal:fill-slot="editmain">
-<form id="userlist" name="userlist" method="post"
-      enctype="multipart/form-data"
-      action="${view.FolderUrl(context)}delete"
-      tal:define="app context.app;
-                   url view.FolderUrl(context);
-                   fields [app.configurationQuery.GetFld(f, 'user') for f in view.configuration.listfields];
-                   sort view.EscapeSortField(view.configuration.listfields);
-                   asc '1' if view.GetFormValue('as','1')=='1' else '0';
-                   start view.GetFormValue('st','0');
-                   users context.search.SearchType('user', parameter=formvalues, fields=fields, sort=sort or 'name', ascending=asc, start=start, max=100, skipRender=())">
 
-<div tal:replace="structure formhtml"></div>
+    <tal:block metal:fill-slot="editmain">
+        <div class="row"><div class="col-lg">
+        <form id="userlist" name="userlist" method="post" enctype="multipart/form-data"
+              action="${view.FolderUrl(context)}list"
+              tal:define="url view.FolderUrl(context);">
 
-<table class="table table-striped">
-<thead>
-<tr>
-  <th tal:repeat="fld fields">
-    <a tal:content="fld.name"
-       href="${view.CurrentUrl()}?so=${fld.id}&as=${'0' if asc=='1' else '1'}&st=${users.start}"></a>
-  </th>
+            <div style="padding:30px">
+                <div tal:content="structure formhtml" class="form-inline"></div>
+            </div>
 
-  <td></td>
-</tr>
-</thead>
-<tr tal:repeat="user users['items']">
-  <td tal:repeat="fld fields" onclick="document.location.href='${url + str(user.id)}'">
-  <span tal:condition="fld.id!='name'" tal:replace="user[fld.id]"/>
-  <a tal:condition="fld.id=='name'" tal:content="user[fld.id]" tal:attributes="href view.FolderUrl(context)+str(user.id)"></a>
-  </td>
-  <td><input value="${user.id}" type="checkbox" name="ids"></td>
-</tr>
-</table>
-<div tal:content="structure view.PageUrls(users, sort=sort, ascending=asc)"></div>
-<div style="float:right;text-align:right;">
-  <input type="submit" name="delete" value="Delete selected" i18n:attributes="value">
-</div>
-</form>
-</tal:block>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th tal:repeat="fld fields">
+                        <a tal:content="fld.name" id="sort-${fld.id}" class="sort" data-value="${fld.id}" href="#"></a>
+                    </th>
+
+                    <td></td>
+                </tr>
+                </thead>
+                <tr tal:repeat="user users['items']">
+                    <td tal:repeat="fld fields" onclick="document.location.href='${url+str(user.id)}'">
+                        <span tal:condition="fld.id!='name'" tal:replace="user[fld.id]"/>
+                        <a tal:condition="fld.id=='name'" tal:content="user[fld.id]" tal:attributes="href url+str(user.id)"></a>
+                    </td>
+                    <td><input value="${user.id}" type="checkbox" name="ids"></td>
+                </tr>
+            </table>
+            <div tal:content="structure view.PageUrls(users, searchvalues)"></div>
+            <div style="float:right;text-align:right;">
+                <input type="submit" name="delete" id="delete" value="Delete selected" i18n:attributes="value">
+            </div>
+            <input type="hidden" name="ac" value="${searchvalues.get('ac','')}">
+            <input type="hidden" name="so" value="${searchvalues.get('so','')}">
+            <input type="hidden" name="st" value="${searchvalues.get('st','')}">
+
+            <script>
+                $(document).ready(function() {
+                    $("#delete").on("click", function (e) {
+                        e.preventDefault();
+                        $("#userlist").attr("action", "delete").submit();
+                    });
+                    $(".sort").on("click", function (e) {
+                        e.preventDefault();
+                        var fld = $(this);
+                        if(fld.attr("data-value")==$("#userlist input[name=so]")) {
+                            var ac = $("#userlist input[name=ac]");
+                            ac = ac=="1"?"0":"1";
+                            $("#userlist input[name=ac]").val(ac);
+                        } else {
+                            $("#userlist input[name=so]").val($(this).attr("data-value"));
+                            $("#userlist input[name=ac]").val("1");
+                            $("#userlist input[name=st]").val("");
+                        }
+                        $("#userlist").submit();
+                    });
+                });
+            </script>
+        </form>
+        </div></div>
+    </tal:block>
 
 </tal:block>
