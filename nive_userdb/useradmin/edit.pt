@@ -3,13 +3,24 @@
    
 <tal:block metal:fill-slot="editmain">
 
-    <div class="float-right">
-        <span i18n:translate="">Last login</span>: ${view.RenderField('lastlogin')}<br>
-        <span i18n:translate="" i18n:domain="nive">Changed</span>: ${view.RenderField('pool_change')} - ${view.RenderField('pool_changedby')} <br>
-        <span i18n:translate="" i18n:domain="nive">Created</span>: ${view.RenderField('pool_create')} - ${view.RenderField('pool_createdby')}
-    </div>
+
+<p class="float-right">
+  <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#userdetails"
+          aria-expanded="false" aria-controls="collapseExample" i18n:translate="">
+    <strong>+</strong> Details
+  </button>
+</p>
 
     <h1><span i18n:translate="">User</span>: ${context.data.name}</h1>
+
+<div class="collapse float-right" id="userdetails">
+        <span i18n:translate="">Last login</span>: ${view.RenderField('lastlogin')}<br>
+        <span i18n:translate="" i18n:domain="nive">Changed</span>: ${view.RenderField('pool_change')} - ${view.RenderField('pool_changedby')} <br>
+        <span i18n:translate="" i18n:domain="nive">Created</span>: ${view.RenderField('pool_create')} - ${view.RenderField('pool_createdby')}<br>
+        <span i18n:translate="">Token</span>: ${view.RenderField('token')}<br>
+        <span i18n:translate="">Temp</span>: ${view.RenderField('tempcache')}<br>
+</div>
+
     <div style="clear:both"></div>
 
     <span tal:replace="structure content"/>

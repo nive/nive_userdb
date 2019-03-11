@@ -15,21 +15,25 @@
                     </tal:block>
 
                     <tal:block tal:condition="users">
-                        <hr>
-                        <span i18n:translate="">Users</span>: <span class="label label-info" tal:repeat="user users">${user.GetTitle()}</span>
-                        <hr>
+
+                        <ul class="list-group list-group-flush">
+                          <li tal:repeat="user users" class="list-group-item">${user.GetTitle()}</li>
+                        </ul>
+
+                        <br>
                         <form id="userlist" name="userlist" method="post"
                               enctype="multipart/form-data"
                               action="${view.FolderUrl(context)}delete">
                             <input name="confirm" type="hidden" value="1">
                             <input tal:repeat="id ids" name="ids" type="hidden" value="${id}">
-                            <input type="submit" name="delete" value="Delete all" i18n:attributes="value">
-                            <button onclick="history.back();return false;" i18n:translate="">Cancel</button>
+                            <input type="submit" name="delete" value="Delete all" class="btn btn-danger" i18n:attributes="value">
+                            <button onclick="history.back();return false;"  class="btn btn-primary" i18n:translate="">Cancel</button>
                         </form>
 
                     </tal:block>
-                    <tal:block tal:condition="not users" i18n:translate="">
-                        Please select a user first!
+                    <tal:block tal:condition="not users">
+                        <p><span i18n:translate="">Please select a user first!</span></p>
+                        <button onclick="history.back();return false;"  class="btn btn-primary" i18n:translate="">Cancel</button>
                     </tal:block>
 
                 </div>

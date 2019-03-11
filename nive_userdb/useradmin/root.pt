@@ -20,7 +20,7 @@
                     <th tal:repeat="fld fields">
                         <div tal:condition="fld.id in formhtml" tal:replace="structure formhtml[fld.id]"></div>
                     </th>
-                    <th></th>
+                    <th><button class="btn"><img src="${view.StaticUrl('nive.components.adminview:static/icon_reload.svg')}"></button></th>
                 </tr>
                 <tr tal:repeat="user users['items']">
                     <td tal:repeat="fld fields" onclick="document.location.href='${url+str(user.id)}'">
@@ -32,7 +32,7 @@
             </table>
             <div tal:content="structure view.PageUrls(users, searchvalues)"></div>
             <div style="float:right;text-align:right;">
-                <input type="submit" name="delete" id="delete" value="Delete selected" i18n:attributes="value">
+                <input type="submit" name="delete" id="delete" value="Delete selected" class="btn btn-warning" i18n:attributes="value">
             </div>
             <input type="hidden" name="ac" value="${searchvalues.get('ac','')}">
             <input type="hidden" name="so" value="${searchvalues.get('so','')}">
