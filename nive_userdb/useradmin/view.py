@@ -58,8 +58,8 @@ class UsermanagementView(AdminBasics):
     def GetAdminWidgets(self):
         url = self.FolderUrl(self.context.root)
         confs = [
-            Conf(id="admin.root", viewmapper=url+"list", name=_("List users")),
-            Conf(id="admin.add", viewmapper=url+"add", name=_("Add user"))
+            Conf(id="admin.root", viewmapper=url+"list", name=_("List")),
+            Conf(id="admin.add", viewmapper=url+"add", name=_("Add"))
         ]
         return confs
 
@@ -69,24 +69,32 @@ class UsermanagementView(AdminBasics):
         form = HTMLForm(view=self)
         form.actions = [
             Conf(id="default", method="StartForm", name="Initialize", hidden=True),
-            Conf(id="search",  method="ReturnDataOnSuccess", name="Aktualisieren", hidden=False),
+            Conf(id="search",  method="ReturnDataOnSuccess", name="Aktualisieren", css_class="btn btn-info", hidden=False),
         ]
         form.fields = flds
         #settings["widget.item_template"]
         form.Setup()
         result, formvalues = form.Extract(self.request, removeNull=True, removeEmpty=True)
-        formhtml = form.RenderBody(formvalues, msgs=None, errors=None, result=None)
+        formhtml = dict()
+        for f in flds:
+            form = HTMLForm(view=self)
+            form.actions = []
+            f.settings["css_class"] = "form-control form-control-sm"
+            form.fields = [f]
+            form.widget.item_template = "field_nolabel"
+            form.Setup()
+            formhtml[f.id] = form.RenderBody(formvalues, msgs=None, errors=None, result=None)
 
         listfields = [self.context.app.configurationQuery.GetFld(f, 'user') for f in self.configuration.listfields]
         sort = self.EscapeSortField(self.configuration.listfields)
         asc = '1' if self.GetFormValue('ac', '1') == '1' else '0'
         start = self.GetFormValue('st', '0')
-        users = self.context.search.SearchType('user',
+        users = self.context.search.SearchType("user",
                                                parameter=formvalues,
                                                operators=dict(groups="LIKE"),
                                                fields=listfields,
-                                               sort=sort or 'name',
-                                               ascending=asc,
+                                               sort=sort or "name",
+                                               ascending=int(asc),
                                                start=start,
                                                max=100,
                                                skipRender=())
@@ -101,7 +109,9 @@ class UsermanagementView(AdminBasics):
         form = ObjectForm(loadFromType="user", view=self)
         form.subsets = {
             "create": {"fields": self.configuration.addfields,
-                       "actions": ["create"],
+                       "actions": [
+                           Conf(id="create", method="CreateObj", name=_("Add user"),     hidden=False, css_class="btn btn-primary"),
+                       ],
                        "defaultAction": "default"}
         }
         form.redirectSuccess = "obj_url"
@@ -233,7 +243,7 @@ class UsermanagementView(AdminBasics):
 
     def EscapeSortField(self, fields):
         sort = self.GetFormValue("so","name")
-        if not sort in fields:
+        if not sort in [f if isinstance(f, str) else f.id for f in fields]:
             return "name"
         return sort
 

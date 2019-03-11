@@ -3,14 +3,16 @@
    
 <tal:block metal:fill-slot="editmain">
 
- <h2>${context.data.name}</h2>
- <div class="alert alert-success">
-     <strong i18n:translate="">Active</strong> ${view.RenderField({'id':'pool_state','datatype':'bool'},context.meta.pool_state)},
-     <strong i18n:translate="">Last login</strong> ${view.RenderField('lastlogin')},
-     <strong i18n:translate="" i18n:domain="nive">Changed</strong> ${view.RenderField('pool_change')} - ${view.RenderField('pool_changedby')},
-     <strong i18n:translate="" i18n:domain="nive">Created</strong> ${view.RenderField('pool_create')} - ${view.RenderField('pool_createdby')}
- </div>
- <span tal:replace="structure content"/>
+    <div class="float-right">
+        <span i18n:translate="">Last login</span>: ${view.RenderField('lastlogin')}<br>
+        <span i18n:translate="" i18n:domain="nive">Changed</span>: ${view.RenderField('pool_change')} - ${view.RenderField('pool_changedby')} <br>
+        <span i18n:translate="" i18n:domain="nive">Created</span>: ${view.RenderField('pool_create')} - ${view.RenderField('pool_createdby')}
+    </div>
+
+    <h1><span i18n:translate="">User</span>: ${context.data.name}</h1>
+    <div style="clear:both"></div>
+
+    <span tal:replace="structure content"/>
 
 </tal:block>
 

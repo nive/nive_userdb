@@ -7,20 +7,21 @@
               action="${view.FolderUrl(context)}list"
               tal:define="url view.FolderUrl(context);">
 
-            <div style="padding:30px">
-                <div tal:content="structure formhtml" class="form-inline"></div>
-            </div>
-
-            <table class="table table-striped">
+            <table class="table table-striped search">
                 <thead>
                 <tr>
                     <th tal:repeat="fld fields">
                         <a tal:content="fld.name" id="sort-${fld.id}" class="sort" data-value="${fld.id}" href="#"></a>
                     </th>
-
-                    <td></td>
+                    <th></th>
                 </tr>
                 </thead>
+                <tr>
+                    <th tal:repeat="fld fields">
+                        <div tal:condition="fld.id in formhtml" tal:replace="structure formhtml[fld.id]"></div>
+                    </th>
+                    <th></th>
+                </tr>
                 <tr tal:repeat="user users['items']">
                     <td tal:repeat="fld fields" onclick="document.location.href='${url+str(user.id)}'">
                         <span tal:condition="fld.id!='name'" tal:replace="user[fld.id]"/>
@@ -41,13 +42,13 @@
                 $(document).ready(function() {
                     $("#delete").on("click", function (e) {
                         e.preventDefault();
-                        $("#userlist").attr("action", "delete").submit();
+                        $("#userlist").attr("action", "${url}delete").submit();
                     });
                     $(".sort").on("click", function (e) {
                         e.preventDefault();
                         var fld = $(this);
-                        if(fld.attr("data-value")==$("#userlist input[name=so]")) {
-                            var ac = $("#userlist input[name=ac]");
+                        if(fld.attr("data-value")==$("#userlist input[name=so]").val()) {
+                            var ac = $("#userlist input[name=ac]").val();
                             ac = ac=="1"?"0":"1";
                             $("#userlist input[name=ac]").val(ac);
                         } else {
