@@ -398,6 +398,8 @@ class UserView(BaseView):
             receiver = ((receiver.data.get("email"), receiver.meta.get("title")),)
         elif isinstance(receiver, collections.abc.Callable):
             receiver = receiver(self)
+        else: # use userAdmin as default
+            receiver = (self.context.app.configuration.userAdmin,)
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="contact")
         form.startEmpty = True
         form.Setup(subset=subset)
