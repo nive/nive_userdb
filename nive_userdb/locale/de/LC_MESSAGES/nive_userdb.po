@@ -47,7 +47,7 @@ msgstr "E-Mail '${name}' wird bereits verwendet. Bitte eine andere auswählen."
 
 #: nive_userdb/app.py:250
 msgid "Password is too simple. It should have at least 5 different characters."
-msgstr "Passwort ist zu kurz. Bitte mindestens 5 Zeichen eingeben."
+msgstr "Passwort ist zu einfach. Bitte mindestens 5 unterschiedliche Zeichen eingeben."
 
 #: nive_userdb/app.py:259
 msgid "The old password does not match."
