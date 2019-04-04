@@ -29,7 +29,8 @@ configuration = ViewModuleConf("nive.components.adminview.view",
                             widget=RadioChoiceWidget(values=(("true", _("Yes")),("false", _("No"))))),
                   "name",
                   FieldConf(id="password", name=_("Password"), datatype="password", settings={"update": True}),
-                  "email","groups")
+                  "email","groups"),
+    searchfields = ("name","email","groups")
 )
 t = configuration.templates
 configuration.views = [
@@ -66,7 +67,7 @@ class UsermanagementView(AdminBasics):
 
     def view(self):
         flds = self.configuration.searchfields
-        form = HTMLForm(view=self)
+        form = HTMLForm(loadFromType="user", view=self)
         form.actions = [
             Conf(id="default", method="StartForm", name="Initialize", hidden=True),
             Conf(id="search",  method="ReturnDataOnSuccess", name="Aktualisieren", css_class="btn btn-info", hidden=False),
@@ -77,13 +78,13 @@ class UsermanagementView(AdminBasics):
         result, formvalues = form.Extract(self.request, removeNull=True, removeEmpty=True)
         formhtml = dict()
         for f in flds:
-            form = HTMLForm(view=self)
+            form = HTMLForm(loadFromType="user", view=self)
             form.actions = []
-            f.settings["css_class"] = "form-control form-control-sm"
             form.fields = [f]
             form.widget.item_template = "field_nolabel"
             form.Setup()
-            formhtml[f.id] = form.RenderBody(formvalues, msgs=None, errors=None, result=None)
+            form._c_fields[0].settings["css_class"] = "form-control form-control-sm"
+            formhtml[form._c_fields[0].id] = form.RenderBody(formvalues, msgs=None, errors=None, result=None)
 
         listfields = [self.context.app.configurationQuery.GetFld(f, 'user') for f in self.configuration.listfields]
         sort = self.EscapeSortField(self.configuration.listfields)

@@ -129,7 +129,7 @@ class Userroot(Root):
                 tool = app.GetTool("sendMail")
                 if not tool:
                     raise ConfigurationError("Mail tool 'sendMail' not found")
-                result, value = tool(body=body, title=title, recvmails=[sysadmin], force=1)
+                result = tool(body=body, title=title, recvmails=[sysadmin], force=1)
 
         report.append(_("Account created."))
         return obj, report
@@ -214,7 +214,7 @@ class Userroot(Root):
         tool = app.GetTool("sendMail")
         if not tool:
             raise ConfigurationError("Mail tool 'sendMail' not found")
-        result, value = tool(body=body, title=title, recvmails=recv, force=1)
+        result = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
             report.append(_("The email could not be sent."))
             return None, report
@@ -258,7 +258,7 @@ class Userroot(Root):
 
         if mail=="default":
             try:
-                mail = self.app.configuration.settigs.sendPasswordMail
+                mail = self.app.configuration.settings.sendPasswordMail
             except AttributeError as e:
                 raise ConfigurationError(str(e))
 
@@ -267,7 +267,7 @@ class Userroot(Root):
         tool = self.app.GetTool("sendMail")
         if not tool:
             raise ConfigurationError("Mail tool 'sendMail' not found")
-        result, value = tool(body=body, title=title, recvmails=recv, force=1)
+        result = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
             report.append(_("The email could not be sent."))
             return False, report
@@ -319,7 +319,7 @@ class Userroot(Root):
         tool = app.GetTool("sendMail")
         if not tool:
             raise ConfigurationError("Mail tool 'sendMail' not found")
-        result, value = tool(body=body, title=title, recvmails=recv, force=1)
+        result = tool(body=body, title=title, recvmails=recv, force=1)
         if not result:
             report.append(_("The email could not be sent."))
             return None, report

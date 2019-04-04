@@ -53,7 +53,7 @@ configuration = AppConf(
         contactMail = Mail(_("Contact form"), "nive_userdb:userview/mails/contact.pt"),
     ),
     # contact system information
-    #userAdmin = ("admin@mymail.com", "Admin"),
+    userAdmin = ("admin@mymail.com", "Admin"),
     # non-db admin login
     #admin = {"name": "adminusername", "password": "adminpass", "email": ""admin@mymail.com""},
 
