@@ -18,12 +18,12 @@ WIN = sys.platform.startswith("win")
 
 # sqlite and mysql
 if WIN:
-    ROOT = "c:\\Temp\\nive_userdb3-test\\"
+    ROOT = "c:\\Temp\\nive3-test\\"
 else:
-    ROOT = "/tmp/nive_userdb3-test/"
+    ROOT = "/tmp/nive3-test/"
 
 DB_CONF = DatabaseConf(
-    dbName = ROOT+"test.db",
+    dbName = ROOT+"userdb-test.db",
     fileRoot = ROOT,
     context = "Sqlite3"
 )
@@ -33,7 +33,7 @@ MYSQL_CONF = DatabaseConf(
     dbName = "ut_nive_userdb",
     host = "localhost",
     user = "root",
-    password = "",
+    password = "root",
     port = "",
     fileRoot = ROOT
 )
@@ -104,7 +104,10 @@ else:
 
 
 
-# Higher level tests are only run for one database system, not multiple.
-# The database type can be switched here
+# Higher level tests are only run for one database system (sqlite if activated), not multiple.
 DefaultTestCase = SqliteTestCase
-
+if not ENABLE_SQLITE_TESTS:
+    if ENABLE_POSTGRES_TESTS:
+        DefaultTestCase = PostgreSqlTestCase
+    else:
+        DefaultTestCase = MySqlTestCase

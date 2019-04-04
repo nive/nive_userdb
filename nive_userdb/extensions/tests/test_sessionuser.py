@@ -1,9 +1,13 @@
 
 
 import unittest
+import time
 
-from nive_userdb.extensions.sessionuser import *
 from nive.helper import FormatConfTestFailure
+from nive.definitions import Conf
+
+from nive_userdb.extensions.sessionuser import SessionUser, SessionUserCache, ISessionUser, configuration
+from nive_userdb.extensions.sessionuser import RootListener, UserListener, UserFound
 
 
 class cq(object):
@@ -30,9 +34,6 @@ class CacheTest(unittest.TestCase):
     
     def setUp(self):
         self.cache = SessionUserCache(1234)
-    
-    def tearDown(self):
-        pass
     
     def test_caching(self):
         user1 = SessionUser("user1", 1, Conf(), Conf())
@@ -82,12 +83,6 @@ class CacheTest(unittest.TestCase):
 
 class ListenerTest(unittest.TestCase):
     
-    def setUp(self):
-        pass
-    
-    def tearDown(self):
-        pass
-    
     def test_root(self):
         r = RootListener()
         r.app = testobj()
@@ -131,10 +126,7 @@ class SessionuserTest(unittest.TestCase):
         self.user = SessionUser("user1", 1, Conf(**values), Conf(**values2))
         pass
     
-    def tearDown(self):
-        pass
-    
-    
+
     def test_iface(self):
         i = ISessionUser
         

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from nive_userdb.tests.db_app import *
 from nive_userdb.tests import __local
+from nive_userdb.tests import db_app
 
 from nive_userdb.useradmin import view
 from nive_userdb.useradmin import adminroot
+
+from nive.security import User
+from nive.portal import Portal
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid import testing
@@ -34,6 +37,7 @@ class tViews(__local.DefaultTestCase):
 
 
     def tearDown(self):
+        db_app.emptypool(self.app)
         self.app.Close()
         testing.tearDown()
 
@@ -75,25 +79,25 @@ class tViews(__local.DefaultTestCase):
 
     def test_add(self):
         user = self.root.GetUserByName("testuser")
-        if user:
-            self.root.DeleteUser("testuser")
+        #if user is not None:
+        self.root.DeleteUser("testuser")
         v = view.UsermanagementView(context=self.root, request=self.request)
         v.__configuration__ = lambda: view.configuration
         r = v.add()
         self.assertTrue(r["result"])
-        if self.root.GetUserByName("testuser"):
-            self.assertTrue(False, "User should not exist")
+        user = self.root.GetUserByName("testuser")
+        self.assertFalse(user, "User should not exist")
         self.request.POST = {"name":"testuser", "password":"", "email":"test@aaa.com", "groups":("group:admin",)}
         r = v.add()
         self.assertTrue(r["result"])
-        if self.root.GetUserByName("testuser"):
-            self.assertTrue(False, "User should not exist")
+        user = self.root.GetUserByName("testuser")
+        self.assertFalse(user, "User should not exist")
         
         self.request.POST["create$"] = "create"
         r = v.add()
         self.assertFalse(r["result"])
-        if self.root.GetUserByName("testuser"):
-            self.assertTrue(False, "User should not exist")
+        user = self.root.GetUserByName("testuser")
+        self.assertFalse(user, "User should not exist")
         self.request.POST["password"] = "password"
         self.request.POST["password-confirm"] = "password"
         

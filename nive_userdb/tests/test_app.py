@@ -2,8 +2,10 @@
 
 from pyramid import testing
 
-from nive_userdb.tests.db_app import *
 from nive_userdb.tests import __local
+from nive_userdb.tests import db_app
+
+from nive.security import User
 
 from nive_userdb.app import UsernameValidator, EmailValidator, IsReservedUserName, Invalid
 from nive_userdb.app import Sha
@@ -21,8 +23,10 @@ class ObjectTest_db(object):
         self.app.Startup(self.config)
 
     def tearDown(self):
+        db_app.emptypool(self.app)
         self.app.Close()
-        pass
+        testing.tearDown()
+
     
     def test_add(self):
         a=self.app
@@ -394,7 +398,7 @@ class AdminuserTest_db(__local.DefaultTestCase):
         
     def tearDown(self):
         self.app.Close()
-        pass
+
     
     def test_login(self):
         user = User("test")
@@ -421,4 +425,5 @@ class AdminuserTest_db(__local.DefaultTestCase):
         self.assertFalse(l,r)
         l,r = root.Login("admin", "", raiseUnauthorized = 0)
         self.assertFalse(l,r)
+
 

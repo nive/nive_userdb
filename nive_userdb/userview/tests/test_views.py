@@ -8,6 +8,7 @@ from nive.views import BaseView
 from nive.security import User
 
 from nive_userdb.tests import __local
+from nive_userdb.tests import db_app
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid import testing
@@ -41,6 +42,7 @@ class tViews(__local.DefaultTestCase):
         self.app.Query("delete from users")
 
     def tearDown(self):
+        db_app.emptypool(self.app)
         self.app.Close()
         testing.tearDown()
 
