@@ -251,7 +251,7 @@ system = [
     FieldConf(id="password", datatype="password",    size=100, default="", required=1, name=_("Password"), description="",
               validator=PasswordValidator),
 
-    FieldConf(id="groups",   datatype="checkbox",    size=255, default="", name=_("Groups"), settings={"codelist":"groups", "sort": "sort"}, description=""),
+    FieldConf(id="groups",   datatype="checkbox",    size=255, default="", name=_("Groups"), settings={"codelist":"groups"}, description=""),
     FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_("Activate email notifications"), description=""),
     FieldConf(id="lastlogin",datatype="datetime",    size=0,   default="", name=_("Last login"), description=""),
     FieldConf(id="token",    datatype="string",      size=30,  default="", name=_("Token for activation or password reset")),
