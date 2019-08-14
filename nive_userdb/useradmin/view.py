@@ -116,7 +116,7 @@ class UsermanagementView(AdminBasics):
                        "defaultAction": "default"}
         }
         form.Setup(subset="create")
-        result, data, action = form.Process(pool_type="user", redirectSuccess = "obj_url")
+        result, data, action = form.Process(pool_type="user", redirectSuccess="obj_url")
         return {"content": data, "result": result, "head": form.HTMLHead()}
 
 
@@ -137,7 +137,7 @@ class UsermanagementView(AdminBasics):
                        "defaultAction": "defaultEdit"},
         }        
         form.Setup(subset="edit")
-        result, data, action = form.Process()#, redirectSuccess="obj_url")
+        result, data, action = form.Process(redirectSuccess="obj_url")
         return {"content": data, "result": result, "head": form.HTMLHead()}
             
     
