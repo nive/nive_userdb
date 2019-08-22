@@ -244,7 +244,7 @@ configuration = ObjectConf(
 
 # split the fields up in system and extended data. Makes customizing easier.
 system = [
-    FieldConf(id="name",     datatype="string",      size= 30, default="", required=1, name=_("User ID"), description="",
+    FieldConf(id="name",     datatype="string",      size= 40, default="", required=1, name=_("User ID"), description="",
               validator=UsernameValidator),
     FieldConf(id="email",    datatype="email",       size=255, default="", required=1, name=_("Email"), description="",
               validator=EmailValidator),
@@ -252,7 +252,7 @@ system = [
               validator=PasswordValidator),
 
     FieldConf(id="groups",   datatype="checkbox",    size=255, default="", name=_("Groups"), settings={"codelist":"groups"}, description=""),
-    FieldConf(id="notify",   datatype="bool",        size= 4,  default=True, name=_("Activate email notifications"), description=""),
+    FieldConf(id="notify",   datatype="bool",        size=4,  default=True, name=_("Activate email notifications"), description=""),
     FieldConf(id="lastlogin",datatype="datetime",    size=0,   default="", name=_("Last login"), description=""),
     FieldConf(id="token",    datatype="string",      size=30,  default="", name=_("Token for activation or password reset")),
     FieldConf(id="tempcache",datatype="string",      size=255, default="", name=_("Temp cache for additional verification data")),
