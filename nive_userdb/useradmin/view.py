@@ -92,7 +92,7 @@ class UsermanagementView(AdminBasics):
         start = self.GetFormValue('st', '0')
         users = self.context.search.SearchType("user",
                                                parameter=formvalues,
-                                               operators=dict(groups="LIKE"),
+                                               operators=dict(groups="LIKE",name="LIKE",email="LIKE"),
                                                fields=listfields,
                                                sort=sort or "name",
                                                ascending=int(asc),
@@ -189,7 +189,7 @@ class UsermanagementView(AdminBasics):
         start = items.get("start")
         maxPage = items.get("max")
         total = items.get("total")
-        pageCount = total / maxPage + (total % maxPage != 0)
+        pageCount = int(total / maxPage) + (total % maxPage != 0)
         pageHtml = ""
 
         if total <= maxPage:
@@ -211,7 +211,7 @@ class UsermanagementView(AdminBasics):
             current = int(start / maxPage)
             count = 10
             pages = [0]
-            first = current - count / 2 + 1
+            first = current - int(count / 2) + 1
             if first < 1:
                 first = 1
             elif pageCount < count:
@@ -239,6 +239,7 @@ class UsermanagementView(AdminBasics):
 
         html = """<div class="paging"><div>%s %s %s %s</div></div>""" % (cnt, prev, pageHtml, next)
         return html
+
 
 
     def EscapeSortField(self, fields):

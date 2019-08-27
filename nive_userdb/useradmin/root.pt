@@ -7,6 +7,7 @@
               action="${view.FolderUrl(context)}list"
               tal:define="url view.FolderUrl(context);">
 
+            <div tal:content="structure view.PageUrls(users, searchvalues)"></div>
             <table class="table table-striped search">
                 <thead>
                 <tr>
