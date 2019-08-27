@@ -267,9 +267,18 @@ def AcceptValidator(node, value):
         err = _("Please accept the terms and conditions.")
         raise Invalid(node, err)
 
-def Sha(password):
-    return hashlib.sha224(password.encode("utf-8")).hexdigest()
 
-def Md5(password):
-    return hashlib.md5(password.encode("utf-8")).hexdigest()
 
+from AuthEncoding import AuthEncoding
+from binascii import b2a_base64
+
+class SHA512DigestScheme:
+
+    def encrypt(self, pw):
+        return b2a_base64(hashlib.sha512(pw).digest())[:-1]
+
+    def validate(self, reference, attempt):
+        compare = b2a_base64(hashlib.sha512(attempt.encode("utf-8")).digest())[:-1]
+        return AuthEncoding.constant_time_compare(compare, reference)
+
+AuthEncoding.registerScheme("SHA512", SHA512DigestScheme())

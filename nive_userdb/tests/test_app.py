@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid import testing
+import AuthEncoding
 
 from nive_userdb.tests import __local
 from nive_userdb.tests import db_app
@@ -193,7 +194,7 @@ class ObjectTest_db(object):
         o.HashPassword()
         o.data["password"] = "12345"
         o.HashPassword()
-        self.assertTrue(o.data["password"] == Sha("12345"))
+        self.assertTrue(AuthEncoding.pw_validate(o.data.password, "12345"))
 
         o.data["surname"] = ""
         o.data["lastname"] = ""
@@ -205,9 +206,9 @@ class ObjectTest_db(object):
         self.assertTrue(o.Activate(currentUser=user))
 
         o.UpdatePassword("22222", user=user, resetActivation=True)
-        self.assertTrue(o.data["password"] == Sha("22222"))
+        self.assertTrue(AuthEncoding.pw_validate(o.data.password, "22222"))
         o.UpdatePassword("33333", user=user, resetActivation=False)
-        self.assertTrue(o.data["password"] == Sha("33333"))
+        self.assertTrue(AuthEncoding.pw_validate(o.data.password, "33333"))
 
 
     def test_reserved(self):

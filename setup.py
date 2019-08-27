@@ -14,7 +14,8 @@ except:
     CHANGES = ''
 
 requires = [
-    'nive>=1.3.1'
+    'nive>=1.3.1',
+    'AuthEncoding'
 ]
 
 setupkw = dict(

@@ -3,12 +3,14 @@
 #
 
 import hashlib
+import AuthEncoding
 from datetime import datetime
 
 from nive_userdb.i18n import _
 from nive.definitions import implementer, IUser
 
 from nive.objects import Object
+
 
 
 
@@ -41,14 +43,14 @@ class Userobject(Object):
             self.meta["title"] = t
 
 
-    def _EncryptPW(self, password):
-        return Sha(password.encode(self.configuration.get("frontendCodepage", "utf-8")))
-
-
     def Authenticate(self, password):
         if not password:
             return False
-        return self._EncryptPW(password) == self.data["password"]
+        # bw compat passwords sha 224
+        if not self.data.password.startswith("{"):
+            pw = Sha(password.encode(self.configuration.get("frontendCodepage", "utf-8")))
+            return pw==self.data.password
+        return AuthEncoding.pw_validate(self.data.password, password)
 
     
     def Activate(self, currentUser):
@@ -115,7 +117,7 @@ class Userobject(Object):
     def HashPassword(self):
         if not self.data.HasTempKey("password"):
             return
-        pw = self._EncryptPW(self.data.password)
+        pw = AuthEncoding.pw_encrypt(self.data.password, encoding="SSHA")
         self.data["password"] = pw
 
 
