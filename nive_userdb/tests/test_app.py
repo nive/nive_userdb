@@ -9,7 +9,6 @@ from nive_userdb.tests import db_app
 from nive.security import User
 
 from nive_userdb.app import UsernameValidator, EmailValidator, IsReservedUserName, Invalid
-from nive_userdb.app import Sha
 
 
 class ObjectTest_db(object):

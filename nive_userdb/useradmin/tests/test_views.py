@@ -137,8 +137,8 @@ class tViews(__local.DefaultTestCase):
         
         self.request.POST = {"name":"testuser", "email":"test@bbb.com", "groups":("group:admin",)}
         self.request.POST["edit$"] = "edit"
-        r = v.edit()
-        self.assertTrue(r["result"])
+        self.assertRaises(HTTPFound, v.edit)
+        #self.assertTrue(r["result"])
         user = self.root.GetUserByName("testuser")
         self.assertTrue(user.data.email == "test@bbb.com")
         
