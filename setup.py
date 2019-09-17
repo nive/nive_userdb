@@ -23,6 +23,7 @@ setupkw = dict(
       version='1.3.1',
       description='Nive User Database',
       long_description=README + '\n\n' + CHANGES,
+      long_description_content_type="text/markdown",
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
