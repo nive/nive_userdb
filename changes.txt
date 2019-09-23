@@ -1,3 +1,7 @@
+1.3.2
+-----
+- sendmail tool fixes
+
 1.3.1
 -----
 - nive base package updates

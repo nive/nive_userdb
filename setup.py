@@ -14,13 +14,13 @@ except:
     CHANGES = ''
 
 requires = [
-    'nive>=1.3.1',
+    'nive>=1.3.3',
     'AuthEncoding'
 ]
 
 setupkw = dict(
       name='nive_userdb',
-      version='1.3.1',
+      version='1.3.2',
       description='Nive User Database',
       long_description=README + '\n\n' + CHANGES,
       long_description_content_type="text/markdown",
