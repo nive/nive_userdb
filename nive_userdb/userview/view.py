@@ -926,7 +926,7 @@ class UserForm(ObjectForm):
         if not tool:
             raise ConfigurationError("Mail tool 'sendMail' not found")
 
-        result, value = tool(body=body, title=title, recvmails=recv, replyTo=replyTo, force=1)
+        stream, result = tool(body=body, title=title, recvmails=recv, replyTo=replyTo, force=1)
         if not result:
             msgs=(_("The email could not be sent."),)
         else:
