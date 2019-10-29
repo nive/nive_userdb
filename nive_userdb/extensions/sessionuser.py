@@ -139,7 +139,7 @@ class RootListener(object):
     
     def LookupCache(self, ident=None, activeOnly=None):
         user = self.app.usercache.Get(ident)
-        if user:
+        if user is not None:
             raise UserFound(user)
 
     def AddToCache(self, user=None, lastlogin=None):
