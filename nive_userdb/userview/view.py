@@ -569,7 +569,7 @@ class UserView(BaseView):
         # form rendering settings
         # form setup
         typeconf=self.context.app.configurationQuery.GetObjectConf("user")
-        form = UserForm(view=self, context=self.context, loadFromType=typeconf)
+        form = UserForm(view=self, context=self.context.root, loadFromType=typeconf)
         defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.app.configuration.settings
