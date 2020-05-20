@@ -67,7 +67,7 @@ class UsermanagementView(AdminBasics):
 
     def view(self):
         flds = self.configuration.searchfields
-        form = HTMLForm(loadFromType="user", view=self)
+        form = HTMLForm(loadFromType="user", view=self, autofill="off")
         form.actions = [
             Conf(id="default", method="StartForm", name="Initialize", hidden=True),
             Conf(id="search",  method="ReturnDataOnSuccess", name="Aktualisieren", css_class="btn btn-info", hidden=False),
@@ -78,7 +78,7 @@ class UsermanagementView(AdminBasics):
         result, formvalues = form.Extract(self.request, removeNull=True, removeEmpty=True)
         formhtml = dict()
         for f in flds:
-            form = HTMLForm(loadFromType="user", view=self)
+            form = HTMLForm(loadFromType="user", view=self, autofill="off")
             form.actions = []
             form.fields = [f]
             form.widget.item_template = "field_nolabel"
@@ -107,7 +107,7 @@ class UsermanagementView(AdminBasics):
     def add(self):
         name = self.context.app.configurationQuery.GetObjectFld("name", "user").copy()
         name.settings["validator"] = UsernameValidator
-        form = ObjectForm(loadFromType="user", view=self)
+        form = ObjectForm(loadFromType="user", view=self, autofill="off")
         form.subsets = {
             "create": {"fields": self.configuration.addfields,
                        "actions": [
@@ -124,7 +124,7 @@ class UsermanagementView(AdminBasics):
         pwd = self.context.app.configurationQuery.GetObjectFld("password", "user").copy()
         pwd.settings["update"] = True
         pwd.required = False
-        form = ObjectForm(loadFromType="user", subset="edit", view=self)
+        form = ObjectForm(loadFromType="user", subset="edit", view=self, autofill="off")
         def removepasswd(data, obj):
             try:
                 del data["password"]
