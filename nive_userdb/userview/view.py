@@ -373,6 +373,8 @@ class UserView(BaseView):
         - *form*: (dict) the form setup including fields and form settings for the form setup.
         - *mail*: (nive.views.Mail) The template used to render the email. Form values are passed as `data` to the mail
                   template. Uses `nive_userdb:userview/mails/contact.pt` by default. See nive_userdb.application configuration.
+        - *senderConfirmationNote*: (string) sends a confirmation mail to sender and prepends the note to email copy. if empty or none
+                                    the confirmation mail will be skipped.
 
         **Return values**
 
@@ -380,7 +382,7 @@ class UserView(BaseView):
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = ""
-        mail = receiver = None
+        mail = receiver = senderConfirmationNote = None
         replyToSender = False
         subset = "contact"
         viewconf = self.GetViewConf()
@@ -390,6 +392,8 @@ class UserView(BaseView):
             replyToSender = viewconf.settings.get("replyToSender")
             subset = viewconf.settings.get("form")
             mail = viewconf.settings.get("mail")
+            senderConfirmationNote = viewconf.settings.get("senderConfirmationNote")
+
         # get the receiver
         if isinstance(receiver, str):
             user = self.context.GetUser(receiver)
@@ -403,7 +407,8 @@ class UserView(BaseView):
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="contact")
         form.startEmpty = True
         form.Setup(subset=subset)
-        result, data, action = form.Process(receiver=receiver, replyToSender=replyToSender, mail=mail, renderSuccess=False)
+        result, data, action = form.Process(receiver=receiver, replyToSender=replyToSender, mail=mail, renderSuccess=False,
+                                            senderConfirmationNote=senderConfirmationNote)
         self.AddHeader("X-Result", str(result).lower())
         return {"content": data, 
                 "result": result, 
@@ -901,7 +906,7 @@ class UserForm(ObjectForm):
         Sends a email to the user 'receiver'
 
         :param action:
-        :param kw: mail, receiver, replyToSender
+        :param kw: mail, receiver, replyToSender, senderConfirmationNote
         :return:
         """
         result,data,errors = self.Validate(self.request)
@@ -931,5 +936,12 @@ class UserForm(ObjectForm):
             msgs=(_("The email could not be sent."),)
         else:
             msgs = (_("The email has been sent."),)
+
+        if kw.get("senderConfirmationNote"):
+            sender = self.view.User(sessionuser=False)
+            recv = ((sender.data.email, sender.meta.title),)
+            title = kw.get("senderConfirmationNote") + title
+            tool(body=body, title=title, recvmails=recv, force=1)
+
         return self._FinishFormProcessing(result, data, msgs, None, **kw)
 
