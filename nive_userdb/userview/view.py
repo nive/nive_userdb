@@ -23,8 +23,8 @@ configuration = ViewModuleConf(
     id = "userview",
     name = _("User signup"),
     static = "nive_userdb.userview:static",
-    containment = "nive_userdb.app.UserDB",
-    context = "nive_userdb.root.Userroot",
+    containment = "nive.definitions.IPortal",
+    context = "nive_userdb.app.UserDB",
     view = "nive_userdb.userview.view.UserView",
     templates = "nive_userdb.userview:",
     template = "main.pt",
@@ -396,14 +396,14 @@ class UserView(BaseView):
 
         # get the receiver
         if isinstance(receiver, str):
-            user = self.context.GetUser(receiver)
+            user = self.context.root.GetUser(receiver)
             receiver = ((user.data.get("email"), user.meta.get("title")),)
         elif IUser.providedBy(receiver):
             receiver = ((receiver.data.get("email"), receiver.meta.get("title")),)
         elif isinstance(receiver, collections.abc.Callable):
             receiver = receiver(self)
         else: # use userAdmin as default
-            receiver = (self.context.app.configuration.userAdmin,)
+            receiver = (self.context.configuration.userAdmin,)
         form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="contact")
         form.startEmpty = True
         form.Setup(subset=subset)
@@ -438,7 +438,7 @@ class UserView(BaseView):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title","")
             resetPasswordLink = viewconf.settings.get("resetPasswordLink",resetPasswordLink)
-        if self.context.app.configuration.loginByEmail:
+        if self.context.configuration.loginByEmail:
             defaultsubset = "loginMail"
         else:
             defaultsubset = "login"
@@ -449,7 +449,7 @@ class UserView(BaseView):
             redirect = self.GetFormValue("redirect")
             if not redirect:
                 try:
-                    redirect = self.context.app.portal.configuration.loginSuccessUrl
+                    redirect = self.context.portal.configuration.loginSuccessUrl
                 except:
                     redirect = self.request.url
                 result, data, action = form.Process(redirectSuccess=redirect)
@@ -473,16 +473,16 @@ class UserView(BaseView):
         Logout action
         """
         self.ResetFlashMessages()
-        app = self.context.app
+        app = self.context
         user = self.UserName()
-        a = self.context.Logout(user)
+        a = self.context.root.Logout(user)
         app.ForgetLogin(self.request)
         redirect = self.GetFormValue("redirect")
         if not redirect:
             try:
-                redirect = self.context.app.portal.configuration.logoutSuccessUrl
+                redirect = self.context.portal.configuration.logoutSuccessUrl
             except:
-                redirect = self.context.app.portal.configuration.portalDefaultUrl
+                redirect = self.context.portal.configuration.portalDefaultUrl
         if redirect:
             localizer = translator(self.request)
             self.Redirect(redirect, messages=[localizer(_("You have been logged out!"))])
@@ -493,7 +493,7 @@ class UserView(BaseView):
 
     def logouturl(self):
         try:
-            return self.context.app.portal.configuration.logoutUrl
+            return self.context.portal.configuration.logoutUrl
         except:
             return self.request.url
 
@@ -536,8 +536,8 @@ class UserView(BaseView):
         remove = self.GetFormValue("remove", method="POST")=="1"
         if remove:
             # delete the object, cache and sign out
-            self.context.DeleteUser(user, currentUser=user)
-            self.context.app.ForgetLogin(self.request)
+            self.context.root.DeleteUser(user, currentUser=user)
+            self.context.ForgetLogin(self.request)
             values["result"] = True
             self.AddHeader("X-Result", "true")
         return values
@@ -554,9 +554,9 @@ class UserView(BaseView):
     def _loadSimpleForm(self):
         # form rendering settings
         # form setup
-        form = UserForm(view=self, context=self.context, loadFromType="user")
+        form = UserForm(view=self, context=self.context.root, loadFromType="user")
         # sign up settings defined in user db configuration user in AddUser()
-        form.settings = self.context.app.configuration.settings
+        form.settings = self.context.configuration.settings
 
         # customize form widget. values are applied to form.widget
         form.widget.item_template = "field_onecolumn"
@@ -573,11 +573,11 @@ class UserView(BaseView):
     def _loadForm(self, subset, viewconf, defaultsubset):
         # form rendering settings
         # form setup
-        typeconf=self.context.app.configurationQuery.GetObjectConf("user")
+        typeconf=self.context.configurationQuery.GetObjectConf("user")
         form = UserForm(view=self, context=self.context.root, loadFromType=typeconf)
         defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
-        form.settings = self.context.app.configuration.settings
+        form.settings = self.context.configuration.settings
 
         # load subset
         subset = subset or defaultsubset
@@ -618,6 +618,8 @@ class UserView(BaseView):
 class UserForm(ObjectForm):
     """
     Extended User form used in `userview` functions
+
+    context = Userroot
     """
 
     def __init__(self, view=None, loadFromType=None, context=None, request=None, app=None, **kw):
