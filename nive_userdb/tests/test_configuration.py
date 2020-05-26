@@ -15,20 +15,20 @@ class TestConf(unittest.TestCase):
         r=app.configuration.test()
         if not r:
             return
-        print(FormatConfTestFailure(r))
-        self.assert_(False, "Configuration Error")
+        self.fail(FormatConfTestFailure(r))
+
 
     def test_conf2(self):
         r=root.configuration.test()
         if not r:
             return
-        print(FormatConfTestFailure(r))
-        self.assert_(False, "Configuration Error")
+        self.fail(FormatConfTestFailure(r))
+
 
     def test_conf3(self):
         r=user.configuration.test()
         if not r:
             return
-        print(FormatConfTestFailure(r))
-        self.assert_(False, "Configuration Error")
+        self.fail(FormatConfTestFailure(r))
+
 
