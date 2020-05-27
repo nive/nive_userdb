@@ -206,7 +206,7 @@ class UserView(BaseView):
                     "result": False, "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), "title": title}
         form.Setup(subset=subset)
         try:
-            result, data, action = form.Process(values=values)
+            result, data, action = form.Process(values=values, renderSuccess=True)
             self.AddHeader("X-Result", str(result).lower())
             return {"content": data,
                     "result": result,
@@ -265,7 +265,7 @@ class UserView(BaseView):
             title = viewconf.settings.get("title","")
         form = self._loadSimpleForm()
         form.startEmpty = True
-        if self.context.app.configuration.loginByEmail:
+        if self.context.configuration.loginByEmail:
             subset = "resetpassMail"
         else:
             subset = "resetpass"
@@ -574,7 +574,7 @@ class UserView(BaseView):
         # form rendering settings
         # form setup
         typeconf=self.context.configurationQuery.GetObjectConf("user")
-        form = UserForm(view=self, context=self.context.root, loadFromType=typeconf)
+        form = UserForm(view=self, context=self.User(sessionuser=False), loadFromType=typeconf)
         defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.configuration.settings
@@ -765,28 +765,6 @@ class UserForm(ObjectForm):
         return data!=None, self.Render(data)
 
 
-    def Update(self, action, **kw):
-        """
-        Form action: safely update a user
-
-        Pass additional user data as `values` in keywords.
-        """
-        user = self.view.User(sessionuser=False)
-        if not user:
-            raise Unauthorized("User not found.")
-        msgs = []
-        result,data,errors = self.Validate(self.request)
-        if result:
-            # add additional user values if passed in kws
-            if kw.get("values"):
-                data.update(kw["values"])
-            result = user.SecureUpdate(data, user)
-            if result:
-                msgs.append(_("OK."))
-
-        return self._FinishFormProcessing(result, data, msgs, errors, **kw)
-
-
     def Login(self, action, **kw):
         """
         Form action: user login
@@ -827,6 +805,30 @@ class UserForm(ObjectForm):
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
 
 
+    def Update(self, action, **kw):
+        """
+        Form action: safely update a user
+
+        Pass additional user data as `values` in keywords.
+        """
+        user = self.view.User(sessionuser=False)
+        if not user:
+            raise Unauthorized("User not found.")
+        # switch context to current user
+        self.context = user
+        msgs = []
+        result,data,errors = self.Validate(self.request)
+        if result:
+            # add additional user values if passed in kws
+            if kw.get("values"):
+                data.update(kw["values"])
+            result = user.SecureUpdate(data, user)
+            if result:
+                msgs.append(_("OK."))
+
+        return self._FinishFormProcessing(result, data, msgs, errors, **kw)
+
+
     def UpdatePass(self, action, **kw):
         """
         Form action: update password if current password matches
@@ -834,6 +836,8 @@ class UserForm(ObjectForm):
         user = self.view.User(sessionuser=False)
         if user is None:
             raise Unauthorized("User not found.")
+        # switch context to current user
+        self.context = user
         msgs = []
         result,data,errors = self.Validate(self.request)
         if not result:
@@ -853,6 +857,8 @@ class UserForm(ObjectForm):
         user = self.view.User(sessionuser=False)
         if not user:
             raise Unauthorized("User not found.")
+        # switch context to current user
+        self.context = user
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:

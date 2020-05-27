@@ -267,7 +267,8 @@ extended = [
 configuration.data = tuple(system+extended)
 
 configuration.forms = {
-    "create": {"fields": ["name", "email", "password", "surname", "lastname"]},
-    "edit":   {"fields": [FieldConf(id="password", name=_("Password"), datatype="password", required=False, settings={"update": True}),
-                          "surname", "lastname"]},
+    "create": {"fields": ["name", "email", "password", "surname", "lastname", "organisation"]},
+    "edit":   {"fields": ["email",
+                          FieldConf(id="password", name=_("Password"), datatype="password", required=False, settings={"update": True}),
+                          "surname", "lastname", "organisation"]},
 }

@@ -12,10 +12,13 @@
 body {font-family: Verdana, Arial, sans-serif; font-size:80%;}
 #container {margin: auto; height:auto;width:380px;}
 #main {margin-top:40%; width:auto;padding:10px;}
-#header {padding-bottom:20px;font-family: Courier, monospace;text-align:left;color: #000000;font-size:20pt;border-bottom:1px dashed #aaaaaa;}
+#header {padding-bottom:20px;text-align:left;color: #000000;font-size:12pt;}
+#header img { float:right; }
+.content { clear:both; border-top: 1px solid lightgray; }
 form {margin-top:10px; width:49%; float:left;}
 .control-group {color:#666666;float:left; margin-right:1%; margin-bottom:10px;}
 .form-actions {margin-top:10px;margin-right:1%;clear:both;}
+.form-control-feedback { color:red; }
 .clear {clear:both;}
 input {width:95%;}
 .widget .req {display:none;}
@@ -23,7 +26,7 @@ ul { list-style:none; padding:0px; margin-bottom:10px; }
 li { padding:0px;margin:0px; }
 .links {width:40%;float:right;margin-top:20px;}
 a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gray;margin-right:1px;text-decoration:none;color:white;}
-.alert { padding:2px 8px 2px 8px; display:block; width:100%; margin-bottom:10px; }
+.alert { padding:2px 8px 2px 8px; display:block; margin-bottom:10px; }
 .alert-success, .alert-warning { background-color:#8de4d4; }
 .alert-error { background-color:#FFDFDF; }
 </style>
@@ -33,11 +36,14 @@ a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gra
 <div id="container">
   <div id="main">
   <div id="header">
-  <img src="${view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" title="Nive cms">
+  <img src="${view.configuration.logo or view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" alt="Logo">
+  <div>${view.configuration.name or ""}</div>
   </div>
 
+  <div class="content">
   <tal:block metal:define-slot="content"></tal:block>
-  
+  </div>
+
   <div tal:define="user view.User()" class="links">
   <a tal:condition="not user and request.view_name!='login'"
      href="login" i18n:translate="">Login</a>
@@ -46,12 +52,12 @@ a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gra
   <a tal:condition="not user and view.Allowed('signup', context=None) and request.view_name!='signup'"
      href="signup" i18n:translate="">Signup</a>
   <a tal:condition="user and request.view_name!='update'"
-     href="update" i18n:translate="">Account</a>
+     href="${view.context.portal.configuration.accountUrl}" i18n:translate="">Account</a>
   <a tal:condition="user and request.view_name!='login'"
-     href="logout?redirect=login" i18n:translate="">Log out</a>
-  <a href="/" i18n:translate="">Website</a>
-  <a tal:condition="user and user.InGroups(('group:admin','group:editor','group:author','group:reader','group:reviewer'))"
-     href="/website/editor" i18n:translate="">Editor</a>
+     href="${view.context.portal.configuration.logoutUrl}?redirect=login" i18n:translate="">Log out</a>
+  <a href="${view.context.portal.configuration.portalDefaultUrl}" i18n:translate="">Website</a>
+  <a tal:condition="user"
+     href="${view.context.portal.configuration.loginSuccessUrl}" i18n:translate="">Editor</a>
   </div>
   </div>
 </div>
