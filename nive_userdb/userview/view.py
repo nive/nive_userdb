@@ -121,7 +121,7 @@ class UserView(BaseView):
             title = viewconf.settings.get("title")
             values = viewconf.settings.get("values")
 
-        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="create")
+        form, subset = self._loadForm(subset, context=self.context.root, viewconf=viewconf, defaultsubset="create")
         form.Setup(subset=subset)
 
         if self.GetFormValue("assets")=="only":
@@ -404,7 +404,7 @@ class UserView(BaseView):
             receiver = receiver(self)
         else: # use userAdmin as default
             receiver = (self.context.configuration.userAdmin,)
-        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="contact")
+        form, subset = self._loadForm(subset, context=self.context.root, viewconf=viewconf, defaultsubset="contact")
         form.startEmpty = True
         form.Setup(subset=subset)
         result, data, action = form.Process(receiver=receiver, replyToSender=replyToSender, mail=mail, renderSuccess=False,
@@ -442,7 +442,7 @@ class UserView(BaseView):
             defaultsubset = "loginMail"
         else:
             defaultsubset = "login"
-        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset=defaultsubset)
+        form, subset = self._loadForm(subset, context=self.context.root, viewconf=viewconf, defaultsubset=defaultsubset)
         form.Setup(subset=subset)
         user = self.User()
         if not user:
@@ -570,11 +570,12 @@ class UserView(BaseView):
                 form.ApplyOptions(formsettings)
         return form
 
-    def _loadForm(self, subset, viewconf, defaultsubset):
+    def _loadForm(self, subset, viewconf, defaultsubset, context=None):
         # form rendering settings
         # form setup
+        context = context or self.User(sessionuser=False)
         typeconf=self.context.configurationQuery.GetObjectConf("user")
-        form = UserForm(view=self, context=self.User(sessionuser=False), loadFromType=typeconf)
+        form = UserForm(view=self, context=context, loadFromType=typeconf)
         defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.configuration.settings
