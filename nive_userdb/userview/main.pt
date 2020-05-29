@@ -36,7 +36,7 @@ a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gra
 <div id="container">
   <div id="main">
   <div id="header">
-  <img src="${view.configuration.logo or view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" alt="Logo">
+  <img src="${view.configuration.get('logo') or view.StaticUrl('nive_userdb.userview:static/logocms2.png')}" class="logo" alt="Logo">
   <div>${view.configuration.name or ""}</div>
   </div>
 

@@ -49,7 +49,7 @@ class tViews(__local.DefaultTestCase):
 
     
     def test_views(self):
-        view = UserView(context=self.root, request=self.request)
+        view = UserView(context=self.app, request=self.request)
         view.__configuration__ = lambda: view_configuration
         view.create()
         view.update()
@@ -67,9 +67,9 @@ class tViews(__local.DefaultTestCase):
 
 
     def test_templates(self):    
-        view = UserView(context=self.root, request=self.request)
+        view = UserView(context=self.app, request=self.request)
         view.__configuration__ = lambda: view_configuration
-        vrender = {"context":self.root, "view":view, "request": self.request}
+        vrender = {"context":self.app, "view":view, "request": self.request}
         
         values = view.login()
         values.update(vrender)
@@ -140,9 +140,9 @@ class tViews(__local.DefaultTestCase):
         r,v = form.AddUser("action", redirectSuccess="")
         self.assertTrue(r, r)
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="edit")
-        self.request.POST = {"surname": "12345", "password": "12345", "password-confirm": "12345"}
+        self.request.POST = {"surname": "12345", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
         self.request.GET = {}
 
         r,v = form.LoadUser("action", redirectSuccess="")
@@ -197,21 +197,21 @@ class tViews(__local.DefaultTestCase):
         # UpdatePass -----------------------------------------------------------------------------------------------------
 
         view = TestView(context=self.root, request=self.request)
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
         self.request.POST = {"oldpassword": "12345", "password": "34567", "password-confirm": "67890"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
         self.assertFalse(r)
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
         self.request.POST = {"oldpassword": "12345", "password": "67890", "password-confirm": "67890"}
         self.request.GET = {}
         r, v = form.UpdatePass("action", redirectSuccess="")
         self.assertTrue(r)
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="updatepass")
         self.request.POST = {"oldpassword": "67890", "password": "12345", "password-confirm": "12345"}
         self.request.GET = {}
@@ -221,21 +221,21 @@ class tViews(__local.DefaultTestCase):
 
         # UpdateMail -----------------------------------------------------------------------------------------------------
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail1")
         self.request.POST = {"newmail": "testuser"}
         self.request.GET = {}
         r, v = form.UpdateMail("action", redirectSuccess="")
         self.assertFalse(r)
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail1")
         self.request.POST = {"newmail": "testuser@domain.net"}
         self.request.GET = {}
         r, v = form.UpdateMail("action", redirectSuccess="", url="")
-        self.assertFalse(r)
+        self.assertTrue(r, v)
 
-        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form = UserForm(loadFromType="user", context=view.User(), request=self.request, view=view, app=self.app)
         form.Setup(subset="updatemail1")
         self.request.POST = {"newmail": "newuser@domain.net"}
         self.request.GET = {}
@@ -247,7 +247,7 @@ class tViews(__local.DefaultTestCase):
         # UpdateMailToken -----------------------------------------------------------------------------------------------------
 
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
-        form.Setup(subset="updatemail1")
+        form.Setup(subset="updatemail2")
         self.request.GET = {"token": "000"}
         r, v = form.UpdateMailToken("action", redirectSuccess="")
         self.assertFalse(r)

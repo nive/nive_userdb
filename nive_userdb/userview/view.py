@@ -186,15 +186,20 @@ class UserView(BaseView):
             {"fields": ("surname", "lastname"), "use_ajax": True}
 
         """
-        user=self.User(sessionuser=False)
-        subset = values = None
         title = ""
+        user = self.User(sessionuser=False)
+        if user is None:
+            self.AddHeader("X-Result", "false")
+            return {"content": _("User not found."),
+                    "result": False, "head": "", "title": title}
+
+        subset = values = None
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title","")
             values = viewconf.settings.get("values")
-        form, subset = self._loadForm(subset, viewconf=viewconf, defaultsubset="edit")
+        form, subset = self._loadForm(subset, context=user, viewconf=viewconf, defaultsubset="edit")
 
         if self.GetFormValue("assets")=="only":
             self.AddHeader("X-Result", "true")
@@ -236,7 +241,7 @@ class UserView(BaseView):
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title","")
-        form = self._loadSimpleForm()
+        form = self._loadSimpleForm(context=self.context.root)
         form.startEmpty = True
         form.Setup(subset="activate")
         result, data, action = form.Process(renderSuccess=False)
@@ -263,7 +268,7 @@ class UserView(BaseView):
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title","")
-        form = self._loadSimpleForm()
+        form = self._loadSimpleForm(context=self.context.root)
         form.startEmpty = True
         if self.context.configuration.loginByEmail:
             subset = "resetpassMail"
@@ -291,10 +296,16 @@ class UserView(BaseView):
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = ""
+        user = self.User(sessionuser=False)
+        if user is None:
+            self.AddHeader("X-Result", "false")
+            return {"content": _("User not found."),
+                    "result": False, "head": "", "title": title}
+
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title","")
-        form = self._loadSimpleForm()
+        form = self._loadSimpleForm(context=user)
         form.startEmpty = True
         form.Setup(subset="updatepass")
         result, data, action = form.Process(renderSuccess=False)
@@ -319,10 +330,16 @@ class UserView(BaseView):
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
         title = ""
+        user = self.User(sessionuser=False)
+        if user is None:
+            self.AddHeader("X-Result", "false")
+            return {"content": _("User not found."),
+                    "result": False, "head": "", "title": title}
+
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title","")
-        form = self._loadSimpleForm()
+        form = self._loadSimpleForm(context=user)
         form.startEmpty = True
         form.Setup(subset="updatemail1")
         result, data, action = form.Process(url=self.Url()+"updatemail2", renderSuccess=False)
@@ -349,7 +366,7 @@ class UserView(BaseView):
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title","")
-        form = self._loadSimpleForm()
+        form = self._loadSimpleForm(context=self.context.root)
         form.startEmpty = True
         form.Setup(subset="updatemail2")
         result, data, action = form.Process(renderSuccess=False)
@@ -438,7 +455,7 @@ class UserView(BaseView):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title","")
             resetPasswordLink = viewconf.settings.get("resetPasswordLink",resetPasswordLink)
-        if self.context.configuration.loginByEmail:
+        if self.context.app.configuration.loginByEmail:
             defaultsubset = "loginMail"
         else:
             defaultsubset = "login"
@@ -523,16 +540,19 @@ class UserView(BaseView):
         - *body*: This function returns rendered html code as body.
         - *X-Result header*: http header indicating whether the new item has been created or not.
         """
-        user=self.User(sessionuser=False)
         title = ""
+        user = self.User(sessionuser=False)
+        if user is None:
+            self.AddHeader("X-Result", "false")
+            return {"content": _("User not found."),
+                    "result": False, "head": "", "title": title, "description": ""}
+
         description = ""
         viewconf = self.GetViewConf()
         if viewconf and viewconf.get("settings"):
             title = viewconf.settings.get("title","")
             description = viewconf.settings.get("description","")
         values = {"title": title, "description": description, "result":False}
-        if user is None:
-            return values
         remove = self.GetFormValue("remove", method="POST")=="1"
         if remove:
             # delete the object, cache and sign out
@@ -551,10 +571,11 @@ class UserView(BaseView):
         return html % ("</li><li>".join(messages))
 
 
-    def _loadSimpleForm(self):
+    def _loadSimpleForm(self, context=None):
         # form rendering settings
         # form setup
-        form = UserForm(view=self, context=self.context.root, loadFromType="user")
+        context = context or self.User(sessionuser=False)
+        form = UserForm(view=self, context=context, loadFromType="user")
         # sign up settings defined in user db configuration user in AddUser()
         form.settings = self.context.configuration.settings
 
@@ -570,11 +591,10 @@ class UserView(BaseView):
                 form.ApplyOptions(formsettings)
         return form
 
-    def _loadForm(self, subset, viewconf, defaultsubset, context=None):
+    def _loadForm(self, subset, viewconf, defaultsubset, context):
         # form rendering settings
         # form setup
-        context = context or self.User(sessionuser=False)
-        typeconf=self.context.configurationQuery.GetObjectConf("user")
+        typeconf = self.context.app.configurationQuery.GetObjectConf("user")
         form = UserForm(view=self, context=context, loadFromType=typeconf)
         defaultaction = form.subsets[defaultsubset]
         # sign up settings defined in user db configuration user in AddUser()
@@ -730,6 +750,8 @@ class UserForm(ObjectForm):
         """
         Form action: safely add a user
 
+        context: root
+
         Pass additional user data as `values` in keywords.
         """
         msgs = []
@@ -753,12 +775,10 @@ class UserForm(ObjectForm):
     def LoadUser(self, action, **kw):
         """
         Initially load data from obj.
-        context = obj
+
+        context: user
         """
-        user = self.view.User(sessionuser=False)
-        if not user:
-            raise Unauthorized("User not found.")
-        data = self.LoadObjData(user)
+        data = self.LoadObjData(self.context)
         try:
             del data["password"]
         except:
@@ -769,6 +789,8 @@ class UserForm(ObjectForm):
     def Login(self, action, **kw):
         """
         Form action: user login
+
+        context: root
         """
         redirectSuccess = kw.get("redirectSuccess")
         data = self.GetFormValues(self.request)
@@ -785,6 +807,8 @@ class UserForm(ObjectForm):
     def Activate(self, action, **kw):
         """
         Form action: activate the mail in tempcache if token matches
+
+        context: root
         """
         msgs = []
         errors = []
@@ -810,20 +834,17 @@ class UserForm(ObjectForm):
         """
         Form action: safely update a user
 
+        context: user
+
         Pass additional user data as `values` in keywords.
         """
-        user = self.view.User(sessionuser=False)
-        if not user:
-            raise Unauthorized("User not found.")
-        # switch context to current user
-        self.context = user
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
             # add additional user values if passed in kws
             if kw.get("values"):
                 data.update(kw["values"])
-            result = user.SecureUpdate(data, user)
+            result = self.context.SecureUpdate(data, self.view.user)
             if result:
                 msgs.append(_("OK."))
 
@@ -833,18 +854,16 @@ class UserForm(ObjectForm):
     def UpdatePass(self, action, **kw):
         """
         Form action: update password if current password matches
+
+        context: user
+
         """
-        user = self.view.User(sessionuser=False)
-        if user is None:
-            raise Unauthorized("User not found.")
-        # switch context to current user
-        self.context = user
         msgs = []
         result,data,errors = self.Validate(self.request)
         if not result:
             return result, self.Render(data, msgs=msgs, errors=errors)
 
-        result = user.UpdatePassword(data["password"], user)
+        result = self.context.UpdatePassword(data["password"], self.view.user)
         if result:
             msgs.append(_("OK. Password changed."))
             return result, self.Render(data, msgs=msgs, errors=None, messagesOnly=True)
@@ -855,22 +874,19 @@ class UserForm(ObjectForm):
         """
         Form action: trigger a mail to verify another mail address
         """
-        user = self.view.User(sessionuser=False)
-        if not user:
-            raise Unauthorized("User not found.")
-        # switch context to current user
-        self.context = user
         msgs = []
         result,data,errors = self.Validate(self.request)
         if result:
             newmail = data["newmail"]
-            result, msgs = self.context.MailVerifyNewEmail(user, newmail, currentUser=user, **kw)
+            result, msgs = self.context.root.MailVerifyNewEmail(self.context, newmail, currentUser=self.view.user, **kw)
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
 
 
     def UpdateMailToken(self, action, **kw):
         """
         Form action: activate the mail in tempcache if token matches
+
+        context: root
         """
         msgs = []
         errors = []
@@ -899,6 +915,8 @@ class UserForm(ObjectForm):
     def ResetPass(self, action, **kw):
         """
         Form action: generate a new password and mail to the user
+
+        context: root
         """
         data = self.GetFormValues(self.request)
         kw["form"] = self
@@ -913,6 +931,8 @@ class UserForm(ObjectForm):
     def Contact(self, action, **kw):
         """
         Sends a email to the user 'receiver'
+
+        context: root
 
         :param action:
         :param kw: mail, receiver, replyToSender, senderConfirmationNote
