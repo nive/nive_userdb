@@ -284,3 +284,54 @@ class tViews(__local.DefaultTestCase):
         self.request.GET = {}
         form.Contact("action", redirectSuccess="")
 
+
+    def test_form3(self):
+        view = TestView(context=self.root, request=self.request)
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.settings["mail"] = None
+        form.Setup(subset="create")
+        self.request.GET = {}
+        self.request.POST = {"name": "testuser", "email": "testuser@domain.net", "password": "12345", "password-confirm": "12345"}
+        r,v = form.AddUser("action", redirectSuccess="")
+        self.assertTrue(r, r)
+
+        # resetpass
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="resetpass_mail")
+        form.mail = None
+        self.request.POST = {"email": "testuser@domain.net"}
+        self.request.GET = {}
+
+        u = self.root.GetUserByName("testuser")
+        u.data["token"] = ""
+        u.Commit(user=view.User())
+
+        r, v = form.MailPassToken("action", redirectSuccess="", url="")
+        self.assertTrue(r, v)
+        u = self.root.GetUserByName("testuser")
+        self.assertTrue(u.data.token)
+
+        self.request.POST = {"email": "not a email@ net"}
+        r, v = form.MailPassToken("action", redirectSuccess="")
+        self.assertFalse(r, v)
+
+        # editpass token
+        form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
+        form.Setup(subset="editpass_token")
+        self.request.GET = {}
+
+        testuser = self.root.GetUserByName("testuser")
+        testuser.data["token"] = ""
+        testuser.Commit(user=view.User())
+        self.request.POST = {"password": "55555", "password-confirm": "33333", "token": "invalid"}
+        r, v = form.UpdatePassToken("action", redirectSuccess="")
+        self.assertFalse(r)
+
+        testuser.data["token"] = "12345"
+        testuser.Commit(user=view.User())
+        self.request.POST = {"password": "abcde", "password-confirm": "abcde", "token": "12345"}
+        r, v = form.UpdatePassToken("action", redirectSuccess="")
+        self.assertTrue(r, v)
+
+        u = self.root.GetUserByName("testuser")
+        self.assertFalse(u.data.token)

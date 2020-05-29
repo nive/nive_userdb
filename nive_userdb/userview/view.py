@@ -705,6 +705,24 @@ class UserForm(ObjectForm):
                 "actions": [Conf(id="updatepass", method="UpdatePass", name=_("Update password"), hidden=False)],
                 "defaultAction": "default"
             },
+            "resetpass_mail": {
+                "fields": [
+                    FieldConf(id="email", name=_("Name or email"), datatype="string", size=35)
+                ],
+                "actions": [
+                    Conf(id="resetpass", method="MailPassToken", name=_("Reset password"), hidden=False)
+                ]
+            },
+            "editpass_token": {
+                "fields": [
+                    "password",
+                    FieldConf(id="token", datatype="string", name="reset token", size=500, required=True, hidden=True)
+                ],
+                "actions": [
+                    Conf(id="editpass", method="UpdatePassToken", name=_("Update password"), hidden=False)
+                ],
+                "defaultAction": Conf(id="starteditpass", method="StartRequestGET", name="Start update password", hidden=True)
+            },
 
             "updatemail1": {
                 "fields": [
@@ -926,6 +944,62 @@ class UserForm(ObjectForm):
         if result:
             data = {}
         return self._FinishFormProcessing(result, data, msgs, None, **kw)
+
+
+    def MailPassToken(self, action, **kw):
+        """
+        Form action: safely update a user
+
+        context: root
+
+        kw parameter:
+        - mail
+        - redirectSuccess
+        """
+        msgs = []
+        redirectSuccess = kw.get("redirectSuccess")
+        result,data,errors = self.Validate(self.request)
+        if result:
+            result, msgs = self.context.MailResetPass(data.get("email"),
+                                                      currentUser=self.view.User(),
+                                                      **kw)
+            if result:
+                errors=None
+                #msgs.append(_("You can now sign in with the new password."))
+                if self.view and redirectSuccess:
+                    self.view.Redirect(redirectSuccess, messages=msgs)
+                    return
+                return result, self.Render(data, msgs=msgs, errors=errors, messagesOnly=True)
+        return result, self.Render(data, msgs=msgs, errors=errors)
+
+
+    def UpdatePassToken(self, action, **kw):
+        """
+        Form action: safely update a user
+
+        context: root
+
+        kw parameter:
+        - redirectSuccess
+        """
+        msgs = []
+        redirectSuccess = kw.get("redirectSuccess")
+        result,data,errors = self.Validate(self.request)
+        if result and data.get("token"):
+            user = self.context.root.GetUserForToken(data["token"])
+            if not user:
+                return result, self.Render(data, msgs=[_("The token is invalid. Please make sure it is complete.")], errors=None)
+            result = user.UpdatePassword(data["password"], self.view.User())
+            if result:
+                msgs.append(_("OK. Your password has successfully been updated."))
+                errors=None
+                if self.view and redirectSuccess:
+                    self.view.Redirect(redirectSuccess, messages=msgs)
+                    return
+                return result, self.Render(data, msgs=msgs, errors=errors, messagesOnly=True)
+        if not data.get("t"):
+            msgs=[_("The token is invalid. Please make sure it is complete.")]
+        return result, self.Render(data, msgs=msgs, errors=errors)
 
 
     def Contact(self, action, **kw):
