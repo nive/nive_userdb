@@ -145,7 +145,7 @@ class Userroot(Root):
 
         # session login
         user = self.GetUserByName(name)
-        if not user:
+        if user is None:
             if raiseUnauthorized:
                 raise Unauthorized("Login failed")
             report.append(_("Sign in failed. Please check your username and password."))

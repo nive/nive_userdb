@@ -649,8 +649,8 @@ class UserForm(ObjectForm):
         self.actions = [
             Conf(id="default",    method="StartForm", name="Initialize",    hidden=True),
             Conf(id="defaultEdit",method="LoadUser",  name="Initialize",    hidden=True),
-            Conf(id="create",     method="AddUser",   name=_("Signup"),        hidden=False),
-            Conf(id="edit",       method="Update",    name=_("Confirm"),       hidden=False),
+            Conf(id="create",     method="AddUser",   name=_("Signup"),        hidden=False, css_class="btn btn-primary"),
+            Conf(id="edit",       method="Update",    name=_("Confirm"),       hidden=False, css_class="btn btn-primary"),
             Conf(id="login",      method="Login",     name=_("Login"),         hidden=False),
         ]
 
