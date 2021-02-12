@@ -120,8 +120,10 @@ class UserDB(Application):
         if request:
             try:
                 user = request.environ["authenticated_user"]
-            except KeyError:
+            except (AttributeError, KeyError):
                 user = self.root.GetUser(userid)
+                if not hasattr(request, "environ"):
+                    request.environ = dict()
                 request.environ["authenticated_user"] = user
                 def remove_user(request):
                     if "authenticated_user" in request.environ:
