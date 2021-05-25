@@ -862,9 +862,16 @@ class UserForm(ObjectForm):
             # add additional user values if passed in kws
             if kw.get("values"):
                 data.update(kw["values"])
+            password = data.get("password")
+            email = data.get("email")
             result = self.context.SecureUpdate(data, self.view.user)
             if result:
+                if password:
+                    result = self.context.UpdatePassword(password, self.view.user)
+                if email:
+                    result = self.context.UpdateEmail(email, self.view.user)
                 msgs.append(_("OK."))
+            data["email"] = email
 
         return self._FinishFormProcessing(result, data, msgs, errors, **kw)
 
