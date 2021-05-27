@@ -313,7 +313,7 @@ class Userroot(Root):
             except AttributeError as e:
                 raise ConfigurationError(str(e))
         if not mail:
-            raise ConfigurationError("Required  mailtemplate is required")
+            raise ConfigurationError("Mail template 'resetPasswordMail' is required")
         title = mail.title
         body = mail(user=obj, **kw)
         tool = app.GetTool("sendMail")
