@@ -652,6 +652,7 @@ class UserForm(ObjectForm):
             Conf(id="create",     method="AddUser",   name=_("Signup"),        hidden=False, css_class="btn btn-primary"),
             Conf(id="edit",       method="Update",    name=_("Confirm"),       hidden=False, css_class="btn btn-primary"),
             Conf(id="login",      method="Login",     name=_("Login"),         hidden=False),
+            Conf(id="loginmail",  method="LoginEmail",name=_("Login"),         hidden=False),
         ]
 
         self.subsets = {
@@ -677,11 +678,11 @@ class UserForm(ObjectForm):
             },
             "loginMail":  {
                 "fields":  [
-                    FieldConf(id="name", name=_("Name or email"), datatype="string"),
+                    FieldConf(id="email", name=_("Email"), datatype="string"),
                     FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True}),
                     FieldConf(id="redirect", datatype="string", size="500", name="redirect url", hidden=True),
                 ],
-                "actions": ["login"],
+                "actions": ["loginmail"],
                 "defaultAction": "default"
             },
 
@@ -814,6 +815,24 @@ class UserForm(ObjectForm):
         data = self.GetFormValues(self.request)
         user, msgs = self.context.Login(data.get("name"), data.get("password"), 0)
         if user:
+            self.context.app.RememberLogin(self.request, str(user))
+            if self.view and redirectSuccess:
+                self.view.Redirect(redirectSuccess)
+                return
+        errors=None
+        return user, self.Render(data, msgs=msgs, errors=errors)
+
+
+    def LoginEmail(self, action, **kw):
+        """
+        Form action: user login
+
+        context: root
+        """
+        redirectSuccess = kw.get("redirectSuccess")
+        data = self.GetFormValues(self.request)
+        user, msgs = self.context.Login(None, data.get("password"), email=data.get("email"), raiseUnauthorized=0)
+        if user is not None:
             self.context.app.RememberLogin(self.request, str(user))
             if self.view and redirectSuccess:
                 self.view.Redirect(redirectSuccess)

@@ -137,14 +137,17 @@ class Userroot(Root):
 
     # Login/logout and user sessions ------------------------------------------------------------------------------------------------------
 
-    def Login(self, name, password, raiseUnauthorized = 1):
+    def Login(self, name, password, email = None, raiseUnauthorized = 1):
         """
         returns user/none and report list
         """
         report = []
 
         # session login
-        user = self.GetUserByName(name)
+        if email is not None:
+            user = self.GetUserByMail(email)
+        else:
+            user = self.GetUserByName(name)
         if user is None:
             if raiseUnauthorized:
                 raise Unauthorized("Login failed")
