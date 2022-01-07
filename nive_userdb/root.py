@@ -281,23 +281,26 @@ class Userroot(Root):
         return True, report
 
 
-    def MailResetPass(self, name, mail="default", currentUser=None, **kw):
+    def MailResetPass(self, name, email=None, mail="default", currentUser=None, **kw):
         """
         returns status and report list
         """
         report=[]
 
-        if not name:
+        if not name or email:
             report.append(_("Please enter your sign in name or email address."))
             return None, report
 
-        if isinstance(name, str):
+        if email and isinstance(email, str):
+            obj = self.GetUserByMail(email)
+        elif name and isinstance(name, str):
             obj = self.GetUserByName(name)
-            if not obj:
-                report.append(_("No matching account found."))
-                return None, report
         else:
             obj = name
+
+        if not obj:
+            report.append(_("No matching account found."))
+            return None, report
 
         email = obj.data.get("email")
         if not email:

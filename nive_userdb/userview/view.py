@@ -44,6 +44,8 @@ configuration.views = [
     ViewConf(name="updatemail1",    attr="updatemail1",renderer=t+"form.pt",      permission="updateuser"),
     ViewConf(name="updatemail2",    attr="updatemail2",renderer=t+"form.pt"),
     ViewConf(name="resetpass",      attr="resetpass",  renderer=t+"form.pt"),
+    ViewConf(name="resetpass1",     attr="resetpassToken",  renderer=t+"form.pt"),
+    ViewConf(name="resetpass2",     attr="updatepassToken", renderer=t+"form.pt"),
     ViewConf(name="logout",         attr="logout"),
     ViewConf(name="contact",        attr="contact",    renderer=t+"form.pt",      permission="contactuser"),
     ViewConf(name="closefirstrun",  attr="closefirstrun",renderer="json",         permission="updateuser"),
@@ -313,6 +315,64 @@ class UserView(BaseView):
         return {"content": data, 
                 "result": result, 
                 "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]), 
+                "title": title}
+
+    def resetpassToken(self):
+        """
+        Resets the users password and sends a randomly generated password to the users email.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
+        """
+        title = ""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title","")
+        form = self._loadSimpleForm(context=self.context.root)
+        form.startEmpty = True
+        form.Setup(subset="resetpass_mail")
+        result, data, action = form.Process(renderSuccess=False)
+        self.AddHeader("X-Result", str(result).lower())
+        return {"content": data,
+                "result": result,
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
+                "title": title}
+
+    def updatepassToken(self):
+        """
+        Update the users password. The user is forced to enter the current password to change it.
+
+        **Settings**
+
+        - *title*: (string) title displayed above the form
+
+        **Return values**
+
+        - *body*: This function returns rendered html code as body.
+        - *X-Result header*: http header indicating whether the new item has been created or not.
+        """
+        title = ""
+        viewconf = self.GetViewConf()
+        if viewconf and viewconf.get("settings"):
+            title = viewconf.settings.get("title","")
+        form = self._loadSimpleForm(context=self.context.root)
+        token = self.GetFormValue("token")
+        user = self.context.root.GetUserForToken(token)
+        if user is None:
+            form.Setup(subset="editpass_token2")
+        else:
+            form.Setup(subset="editpass_token")
+        result, data, action = self.form.Process(renderSuccess=False)
+        self.AddHeader("X-Result", str(result).lower())
+        return {"content": data,
+                "result": result,
+                "head": form.HTMLHead(ignore=[a[0] for a in self.configuration.assets]),
                 "title": title}
 
     def updatemail1(self):
@@ -724,6 +784,16 @@ class UserForm(ObjectForm):
                 ],
                 "defaultAction": Conf(id="starteditpass", method="StartRequestGET", name="Start update password", hidden=True)
             },
+            "editpass_token2":{
+                "fields": [
+                    FieldConf(id="token", datatype="string", name="Password reset token", size=500, required=True, hidden=False),
+                    "password"
+                ],
+                "actions": [
+                    Conf(id="editpass", method="UpdatePassToken", name=_("Update password"), hidden=False, css_class="btn btn-primary")
+                ],
+                "defaultAction": Conf(id="starteditpass", method="StartRequestGET", name="Start update password", hidden=True)
+            },
 
             "updatemail1": {
                 "fields": [
@@ -813,7 +883,7 @@ class UserForm(ObjectForm):
         """
         redirectSuccess = kw.get("redirectSuccess")
         data = self.GetFormValues(self.request)
-        user, msgs = self.context.Login(data.get("name"), data.get("password"), 0)
+        user, msgs = self.context.Login(data.get("name"), data.get("password"), raiseUnauthorized=0)
         if user:
             self.context.app.RememberLogin(self.request, str(user))
             if self.view and redirectSuccess:
