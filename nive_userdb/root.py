@@ -287,7 +287,7 @@ class Userroot(Root):
         """
         report=[]
 
-        if not name or email:
+        if not name and not email:
             report.append(_("Please enter your sign in name or email address."))
             return None, report
 
@@ -474,7 +474,7 @@ class Userroot(Root):
             user = self.search.Select(pool_type="user", parameter=param, fields=["id"], max=2)
             
             # check multiple identity fields
-            if len(user)==0 and loginByEmail:
+            if len(user)==0 and self.app.configuration.get("identityFallbackAlternative", True):
                 if name:
                     del param["name"]
                     param["email"] = name

@@ -368,7 +368,7 @@ class UserView(BaseView):
             form.Setup(subset="editpass_token2")
         else:
             form.Setup(subset="editpass_token")
-        result, data, action = self.form.Process(renderSuccess=False)
+        result, data, action = form.Process(renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
         return {"content": data,
                 "result": result,
@@ -747,7 +747,7 @@ class UserForm(ObjectForm):
             },
 
             "activate": {
-                "fields": [FieldConf(id="token", datatype="string", size="500", name="Activation token", required=True, hidden=False)],
+                "fields": [FieldConf(id="token", datatype="string", size="500", name=_("Token for activation or password reset"), required=True, hidden=False)],
                 "actions": [Conf(id="activate", method="Activate", name=_("Activate"), hidden=False)],
                 "defaultAction": "activate"
             },
@@ -768,7 +768,7 @@ class UserForm(ObjectForm):
             },
             "resetpass_mail": {
                 "fields": [
-                    FieldConf(id="email", name=_("Name or email"), datatype="string", size=35)
+                    FieldConf(id="email", name=_("Email"), datatype="string", size=35)
                 ],
                 "actions": [
                     Conf(id="resetpass", method="MailPassToken", name=_("Reset password"), hidden=False)
@@ -777,7 +777,7 @@ class UserForm(ObjectForm):
             "editpass_token": {
                 "fields": [
                     "password",
-                    FieldConf(id="token", datatype="string", name="reset token", size=500, required=True, hidden=True)
+                    FieldConf(id="token", datatype="string", name=_("Token for activation or password reset"), size=500, required=True, hidden=True)
                 ],
                 "actions": [
                     Conf(id="editpass", method="UpdatePassToken", name=_("Update password"), hidden=False)
@@ -786,7 +786,7 @@ class UserForm(ObjectForm):
             },
             "editpass_token2":{
                 "fields": [
-                    FieldConf(id="token", datatype="string", name="Password reset token", size=500, required=True, hidden=False),
+                    FieldConf(id="token", datatype="string", name=_("Token for activation or password reset"), size=500, required=True, hidden=False),
                     "password"
                 ],
                 "actions": [
@@ -809,7 +809,7 @@ class UserForm(ObjectForm):
                 "defaultAction": "default"
             },
             "updatemail2": {
-                "fields": [FieldConf(id="token", datatype="string", size="500", name="Activation token", required=True, hidden=False)],
+                "fields": [FieldConf(id="token", datatype="string", size="500", name=_("Token for activation or password reset"), required=True, hidden=False)],
                 "actions": [Conf(id="updatemail_token", method="UpdateMailToken", name=_("Verify email"), hidden=False)],
                 "defaultAction": "updatemail_token"
             },
@@ -1056,7 +1056,8 @@ class UserForm(ObjectForm):
         redirectSuccess = kw.get("redirectSuccess")
         result,data,errors = self.Validate(self.request)
         if result:
-            result, msgs = self.context.MailResetPass(data.get("email"),
+            result, msgs = self.context.MailResetPass(name=None,
+                                                      email=data.get("email"),
                                                       currentUser=self.view.User(),
                                                       **kw)
             if result:
@@ -1087,7 +1088,7 @@ class UserForm(ObjectForm):
                 return result, self.Render(data, msgs=[_("The token is invalid. Please make sure it is complete.")], errors=None)
             result = user.UpdatePassword(data["password"], self.view.User())
             if result:
-                msgs.append(_("OK. Your password has successfully been updated."))
+                msgs.append(_("OK. Password changed."))
                 errors=None
                 if self.view and redirectSuccess:
                     self.view.Redirect(redirectSuccess, messages=msgs)

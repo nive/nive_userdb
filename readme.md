@@ -23,3 +23,9 @@ Translations can be extracted using lingua>=3.2
 
     > pip install lingua-3.2
     > bin/pot-create -o nive_userdb/locale/nive_userdb.pot nive_userdb
+
+
+# Email tests
+Use loacel email test smtp server
+
+    > python -m smtpd -n -c DebuggingServer localhost:1025

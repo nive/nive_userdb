@@ -35,6 +35,7 @@ configuration = AppConf(
     title = _("Users"),
 
     loginByEmail = True,
+    identityFallbackAlternative = True, # tries both: name and email as identity fields
     cookieAuthMaxAge=0, # e.g. 60*60*24*7 one week
 
     # signup settings
@@ -44,9 +45,8 @@ configuration = AppConf(
         generatePW=0,
         generateName=False,
         # mails
-        # disabled by default -> requires mailhost setup!
-        signupMail = None, #Mail(_("Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
-        notifyMail = None, #Mail(_("Signup notification"), "nive_userdb:userview/mails/notify.pt"),
+        signupMail = Mail(_("Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
+        notifyMail = Mail(_("Signup notification"), "nive_userdb:userview/mails/notify.pt"),
         sendPasswordMail = Mail(_("Your password"), "nive_userdb:userview/mails/mailpass.pt"),
         verifyPasswordMail = Mail(_("Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
         resetPasswordMail = Mail(_("Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
