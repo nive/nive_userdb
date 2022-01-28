@@ -1,3 +1,10 @@
+1.3.8
+-----
+- login by email fixes
+- app.configuration.identityFallbackAlternative option
+- enalbed login, notify mails by default
+- translation fixes
+
 1.3.7
 -----
 - login by email
