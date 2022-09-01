@@ -28,7 +28,7 @@ li { padding:0px;margin:0px; }
 a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gray;margin-right:1px;text-decoration:none;color:white;}
 .alert { padding:2px 8px 2px 8px; display:block; margin-bottom:10px; }
 .alert-success, .alert-warning { background-color:#8de4d4; }
-.alert-error { background-color:#FFDFDF; }
+.alert-danger { background-color:#FFDFDF; }
 </style>
 </head>
 
