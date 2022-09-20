@@ -729,7 +729,7 @@ class UserForm(ObjectForm):
 
             "login":  {
                 "fields":  [
-                    FieldConf(id="name", name=_("Name"), datatype="string", required=True),
+                    FieldConf(id="name", name=_("Name"), datatype="string", size="255", required=True),
                     FieldConf(id="password", name=_("Password"), datatype="password", required=True, settings={"single": True}),
                     FieldConf(id="redirect", datatype="string", size="500", name="redirect url", hidden=True),
                 ],
@@ -738,7 +738,7 @@ class UserForm(ObjectForm):
             },
             "loginMail":  {
                 "fields":  [
-                    FieldConf(id="email", name=_("Email"), datatype="string"),
+                    FieldConf(id="email", name=_("Email"), datatype="string", size="255", required=True),
                     FieldConf(id="password", name=_("Password"), datatype="password", settings={"single": True}),
                     FieldConf(id="redirect", datatype="string", size="500", name="redirect url", hidden=True),
                 ],
@@ -768,7 +768,7 @@ class UserForm(ObjectForm):
             },
             "resetpass_mail": {
                 "fields": [
-                    FieldConf(id="email", name=_("Email"), datatype="string", size=35)
+                    FieldConf(id="email", name=_("Email"), datatype="string", size=255)
                 ],
                 "actions": [
                     Conf(id="resetpass", method="MailPassToken", name=_("Reset password"), hidden=False)
@@ -815,12 +815,12 @@ class UserForm(ObjectForm):
             },
 
             "resetpass": {
-                "fields": [FieldConf(id="name", name=_("Name"), datatype="string")],
+                "fields": [FieldConf(id="name", name=_("Name"), datatype="string", size=255)],
                 "actions": [Conf(id="resetpass", method="ResetPass", name=_("Reset password"), hidden=False)],
                 "defaultAction": "default"
             },
             "resetpassMail": {
-                "fields": [FieldConf(id="name", name=_("Email"), datatype="string")],
+                "fields": [FieldConf(id="name", name=_("Email"), datatype="string", size=255)],
                 "actions": [Conf(id="resetpass", method="ResetPass", name=_("Reset password"), hidden=False)],
                 "defaultAction": "default"
             },
