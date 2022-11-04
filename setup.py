@@ -14,13 +14,13 @@ except:
     CHANGES = ''
 
 requires = [
-    'nive>=1.3.8',
+    'nive>=1.4.1',
     'AuthEncoding'
 ]
 
 setupkw = dict(
       name='nive_userdb',
-      version='1.3.9',
+      version='1.4.1',
       description='Nive User Database',
       long_description=README + '\n\n' + CHANGES,
       long_description_content_type="text/markdown",
@@ -30,7 +30,7 @@ setupkw = dict(
         "Framework :: Pyramid",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Development Status :: 4 - Beta",
-        "Programming Language :: Python :: 3.7"
+        "Programming Language :: Python :: 3.11"
       ],
       author='Arndt Droullier, Nive GmbH',
       author_email='info@nive.co',
