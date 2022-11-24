@@ -8,8 +8,11 @@
   <span tal:replace="structure view.insertMessages()"/>
   <tal:block tal:condition="not user">
 	<div tal:condition="view.GetFormValue('redirect') and not view.GetFormValue('name')" class="alert alert-warning" i18n:translate="">Please log in!</div>
-    <span tal:replace="structure content"/>
-    <p tal:condition="resetPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
+    <div tal:condition="view.context.app.configuration.get('maintenance')==True" i18n:translate="">Sorry, the login is currently disabled due to maintenance. Please try again later.</div>
+    <div tal:condition="view.context.app.configuration.get('maintenance')!=True">
+        <span tal:replace="structure content"/>
+        <p tal:condition="resetPasswordLink"><hr><a href="resetpass" i18n:translate="">Reset password</a></p>
+    </div>
   </tal:block>
   <div tal:condition="user" class="logout">
     <div tal:condition="view.GetFormValue('redirect')" class="alert alert-warning" i18n:translate="">You do not have the required permissions to access the page.</div>

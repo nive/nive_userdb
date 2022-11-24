@@ -36,7 +36,8 @@ configuration = AppConf(
 
     loginByEmail = True,
     identityFallbackAlternative = True, # tries both: name and email as identity fields
-    cookieAuthMaxAge=0, # e.g. 60*60*24*7 one week
+    cookieAuthMaxAge = 0, # e.g. 60*60*24*7 one week
+    maintenance = False, # if true login and reset password disabled
 
     # signup settings
     settings = Conf(

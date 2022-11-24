@@ -4,7 +4,10 @@
 
 <div class="userform">
   <h3 tal:condition="title" tal:content="structure title"></h3>
-  <span tal:replace="structure content"/>
+  <div tal:condition="view.context.app.configuration.get('maintenance')==True" i18n:translate="">Sorry, the login is currently disabled due to maintenance. Please try again later.</div>
+  <div tal:condition="view.context.app.configuration.get('maintenance')!=True">
+    <span tal:replace="structure content"/>
+  </div>
 </div>
 
 </tal:block>
