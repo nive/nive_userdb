@@ -48,7 +48,7 @@ a {padding:2px 8px 2px 8px;margin-bottom:10px;display:block;background-color:gra
   <a tal:condition="not user and request.view_name!='login'"
      href="login" i18n:translate="">Login</a>
   <a tal:condition="not user and request.view_name!='mailpass'"
-     href="resetpass" i18n:translate="">Reset password</a>
+     href="resetpass1" i18n:translate="">Reset password</a>
   <a tal:condition="not user and view.Allowed('signup', context=None) and request.view_name!='signup'"
      href="signup" i18n:translate="">Signup</a>
   <a tal:condition="user and request.view_name!='update'"

@@ -337,7 +337,7 @@ class UserView(BaseView):
         form = self._loadSimpleForm(context=self.context.root)
         form.startEmpty = True
         form.Setup(subset="resetpass_mail")
-        result, data, action = form.Process(renderSuccess=False)
+        result, data, action = form.Process(url=self.Url()+"resetpass2", renderSuccess=False)
         self.AddHeader("X-Result", str(result).lower())
         return {"content": data,
                 "result": result,
@@ -510,7 +510,7 @@ class UserView(BaseView):
         title = ""
         resetPasswordLink = False
         viewconf = self.GetViewConf()
-        subset = "login"
+        subset = None
         if viewconf and viewconf.get("settings"):
             subset = viewconf.settings.get("form")
             title = viewconf.settings.get("title","")
