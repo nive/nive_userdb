@@ -31,7 +31,7 @@ class tViews(__local.DefaultTestCase):
         self.config = testing.setUp(request=request)
         self.config.include("pyramid_chameleon")
         request._LOCALE_ = "en"
-        request.registry.registerUtility(AuthTktSecurityPolicy(secret="ooo", callback=TestCallback))
+        request.registry.registerUtility(AuthTktSecurityPolicy(secret="ooo"))
         self.request = request
         self.request.content_type = ""
         self.request.method = "POST"

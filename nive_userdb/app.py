@@ -114,7 +114,7 @@ class UserDB(Application):
     """
     """
 
-    def Groupfinder(self, userid, request=None, context=None):
+    def Principals(self, userid, request=None, context=None):
         """
         returns the list of groups assigned to the user 
         """
