@@ -20,7 +20,7 @@ import hashlib
 
 from nive.definitions import AppConf, GroupConf, Conf
 from nive.definitions import implementer, IUserDatabase, ILocalGroups, IRoot
-from nive.security import Allow, Deny, Everyone, Authenticated, ALL_PERMISSIONS, remember, forget
+from nive.security import Allow, Deny, Everyone, Authenticated, ALL_PERMISSIONS
 from nive.application import Application
 from nive.views import Mail
 from nive.components.reform.schema import Invalid
@@ -36,15 +36,15 @@ configuration = AppConf(
 
     loginByEmail = True,
     identityFallbackAlternative = True, # tries both: name and email as identity fields
-    cookieAuthMaxAge = 0, # e.g. 60*60*24*7 one week
+    authMaxAge = 0, # e.g. 60*60*24*7 one week
     maintenance = False, # if true login and reset password disabled
 
     # signup settings
     settings = Conf(
-        groups=(),
-        activate=1,
-        generatePW=0,
-        generateName=False,
+        groups = (),
+        activate = 1,
+        generatePW = 0,
+        generateName = False,
         # mails
         signupMail = Mail(_("Signup confirmation"), "nive_userdb:userview/mails/signup.pt"),
         notifyMail = Mail(_("Signup notification"), "nive_userdb:userview/mails/notify.pt"),
@@ -118,7 +118,7 @@ class UserDB(Application):
         """
         returns the list of groups assigned to the user 
         """
-        if request:
+        if request is not None:
             try:
                 user = request.environ["authenticated_user"]
             except (AttributeError, KeyError):
@@ -148,28 +148,6 @@ class UserDB(Application):
                 return local
             return tuple(list(groups)+list(local))
         return groups
-
-
-    def RememberLogin(self, request, user):
-        """
-        add login info to cookies or session. 
-        """
-        if not hasattr(request.response, "headerlist"):
-            request.response.headerlist = []
-        maxAge = self.configuration.cookieAuthMaxAge
-        headers = remember(request, user, max_age=maxAge if maxAge else None)
-        request.response.headerlist += list(headers)
-
-
-    def ForgetLogin(self, request, url=None):
-        """
-        removes login info from cookies and session
-        """
-        if not hasattr(request.response, "headerlist"):
-            setattr(request.response, "headerlist", [])
-        headers = forget(request)
-        request.response.headerlist += list(headers)
-        #request.authenticate
 
 
 

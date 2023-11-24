@@ -3,6 +3,10 @@
 #
 
 import copy
+try:
+    from pyramid.interfaces import ISecurityPolicy
+except ImportError:
+    ISecurityPolicy = None
 
 from nive.definitions import FieldConf, ViewConf, ViewModuleConf, Conf
 from nive.definitions import ConfigurationError
@@ -553,7 +557,7 @@ class UserView(BaseView):
         app = self.context
         user = self.UserName()
         a = self.context.root.Logout(user)
-        app.ForgetLogin(self.request)
+        self.forgetLogin(self.request)
         redirect = self.GetFormValue("redirect")
         if not redirect:
             try:
@@ -617,7 +621,7 @@ class UserView(BaseView):
         if remove:
             # delete the object, cache and sign out
             self.context.root.DeleteUser(user, currentUser=user)
-            self.context.ForgetLogin(self.request)
+            self.forgetLogin(self.request)
             values["result"] = True
             self.AddHeader("X-Result", "true")
         return values
@@ -629,6 +633,23 @@ class UserView(BaseView):
             return ""
         html = """<div class="alert alert-success">%s</div>"""
         return html % ("</li><li>".join(messages))
+
+
+    def rememberLogin(self, request, user):
+        """
+        add login info to cookies or session.
+        """
+        policy = request.registry.queryUtility(ISecurityPolicy)
+        maxAge = self.context.app.configuration.authMaxAge
+        policy.remember(request, user, response=request.response, max_age=maxAge if maxAge else None)
+
+
+    def forgetLogin(self, request, url=None):
+        """
+        removes login info from cookies and session
+        """
+        policy = request.registry.queryUtility(ISecurityPolicy)
+        policy.forget(request, response=request.response)
 
 
     def _loadSimpleForm(self, context=None):
@@ -885,7 +906,7 @@ class UserForm(ObjectForm):
         data = self.GetFormValues(self.request)
         user, msgs = self.context.Login(data.get("name"), data.get("password"), raiseUnauthorized=0)
         if user:
-            self.context.app.RememberLogin(self.request, str(user))
+            self.view.rememberLogin(self.request, str(user))
             if self.view and redirectSuccess:
                 self.view.Redirect(redirectSuccess)
                 return
@@ -903,7 +924,7 @@ class UserForm(ObjectForm):
         data = self.GetFormValues(self.request)
         user, msgs = self.context.Login(None, data.get("password"), email=data.get("email"), raiseUnauthorized=0)
         if user is not None:
-            self.context.app.RememberLogin(self.request, str(user))
+            self.view.rememberLogin(self.request, str(user))
             if self.view and redirectSuccess:
                 self.view.Redirect(redirectSuccess)
                 return

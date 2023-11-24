@@ -4,8 +4,7 @@ import unittest
 
 from nive_userdb.userview.view import UserForm, UserView
 from nive_userdb.userview.view import configuration as view_configuration
-from nive.views import BaseView
-from nive.security import User
+from nive.security import User, AuthTktSecurityPolicy
 
 from nive_userdb.tests import __local
 from nive_userdb.tests import db_app
@@ -21,16 +20,21 @@ class TestView(UserView):
         return self.context.GetUserByName("testuser")
     
 
+def TestCallback(userid, request):
+    return None
+
+
 class tViews(__local.DefaultTestCase):
 
     def setUp(self):
         request = testing.DummyRequest()
+        self.config = testing.setUp(request=request)
+        self.config.include("pyramid_chameleon")
         request._LOCALE_ = "en"
+        request.registry.registerUtility(AuthTktSecurityPolicy(secret="ooo", callback=TestCallback))
         self.request = request
         self.request.content_type = ""
         self.request.method = "POST"
-        self.config = testing.setUp(request=request)
-        self.config.include('pyramid_chameleon')
         self._loadApp()
         self.app.Startup(self.config)
         self.root = self.app.root
@@ -153,7 +157,7 @@ class tViews(__local.DefaultTestCase):
         r,v = form.Update("action", redirectSuccess="")
         self.assertFalse(r)
 
-        view = BaseView(context=self.root, request=self.request)
+        view = UserView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="login")
         self.request.POST = {"name": "testuser", "password": "12345"}
@@ -167,7 +171,7 @@ class tViews(__local.DefaultTestCase):
         u.data["token"] = "1111111111"
         u.Commit(user=u)
 
-        view = BaseView(context=self.root, request=self.request)
+        view = UserView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="activate")
         form.method = "GET"
@@ -268,7 +272,7 @@ class tViews(__local.DefaultTestCase):
 
         # ResetPass -----------------------------------------------------------------------------------------------------
 
-        view = BaseView(context=self.root, request=self.request)
+        view = UserView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="resetpass")
         self.request.POST = {"email": "testuser@domain.net"}
@@ -277,7 +281,7 @@ class tViews(__local.DefaultTestCase):
 
         # Contact -----------------------------------------------------------------------------------------------------
 
-        view = BaseView(context=self.root, request=self.request)
+        view = UserView(context=self.root, request=self.request)
         form = UserForm(loadFromType="user", context=self.root, request=self.request, view=view, app=self.app)
         form.Setup(subset="contact")
         self.request.POST = {"receiver": str(self.root.LookupUser(name="testuser", reloadFromDB=1))}
