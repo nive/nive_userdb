@@ -185,6 +185,8 @@ def UsernameValidator(node, value):
     u = root.search.Select(pool_type="user", parameter={"name": value}, fields=["id","name","email"], max=2, operators={"name":"="})
     if not u:
         u = root.search.Select(pool_type="user", parameter={"email": value}, fields=["id","name","email"], max=2, operators={"email":"="})
+    if not u and root.identityField not in ("name","email"):
+        u = root.search.Select(pool_type="user", parameter={root.identityField: value}, fields=["id","name","email"], max=2, operators={"email":"="})
     if u:
         # check if its the current user
         ctx = node.widget.form.context
