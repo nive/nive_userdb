@@ -17,7 +17,7 @@ def app_db(confs=None):
         for c in confs:
             app.Register(c)
     p = Portal()
-    p.Register(app)
+    p.Register(app, "userdb")
     app.Startup(None)
     dbfile = DvPath(app.dbConfiguration.dbName)
     if not dbfile.IsFile():
@@ -41,7 +41,7 @@ def app_nodb():
     app = UserDB(appconf)
     app.dbConfiguration=DatabaseConf()
     p = Portal()
-    p.Register(app)
+    p.Register(app, "userdb")
     app.Startup(None)
     return app
 

@@ -5,6 +5,7 @@ import unittest
 from nive_userdb.userview.view import UserForm, UserView
 from nive_userdb.userview.view import configuration as view_configuration
 from nive.security import User, AuthTktSecurityPolicy
+from nive.security import DummySecurityPolicy
 
 from nive_userdb.tests import __local
 from nive_userdb.tests import db_app
@@ -31,7 +32,7 @@ class tViews(__local.DefaultTestCase):
         self.config = testing.setUp(request=request)
         self.config.include("pyramid_chameleon")
         request._LOCALE_ = "en"
-        request.registry.registerUtility(AuthTktSecurityPolicy(secret="ooo"))
+        request.registry.registerUtility(DummySecurityPolicy(""))
         self.request = request
         self.request.content_type = ""
         self.request.method = "POST"
@@ -339,3 +340,7 @@ class tViews(__local.DefaultTestCase):
 
         u = self.root.GetUserByName("testuser")
         self.assertFalse(u.data.token)
+
+
+
+#Test AuthTktSecurityPolicy(secret="ooo"))

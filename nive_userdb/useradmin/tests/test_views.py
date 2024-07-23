@@ -6,6 +6,7 @@ from nive_userdb.tests import db_app
 from nive_userdb.useradmin import view
 from nive_userdb.useradmin import adminroot
 
+from nive.security import DummySecurityPolicy
 from nive.security import User
 from nive.portal import Portal
 
@@ -23,10 +24,11 @@ class tViews(__local.DefaultTestCase):
         self.request = request
         self.request.method = "POST"
         self.config = testing.setUp(request=request)
+        self.config.registry.registerUtility(DummySecurityPolicy("test"))
         self.config.include('pyramid_chameleon')
         self._loadApp()
         self.portal = Portal()
-        self.portal.Register(self.app, "nive")
+        self.portal.Register(self.app, "userdb")
         self.app.Register(adminroot.configuration)
         self.app.Startup(self.config)
         self.root = self.app.GetRoot("usermanagement")
