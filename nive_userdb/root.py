@@ -459,7 +459,7 @@ class Userroot(Root):
                 elif loginByEmail and email and email == admin["email"]:
                     return AdminUser(admin, admin.get(self.identityField))
             # lookup id for name, email or ident
-            param = {}
+            param = dict()
             if activeOnly:
                 param["pool_state"] = 1
             if name:
