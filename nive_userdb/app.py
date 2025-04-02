@@ -171,7 +171,6 @@ def UsernameValidator(node, value):
     Validator which succeeds if the username does not exist.
     Can be used for the name input field in a sign up form.
     """
-    Literal()(node, value)
     Length(min=5,max=40)(node, value)
     if IsReservedUserName(value):
         err = _("Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
