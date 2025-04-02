@@ -910,8 +910,7 @@ class UserForm(ObjectForm):
             if self.view and redirectSuccess:
                 self.view.Redirect(redirectSuccess)
                 return
-        errors=None
-        return user, self.Render(data, msgs=msgs, errors=errors)
+        return user, self.Render(data, msgs=msgs, errors=None)
 
 
     def LoginEmail(self, action, **kw):
