@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nive_userdb"
-version = "1.6.1"
+version = "1.6.2"
 authors = [{name = "Arndt Droullier", email = "info@nive.co"}, {name = "Nive GmbH"}]
 license = {text = "GPL 3"}
 description = "Nive User Database"
@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 urls = {Homepage = "https://niveapps.com/", Repository = "https://github.com/nive/nive_userdb"}
-dependencies = ["nive>=1.6.1", "AuthEncoding"]
+dependencies = ["nive>=1.6.8", "AuthEncoding"]
 
 [project.readme]
 text = """
