@@ -117,7 +117,7 @@ class Userroot(Root):
             stream, result = tool(body=body, title=title, recvids=[str(obj)], force=1)
             if not result:
                 report.append(_("The email could not be sent."))
-                return None, report
+                #return None, report # continue anyway?
 
         sysadmin = app.configuration.get("userAdmin")
         if sysadmin:
