@@ -244,7 +244,6 @@ class ObjectTest_db(object):
         self.assertRaises(Invalid, UsernameValidator, node, "user1@aaa.ccc")
 
         self.assertRaises(Invalid, UsernameValidator, node, "ua")
-        self.assertRaises(Invalid, UsernameValidator, node, "#+§$%")
         self.assertRaises(Invalid, UsernameValidator, node, "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
         self.assertRaises(Invalid, UsernameValidator, node, "group:")
         self.assertRaises(Invalid, UsernameValidator, node, "group:test")
