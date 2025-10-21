@@ -171,16 +171,25 @@ def UsernameValidator(node, value):
     Validator which succeeds if the username does not exist.
     Can be used for the name input field in a sign up form.
     """
+    def invalid():
+        err = _("Username '${name}' already in use. Please choose a different name.", mapping={'name': value})
+        raise Invalid(node, err)
+
     Length(min=5,max=40)(node, value)
     if IsReservedUserName(value):
-        err = _("Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
-        raise Invalid(node, err)
-    # lookup name in database
+        invalid()
+
     c = node.widget.form.context
     if not IRoot.providedBy(c):
         root = c.root
     else:
         root = c
+
+    admin = root.app.configuration.get("admin")
+    if admin and admin.get("name")==value:
+        invalid()
+
+    # lookup name in database
     u = root.search.Select(pool_type="user", parameter={"name": value}, fields=["id","name","email"], max=2, operators={"name":"="})
     if not u:
         u = root.search.Select(pool_type="user", parameter={"email": value}, fields=["id","name","email"], max=2, operators={"email":"="})
@@ -191,25 +200,33 @@ def UsernameValidator(node, value):
         ctx = node.widget.form.context
         if len(u)==1 and ctx.id == u[0][0]:
             return
-        err = _("Username '${name}' already in use. Please choose a different name.", mapping={'name':value})
-        raise Invalid(node, err)
+        invalid()
 
 def EmailValidator(node, value):
     """
     Validator which succeeds if the email does not exist.
     Can be used for the email input field in a sign up form.
     """
+    def invalid():
+        err = _("Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
+        raise Invalid(node, err)
+
     # validate email format
     Email()(node, value)
     if IsReservedUserName(value):
-        err = _("Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
-        raise Invalid(node, err)
-    # lookup email in database
+        invalid()
+
     c = node.widget.form.context
     if not IRoot.providedBy(c):
         root = c.root
     else:
         root = c
+
+    admin = root.app.configuration.get("admin")
+    if admin and admin.get("email")==value:
+        invalid()
+
+    # lookup email in database
     u = root.search.Select(pool_type="user", parameter={"email": value}, fields=["id","name","email"], max=2, operators={"email":"="})
     if not u:
         u = root.search.Select(pool_type="user", parameter={"name": value}, fields=["id","name","email"], max=2, operators={"name":"="})
@@ -218,8 +235,7 @@ def EmailValidator(node, value):
         ctx = node.widget.form.context
         if len(u)==1 and ctx.id == u[0][0]:
             return
-        err = _("Email '${name}' already in use. Please choose a different email.", mapping={'name':value})
-        raise Invalid(node, err)
+        invalid()
 
 def PasswordValidator(node, value):
     """

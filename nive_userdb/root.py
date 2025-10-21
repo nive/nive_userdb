@@ -147,7 +147,10 @@ class Userroot(Root):
         if email is not None:
             user = self.GetUserByMail(email)
         else:
-            user = self.GetUserByName(name)
+            if self.app.configuration.loginByEmail:
+                user = self.GetUserByMail(name)
+            else:
+                user = self.GetUserByName(name)
         if user is None:
             if raiseUnauthorized:
                 raise Unauthorized("Login failed")
