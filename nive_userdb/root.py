@@ -59,9 +59,15 @@ class Userroot(Root):
         else:
             name = data.get("name")
         
-        if not name or name == "":
-            report.append(_("Please enter your username"))
-            return None, report
+        email = data.get("email")
+        if not name:
+            if email and self.app.configuration.get("loginByEmail"):
+                # map email to name as default if identity = email
+                data["name"] = email
+                name = email
+            else:
+                report.append(_("Please enter your username"))
+                return None, report
 
         # check user with name exists
         user = self.GetUserByName(name, activeOnly=0)
