@@ -411,13 +411,13 @@ class AdminuserTest_db(__local.DefaultTestCase):
         data["name"] = "admin"
         data["email"] = "admin@aaa.cccXXXXX"
         o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
-        self.assertFalse(o,r)
+        self.assertFalse(o,r) # error: sys admin
         data["name"] = "adminXXXXX"
         data["email"] = "admin@aaa.ccc"
         o,r = root.AddUser(data, activate=1, generatePW=0, mail=None, groups="", currentUser=user)
-        self.assertFalse(o,r)
+        self.assertFalse(o,r) # error: sys admin
 
-        l,r = root.Login("admin", "11111", raiseUnauthorized = 0)
+        l,r = root.Login("admin@aaa.ccc", "11111", raiseUnauthorized = 0)
         self.assertTrue(l,r)
         self.assertTrue(root.Logout("admin"))
         l,r = root.Login("admin", "aaaaa", raiseUnauthorized = 0)
