@@ -3,6 +3,7 @@
 #
 
 import copy
+from html import escape
 try:
     from pyramid.interfaces import ISecurityPolicy
 except ImportError:
@@ -527,7 +528,7 @@ class UserView(BaseView):
         form.Setup(subset=subset)
         user = self.User()
         if not user:
-            redirect = self.GetFormValue("redirect")
+            redirect = self.SafeRedirectUrl(self.GetFormValue("redirect"))
             if not redirect:
                 try:
                     redirect = self.context.portal.configuration.loginSuccessUrl
@@ -558,7 +559,7 @@ class UserView(BaseView):
         user = self.UserName()
         a = self.context.root.Logout(user)
         self.forgetLogin(self.request)
-        redirect = self.GetFormValue("redirect")
+        redirect = self.SafeRedirectUrl(self.GetFormValue("redirect"))
         if not redirect:
             try:
                 redirect = self.context.portal.configuration.logoutSuccessUrl
@@ -632,7 +633,7 @@ class UserView(BaseView):
         if not messages:
             return ""
         html = """<div class="alert alert-success">%s</div>"""
-        return html % ("</li><li>".join(messages))
+        return html % ("</li><li>".join([escape(str(m)) for m in messages]))
 
 
     def rememberLogin(self, request, user):

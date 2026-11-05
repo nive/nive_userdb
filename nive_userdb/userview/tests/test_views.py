@@ -71,7 +71,28 @@ class tViews(__local.DefaultTestCase):
         view.remove()
 
 
-    def test_templates(self):    
+    def test_logout_redirect(self):
+        view = UserView(context=self.app, request=self.request)
+        view.__configuration__ = lambda: view_configuration
+        self.request.POST = {"redirect": "/home"}
+        with self.assertRaises(HTTPFound) as e:
+            view.logout()
+        self.assertTrue(e.exception.location == "/home")
+        for url in ("https://evil.com/", "//evil.com/", "javascript:alert(1)"):
+            self.request.POST = {"redirect": url}
+            try:
+                view.logout()
+            except HTTPFound as e:
+                self.assertTrue(e.location != url)
+
+    def test_messages(self):
+        view = UserView(context=self.app, request=self.request)
+        self.request.session.flash("<script>")
+        html = view.insertMessages()
+        self.assertTrue("<script>" not in html and "&lt;script&gt;" in html)
+
+
+    def test_templates(self):
         view = UserView(context=self.app, request=self.request)
         view.__configuration__ = lambda: view_configuration
         vrender = {"context":self.app, "view":view, "request": self.request}

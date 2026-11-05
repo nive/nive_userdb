@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 urls = {Homepage = "https://niveapps.com/", Repository = "https://github.com/nive/nive_userdb"}
-dependencies = ["nive>=1.6.8", "AuthEncoding"]
+dependencies = ["nive>=1.8.1", "AuthEncoding"]
 
 [project.readme]
 text = """

@@ -143,7 +143,7 @@ class UsermanagementView(AdminBasics):
     
     def delete(self):
         ids = self.GetFormValue("ids")
-        confirm = self.GetFormValue("confirm")
+        confirm = self.GetFormValue("confirm", method="POST")
         users = []
         msgs = []
         root = self.context.root

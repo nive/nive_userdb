@@ -10,7 +10,7 @@
                     <tal:block tal:condition="not result and len(msgs)">
                         <div class="boxError">
                             <div tal:repeat="msg msgs"
-                                     tal:content="structure msg"></div>
+                                     tal:content="msg"></div>
                         </div>
                     </tal:block>
 
