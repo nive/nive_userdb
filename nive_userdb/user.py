@@ -100,7 +100,7 @@ class Userobject(Object):
         events: login(lastlogin)
         """
         self.previousLogin = self.data.get("lastlogin")
-        date = datetime.now()
+        date = datetime.now(tz=self.app.pytimezone)
         self.data.set("lastlogin", date)
         self.Commit(self)
         self.Signal("login", lastlogin=self.previousLogin)
