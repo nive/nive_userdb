@@ -4,7 +4,6 @@ from pyramid import testing
 import AuthEncoding
 
 from nive_userdb.tests import __local
-from nive_userdb.tests import db_app
 
 from nive.security import User
 
@@ -388,6 +387,10 @@ class ObjectTest_db_postgres(ObjectTest_db, __local.PostgreSqlTestCase):
 class AdminuserTest_db(__local.DefaultTestCase):
 
     def setUp(self):
+        request = testing.DummyRequest()
+        request._LOCALE_ = "en"
+        self.request = request
+        self.config = testing.setUp(request=request)
         self._loadApp()
         self.app.configuration.unlock()
         self.app.configuration.admin = {"name":"admin", "password":"11111", "email":"admin@aaa.ccc", "groups":("group:admin",)}
