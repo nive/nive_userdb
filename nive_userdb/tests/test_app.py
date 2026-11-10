@@ -23,8 +23,7 @@ class ObjectTest_db(object):
         self.app.Startup(self.config)
 
     def tearDown(self):
-        db_app.emptypool(self.app)
-        self.app.Close()
+        self._closeApp(True, True)
         testing.tearDown()
 
     
@@ -396,9 +395,8 @@ class AdminuserTest_db(__local.DefaultTestCase):
         self.app.configuration.lock()
         
     def tearDown(self):
-        self.app.Close()
+        self._closeApp(True, True)
 
-    
     def test_login(self):
         user = User("test")
         a=self.app

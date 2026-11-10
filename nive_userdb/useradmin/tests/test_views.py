@@ -34,13 +34,10 @@ class tViews(__local.DefaultTestCase):
         self.root = self.app.GetRoot("usermanagement")
         self.request.context = self.root
         self.request.content_type = ""
-        self.app.Query("delete from pool_meta")
-        self.app.Query("delete from users")
 
 
     def tearDown(self):
-        db_app.emptypool(self.app)
-        self.app.Close()
+        self._closeApp(True, True)
         testing.tearDown()
 
 
@@ -121,7 +118,7 @@ class tViews(__local.DefaultTestCase):
         self.request.POST["create$"] = "create"
         self.assertRaises(HTTPFound, v.add)
         user = self.root.GetUserByName("testuser")
-        if not user:
+        if user is None:
             self.assertTrue(False, "User should exist")
         
         v = view.UsermanagementView(context=user, request=self.request)

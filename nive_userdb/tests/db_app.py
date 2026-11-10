@@ -39,13 +39,13 @@ def app_nodb():
     appconf.modules.append("nive.tools.sendMail")
     
     app = UserDB(appconf)
-    app.dbConfiguration=DatabaseConf()
+    app.dbConfiguration=DatabaseConf(context="testing")
     p = Portal()
     p.Register(app, "userdb")
     app.Startup(None)
     return app
 
-def emptypool(app):
+def emptypool(app, files=False):
     db = app.db
     cursor = db.Execute("delete FROM pool_meta")
     db.Execute("delete FROM pool_files", cursor=cursor)

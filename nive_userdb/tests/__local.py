@@ -5,15 +5,6 @@ import unittest
 from nive.definitions import DatabaseConf
 from nive_userdb.tests import db_app
 
-# real database test configuration
-# change these to fit your system
-ENABLE_MYSQL_TESTS = True
-try:
-    import MySQLdb
-except ImportError:
-    ENABLE_MYSQL_TESTS = False
-
-
 WIN = sys.platform.startswith("win")
 
 # sqlite and mysql
@@ -64,10 +55,20 @@ if ENABLE_SQLITE_TESTS:
             mods.append(DatabaseConf(DB_CONF))
             self.app = db_app.app_db(mods)
 
+        def _closeApp(self, delete=False, files=False, req=None):
+            #if data:
+            #    db_app.emptypool(self.app, files)
+            self.app.Close()
+            if req:
+                req._process_finished_callbacks()
+
 else:
 
     class SqliteTestCase(object):
         def _loadApp(self, mods=None):
+            pass
+
+        def _closeApp(self, delete=False, files=False, req=None):
             pass
 
 
@@ -80,10 +81,20 @@ if ENABLE_MYSQL_TESTS:
             mods.append(DatabaseConf(MYSQL_CONF))
             self.app = db_app.app_db(mods)
 
+        def _closeApp(self, delete=False, files=False, req=None):
+            if delete:
+                db_app.emptypool(self.app, files)
+            self.app.Close()
+            if req:
+                req._process_finished_callbacks()
+
+
 else:
 
     class MySqlTestCase(object):
         def _loadApp(self, mods=None):
+            pass
+        def _closeApp(self, delete=False, files=False, req=None):
             pass
 
 
@@ -96,18 +107,26 @@ if ENABLE_POSTGRES_TESTS:
             mods.append(DatabaseConf(POSTGRES_CONF))
             self.app = db_app.app_db(mods)
 
+        def _closeApp(self, delete=False, files=False, req=None):
+            if delete:
+                db_app.emptypool(self.app, files)
+            self.app.Close()
+            if req:
+                req._process_finished_callbacks()
+
 else:
 
     class PostgreSqlTestCase(object):
         def _loadApp(self, mods=None):
             pass
+        def _closeApp(self, delete=False, files=False, req=None):
+            pass
 
-
-
-# Higher level tests are only run for one database system (sqlite if activated), not multiple.
+# Higher level tests are only run for one database system, not multiple.
 DefaultTestCase = SqliteTestCase
-if not ENABLE_SQLITE_TESTS:
-    if ENABLE_POSTGRES_TESTS:
-        DefaultTestCase = PostgreSqlTestCase
-    else:
-        DefaultTestCase = MySqlTestCase
+if ENABLE_MYSQL_TESTS:
+    DefaultTestCase = MySqlTestCase
+elif ENABLE_POSTGRES_TESTS:
+    DefaultTestCase = PostgreSqlTestCase
+
+
