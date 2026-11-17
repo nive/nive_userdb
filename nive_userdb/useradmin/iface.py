@@ -11,8 +11,8 @@ from nive_userdb.i18n import _
 
 configuration = IFaceConf(
     sections=   (
-        Conf(id="root.view", ref="users", name=_("Listing")),
-        Conf(id="root.add", ref="add", name=_("Add")),
+        Conf(id="root.viewlist", ref="users", name=_("Listing")),
+        Conf(id="root.add?pool_type=user", ref="add", name=_("Add")),
     ),
 
     acl=None,

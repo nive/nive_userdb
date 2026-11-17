@@ -6,6 +6,8 @@ from nive_userdb.i18n import _
 from nive.definitions import ViewModuleConf, ViewConf
 from nive.components.iface.view import IFaceView
 from nive.definitions import IUserDatabase
+from nive.views import HTTPNotFound
+from nive.components.adminview import view as adminview
 
 from .iface import configuration as ifaceConf
 
@@ -30,15 +32,24 @@ configuration = ViewModuleConf("nive.components.iface.view.configuration",
 
 t = "nive_userdb.useradmin:templates/"
 configuration.views += [
-    ViewConf(name="",     attr="view", context="nive_userdb.useradmin.adminroot.Adminroot", renderer=t+"root.pt"),
-    ViewConf(name="view", attr="view", context="nive_userdb.useradmin.adminroot.Adminroot", renderer=t+"root.pt"),
+    ViewConf(name="",        attr="default"),
+    ViewConf(name="viewlist",attr="view", renderer=t+"root.pt"),
     ViewConf(name="options", attr="options", context="nive_userdb.user.Userobject", renderer=t+"options.pt"),
 ]
 
 
 class UsermanagementView(IFaceView):
     viewModuleID = "useradmin"
-    pass
 
+    headoptions = adminview.headoptions
 
+    #??? name.settings["validator"] = UsernameValidator
+
+    def open(self):
+        id = self.GetFormValue("id")
+        obj = self.context.root.GetObj(id)
+        if obj is None:
+            return HTTPNotFound()
+        url = self.FolderUrl(obj)+"edit"
+        self.Redirect(url)
 
