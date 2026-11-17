@@ -29,12 +29,22 @@ configuration = ViewModuleConf("nive.components.iface.view.configuration",
     assetsCustom = [ ]
 
 )
-
+b = "nive.components.iface:templates/"
 t = "nive_userdb.useradmin:templates/"
-configuration.views += [
-    ViewConf(name="",        attr="default"),
-    ViewConf(name="viewlist",attr="view", renderer=t+"root.pt"),
+configuration.views = [
+    # Root views --------------------------------------------------------------------------------------
+    ViewConf(name="", attr="default"),
+    ViewConf(name="open", attr="open"),
+    ViewConf(name="add", attr="add", renderer=b+"add.pt", permission="add"),
+    ViewConf(name="@delete", attr="deletelist", renderer=b+"delete.pt", permission="delete"),
+    ViewConf(name="viewlist", attr="view", renderer=t+"root.pt"),
+
+    ViewConf(name="", attr="default", context="nive_userdb.user.Userobject"),
+    ViewConf(name="view", attr="view", context="nive_userdb.user.Userobject", renderer=b+"view.pt"),
+    ViewConf(name="edit", attr="edit", context="nive_userdb.user.Userobject", renderer=b+"edit.pt", permission="edit"),
+    ViewConf(name="meta", attr="meta", context="nive_userdb.user.Userobject", renderer=b+"meta.pt"),
     ViewConf(name="options", attr="options", context="nive_userdb.user.Userobject", renderer=t+"options.pt"),
+    ViewConf(name="deleteo", attr="delete", context="nive_userdb.user.Userobject", renderer=b+"delete.pt", permission="delete"),
 ]
 
 

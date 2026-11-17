@@ -1,7 +1,0 @@
-<tal:block metal:use-macro="view.index_tmpl().macros['main_object']">
-
-<tal:block metal:fill-slot="path"></tal:block>
-<tal:block metal:fill-slot="content">
-
-</tal:block>
-</tal:block>
