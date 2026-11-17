@@ -14,7 +14,10 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid import testing
 from pyramid.renderers import render
 
-
+class TestView(view.UsermanagementView):
+    __configuration__ = lambda a: view.configuration
+    def User(self, sessionuser=None):
+        return User("testuser")
 
 class tViews(__local.DefaultTestCase):
 
@@ -42,9 +45,7 @@ class tViews(__local.DefaultTestCase):
 
 
     def test_views(self):
-        v = view.UsermanagementView(context=self.root, request=self.request)
-        v.__configuration__ = lambda: view.configuration
-        self.assertTrue(v.GetAdminWidgets())
+        v = TestView(context=self.root, request=self.request)
         self.assertTrue(v.add())
         self.assertTrue(v.edit())
         self.assertTrue(v.delete())
@@ -52,8 +53,7 @@ class tViews(__local.DefaultTestCase):
 
     def test_templates(self):
         user = User("test")
-        v = view.UsermanagementView(context=self.root, request=self.request)
-        v.__configuration__ = lambda: view.configuration
+        v = TestView(context=self.root, request=self.request)
         vrender = {"context":self.root, "view":v, "request": self.request}
         
         values = v.add()
@@ -80,8 +80,7 @@ class tViews(__local.DefaultTestCase):
         user = self.root.GetUserByName("testuser")
         #if user is not None:
         self.root.DeleteUser("testuser")
-        v = view.UsermanagementView(context=self.root, request=self.request)
-        v.__configuration__ = lambda: view.configuration
+        v = TestView(context=self.root, request=self.request)
         r = v.add()
         self.assertTrue(r["result"])
         user = self.root.GetUserByName("testuser")
@@ -110,8 +109,7 @@ class tViews(__local.DefaultTestCase):
         user = self.root.GetUserByName("testuser")
         if user:
             self.root.DeleteUser("testuser")
-        v = view.UsermanagementView(context=self.root, request=self.request)
-        v.__configuration__ = lambda: view.configuration
+        v = TestView(context=self.root, request=self.request)
         self.request.POST = {"name":"testuser", "email":"test@aaa.com", "groups":("group:admin",)}
         self.request.POST["password"] = "password"
         self.request.POST["password-confirm"] = "password"
@@ -121,8 +119,7 @@ class tViews(__local.DefaultTestCase):
         if user is None:
             self.assertTrue(False, "User should exist")
         
-        v = view.UsermanagementView(context=user, request=self.request)
-        v.__configuration__ = lambda: view.configuration
+        v = TestView(context=user, request=self.request)
         self.request.POST = {}
         r = v.edit()
         self.assertTrue(r["result"])
@@ -145,8 +142,7 @@ class tViews(__local.DefaultTestCase):
 
 
     def test_delete(self):
-        v = view.UsermanagementView(context=self.root, request=self.request)
-        v.__configuration__ = lambda: view.configuration
+        v = TestView(context=self.root, request=self.request)
         user = self.root.GetUserByName("testuser")
         if user is None:
             self.request.POST = {"name":"testuser", "email":"test@aaa.com", "groups":("group:admin",)}

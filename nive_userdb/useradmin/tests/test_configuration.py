@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 
 import unittest
 
 from nive.helper import FormatConfTestFailure
 
 from nive_userdb.useradmin import view
+from nive_userdb.useradmin import iface
 from nive_userdb.useradmin import adminroot
 
 
@@ -18,8 +18,13 @@ class TestConf(unittest.TestCase):
             return
         self.fail(FormatConfTestFailure(r))
 
-
     def test_conf2(self):
+        r=iface.configuration.test()
+        if not r:
+            return
+        self.fail(FormatConfTestFailure(r))
+
+    def test_conf3(self):
         r=adminroot.configuration.test()
         if not r:
             return
