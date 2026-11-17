@@ -60,7 +60,8 @@ idField         = FieldConf(id="id",          datatype="number",      size=255, 
 # object fields
 configuration.addflds = Conf(
     user=Conf(fields=[
-                "name", "email", "password", "groups",
+        "name", "email", "password", "groups",
+        "surname", "lastname", "company",
     ], interfaces=[IObject])
 )
 
@@ -70,8 +71,9 @@ configuration.editflds = Conf(
                         widget=RadioChoiceWidget(values=(("1", _("Yes")), ("0", _("No"))))),
                 "email",
                 FieldConf(id="password", name=_("Password"), datatype="password", settings={"update": True}),
-                "name", "groups", "notify"
-              ], 
+                "name", "groups", "notify",
+                "surname", "lastname", "company",
+    ],
               interfaces=[IObject]
     )
 )
@@ -79,7 +81,7 @@ configuration.metaflds = Conf(default=Conf(fields=[
    "pool_state", "id", "reference", "pool_create", "pool_change", "pool_createdby", "pool_changedby", "token", "tempcache"
 ], interfaces=[IObject]))
 configuration.dataflds = Conf(default=Conf(fields=[
-    "name", "email", "groups", "notify", "lastlogin"
+    "name", "email", "groups", "notify", "surname", "lastname", "company", "lastlogin"
 ], interfaces=[IObject]))
 
 # search types

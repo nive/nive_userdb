@@ -53,8 +53,6 @@ class UsermanagementView(IFaceView):
 
     headoptions = adminview.headoptions
 
-    #??? name.settings["validator"] = UsernameValidator
-
     def open(self):
         id = self.GetFormValue("id")
         obj = self.context.root.GetObj(id)
