@@ -51,8 +51,6 @@ configuration.views = [
 class UsermanagementView(IFaceView):
     viewModuleID = "useradmin"
 
-    headoptions = adminview.headoptions
-
     def open(self):
         id = self.GetFormValue("id")
         obj = self.context.root.GetObj(id)
