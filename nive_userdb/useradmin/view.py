@@ -20,7 +20,7 @@ configuration = ViewModuleConf("nive.components.iface.view.configuration",
     containment = IUserDatabase,
     view ="nive_userdb.useradmin.view.UsermanagementView",
     permission = "manage users",
-    adminLink = "root_folder_url",
+    adminLink = "root_url",
     static = (
         {"path":"nive.components.iface:static/","name":"s-iface"}
     ),
