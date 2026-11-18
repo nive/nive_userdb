@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nive_userdb"
-version = "1.6.3"
+version = "1.7.1"
 authors = [{name = "Arndt Droullier", email = "info@nive.co"}, {name = "Nive GmbH"}]
 license = "GPL-3.0"
 description = "Nive User Database"
@@ -20,14 +20,15 @@ classifiers = [
     "Programming Language :: Python :: 3.15",
 ]
 urls = {Homepage = "https://niveapps.com/", Repository = "https://github.com/nive/nive_userdb"}
-dependencies = ["nive>=1.8.1", "AuthEncoding"]
+dependencies = [
+    "nive>=1.9.1",
+    "AuthEncoding"
+]
 
 [project.readme]
 text = """
 # Nive User Database
-This package provides the user database for nive applications 'nive_cms' and 'nive_datastore'.
-It can be used as standalone user management plugin for pyramid applications though
-the installation is not explicitly dcumented. Please refer to 'Nive cms'.
+This package provides the user database for nive applications.
 """
 content-type = "text/markdown"
 
