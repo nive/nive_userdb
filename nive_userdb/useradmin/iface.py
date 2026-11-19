@@ -18,8 +18,7 @@ configuration = IFaceConf(
     acl=None,
     backlink = Conf(id="root.",         name="Start"),
     headlink = Conf(id="/userdb/logout",name="Abmelden"),
-    headoptions = (
-    ),
+    headoptions = [],
     tmpl_macro = "main_object_full",
     currentSection = "users",
     slogan = _("User management"),
