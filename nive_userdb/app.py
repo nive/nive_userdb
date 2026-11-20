@@ -51,6 +51,7 @@ configuration = AppConf(
         sendPasswordMail = Mail(_("Your password"), "nive_userdb:userview/mails/mailpass.pt"),
         verifyPasswordMail = Mail(_("Verify your new e-mail"), "nive_userdb:userview/mails/verifymail.pt"),
         resetPasswordMail = Mail(_("Your new password"), "nive_userdb:userview/mails/resetpass.pt"),
+        mailPasswordMail = Mail(_("Your new password"), "nive_userdb:userview/mails/mailpass.pt"),
         contactMail = Mail(_("Contact form"), "nive_userdb:userview/mails/contact.pt"),
     ),
     # contact system information
